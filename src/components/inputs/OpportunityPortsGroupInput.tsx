@@ -1,4 +1,4 @@
-import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref } from 'react';
+import React, { HTMLAttributes, MutableRefObject, Ref } from 'react';
 import { Autocomplete } from '@material-ui/lab';
 import {
   CircularProgress,
@@ -12,20 +12,33 @@ import {
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { OpportunityPortsGroup } from '../../model/OpportunityPortsGroup';
+import Port from '../../model/Port';
+import { OpportunityMatchDefinition } from '../../model/Opportunity';
 
 interface Props {
   label: string;
-  options: OpportunityPortsGroup[];
+  options: {
+    definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+    value: OpportunityPortsGroup | Port | string;
+  }[];
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
-  value?: OpportunityPortsGroup | null | undefined;
-  onChange: (group: OpportunityPortsGroup | null | undefined) => void;
+  value?: {
+    definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+    value: OpportunityPortsGroup | Port | string;
+  } | null;
+  onChange: (
+    group: {
+      definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+      value: OpportunityPortsGroup | Port | string;
+    } | null,
+  ) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
   margin?: any;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
   },
@@ -54,16 +67,33 @@ const OpportunityPortsGroupInput: React.FC<Props> = ({
       {...rest}
       className={classes.root}
       value={value || null}
-      onChange={(_: ChangeEvent<{}>, group: OpportunityPortsGroup | null | undefined) =>
-        onChange(group)
-      }
+      onChange={(_, newValue) => onChange(newValue)}
       autoSelect
       autoHighlight
       open={open}
       onOpen={onOpen}
       onClose={onClose}
-      getOptionLabel={(option: OpportunityPortsGroup) => option.name}
-      getOptionSelected={(option, value) => option.id === value?.id}
+      getOptionLabel={(option: {
+        definition: OpportunityMatchDefinition<'groupId' | 'freeText' | 'portId'>;
+        value: OpportunityPortsGroup | Port | string;
+      }) => {
+        if (typeof option?.value === 'string') {
+          return option.value;
+        }
+        if (option?.definition?.type === 'portId') {
+          return (option.value as Port).city;
+        }
+        return (option.value as OpportunityPortsGroup).name;
+      }}
+      getOptionSelected={(option, value) => {
+        if (typeof option.value === 'string' && typeof value?.value === 'string') {
+          return option.value === value.value;
+        }
+        if (typeof option.value === 'object' && typeof value?.value === 'object') {
+          return option.value.id === value.value.id;
+        }
+        return false;
+      }}
       options={options}
       loading={loading}
       renderInput={params => (
@@ -89,8 +119,16 @@ const OpportunityPortsGroupInput: React.FC<Props> = ({
       PopperComponent={Popup}
       PaperComponent={Papyrus}
       renderOption={(option, { inputValue }) => {
-        const matches = match(option.name, inputValue);
-        const parts = parse(option.name, matches);
+        let name = '';
+        if (typeof option?.value === 'string') {
+          name = option.value;
+        } else if (option?.definition?.type === 'portId') {
+          name = (option.value as Port).city;
+        } else {
+          name = (option.value as OpportunityPortsGroup).name;
+        }
+        const matches = match(name, inputValue);
+        const parts = parse(name, matches);
 
         return (
           <div>

@@ -13,8 +13,7 @@ import OpportunityEquipmentGroupInput from '../inputs/OpportunityEquipmentGroupI
 import OpportunityCommodityGroupInput from '../inputs/OpportunityCommodityGroupInput';
 import OpportunityPlacesGroupInput from '../inputs/OpportunityPlacesGroupInput';
 import OpportunityPortsGroupInput from '../inputs/OpportunityPortsGroupInput';
-import useOpportunityPortsGroups from '../../hooks/useOpportunityPortsGroups';
-import useOpportunityPlacesGroups from '../../hooks/useOpportunityPlacesGroups';
+import useOpportunityPortsWithDefinition from '../../hooks/useOpportunityPortsWithDefinition';
 import useOpportunityTags from '../../hooks/useOpportunityTags';
 import useOpportunityCommodityWithDefinition from '../../hooks/useOpportunityCommodityWithDefinition';
 import useOpportunityEquipmentWithDefinition from '../../hooks/useOpportunityEquipmentWithDefinition';
@@ -34,6 +33,8 @@ import useBookingPartyUsers from '../../hooks/useBookingPartyUsers';
 import DateInput from '../inputs/DateInput';
 import { OpportunityMatchDefinition } from '../../model/Opportunity';
 import ContainerType from '../../model/ContainerType';
+import useOpportunityPlacesWithDefinition from '../../hooks/useOpportunityPlacesWithDefinition';
+import Port from '../../model/Port';
 
 interface AddOpportunityDialogProps {
   open: boolean;
@@ -50,16 +51,22 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
     definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
     value: OpportunityEquipmentGroup | ContainerType;
   } | null>(null);
-  const [placeOfReceiptGroup, setPlaceOfReceiptGroup] = useState<OpportunityPlacesGroup | null>(
-    null,
-  );
-  const [portOfLoadingGroup, setPortOfLoadingGroup] = useState<OpportunityPortsGroup | null>(null);
-  const [portOfDischargeGroup, setPortOfDischargeGroup] = useState<OpportunityPortsGroup | null>(
-    null,
-  );
-  const [placeOfDeliveryGroup, setPlaceOfDeliveryGroup] = useState<OpportunityPlacesGroup | null>(
-    null,
-  );
+  const [placeOfReceipt, setPlaceOfReceipt] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  } | null>(null);
+  const [portOfLoading, setPortOfLoading] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText' | 'portId'>;
+    value: OpportunityPortsGroup | string | Port;
+  } | null>(null);
+  const [portOfDischarge, setPortOfDischarge] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText' | 'portId'>;
+    value: OpportunityPortsGroup | string | Port;
+  } | null>(null);
+  const [placeOfDelivery, setPlaceOfDelivery] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  } | null>(null);
   const [commodity, setCommodity] = useState<{
     definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
     value: OpportunityCommodityGroup | string;
@@ -72,8 +79,8 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
   const [agreementId, setAgreementId] = useState<string>('');
   const [quoteKind, setQuoteKind] = useState<string>('');
 
-  const portsGroups = useOpportunityPortsGroups();
-  const placesGroups = useOpportunityPlacesGroups();
+  const portsOptions = useOpportunityPortsWithDefinition();
+  const placesOptions = useOpportunityPlacesWithDefinition();
   const opportunityTags = useOpportunityTags();
   const commodityOptions = useOpportunityCommodityWithDefinition();
   const equipmentOptions = useOpportunityEquipmentWithDefinition();
@@ -89,10 +96,10 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       setStatisticalClient(null);
       setEquipment(null);
       setCommodity(null);
-      setPlaceOfReceiptGroup(null);
-      setPortOfLoadingGroup(null);
-      setPortOfDischargeGroup(null);
-      setPlaceOfDeliveryGroup(null);
+      setPlaceOfReceipt(null);
+      setPortOfLoading(null);
+      setPortOfDischarge(null);
+      setPlaceOfDelivery(null);
       setTags([]);
       setNote('');
       setCapacityTEU('');
@@ -117,10 +124,10 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       statisticalClientId: statisticalClient?.id || '',
       equipment: equipment?.definition || '',
       commodity: commodity?.definition || '',
-      placeOfReceipt: placeOfReceiptGroup,
-      portOfLoading: portOfLoadingGroup,
-      portOfDischarge: portOfDischargeGroup,
-      placeOfDelivery: placeOfDeliveryGroup,
+      placeOfReceipt: placeOfReceipt?.definition || '',
+      portOfLoading: portOfLoading?.definition || '',
+      portOfDischarge: portOfDischarge?.definition || '',
+      placeOfDelivery: placeOfDelivery?.definition || '',
       tagIds,
       note,
       capacityTEU: capacityTEU === '' ? null : Number(capacityTEU) > 0 ? Number(capacityTEU) : null,
@@ -216,30 +223,30 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
         />
         <OpportunityPlacesGroupInput
           label="Place of Receipt"
-          options={placesGroups || []}
-          value={placeOfReceiptGroup}
-          onChange={group => setPlaceOfReceiptGroup(group ?? null)}
+          options={placesOptions || []}
+          value={placeOfReceipt}
+          onChange={group => setPlaceOfReceipt(group)}
           margin="dense"
         />
         <OpportunityPortsGroupInput
           label="Port of Loading"
-          options={portsGroups || []}
-          value={portOfLoadingGroup}
-          onChange={group => setPortOfLoadingGroup(group ?? null)}
+          options={portsOptions || []}
+          value={portOfLoading}
+          onChange={group => setPortOfLoading(group)}
           margin="dense"
         />
         <OpportunityPortsGroupInput
           label="Port of Discharge"
-          options={portsGroups || []}
-          value={portOfDischargeGroup}
-          onChange={group => setPortOfDischargeGroup(group ?? null)}
+          options={portsOptions || []}
+          value={portOfDischarge}
+          onChange={group => setPortOfDischarge(group)}
           margin="dense"
         />
         <OpportunityPlacesGroupInput
           label="Place of Delivery"
-          options={placesGroups || []}
-          value={placeOfDeliveryGroup}
-          onChange={group => setPlaceOfDeliveryGroup(group ?? null)}
+          options={placesOptions || []}
+          value={placeOfDelivery}
+          onChange={group => setPlaceOfDelivery(group)}
           margin="dense"
         />
         <OpportunityTagInput

@@ -63,11 +63,11 @@ export interface NormalizedOpportunity {
   portOfLoading: {
     definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
     value: OpportunityPortsGroup | Port | string;
-  }; // Normalized group object or null
+  } | null; // Normalized group object or null
   portOfDischarge: {
     definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
     value: OpportunityPortsGroup | Port | string;
-  }; // Normalized group object or null
+  } | null; // Normalized group object or null
   placeOfDelivery: {
     definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
     value: OpportunityPlacesGroup | string;
