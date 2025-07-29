@@ -8,19 +8,39 @@ import { ContextFilters } from './filterActions';
 import useUser from '../hooks/useUser';
 import Client from '../model/Client';
 import UserRecord from '../model/UserRecord';
-import { QuoteKind } from '../model/Opportunity';
+import { OpportunityMatchDefinition, QuoteKind } from '../model/Opportunity';
+import ContainerType from '../model/ContainerType';
+import Port from '../model/Port';
 
 export interface OpportunitiesContextFilters extends ContextFilters {
   statisticalClient?: Client | null;
   bookingParty?: Client | null;
   bookingPartyRep?: UserRecord | null;
-  portsOfLoadingGroup?: OpportunityPortsGroup;
-  portsOfDischargeGroup?: OpportunityPortsGroup;
-  placesOfDeliveryGroup?: OpportunityPlacesGroup;
-  placesOfReceiptGroup?: OpportunityPlacesGroup;
+  portsOfLoading?: {
+    definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+    value: OpportunityPortsGroup | Port | string;
+  } | null;
+  portsOfDischarge?: {
+    definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+    value: OpportunityPortsGroup | Port | string;
+  } | null;
+  placesOfDelivery?: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  } | null;
+  placesOfReceipt?: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  } | null;
   tags?: OpportunityTag[];
-  commodityGroup?: OpportunityCommodityGroup;
-  equipmentGroup?: OpportunityEquipmentGroup;
+  commodity?: {
+    definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+    value: OpportunityCommodityGroup | ContainerType;
+  } | null;
+  equipment?: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityEquipmentGroup | string;
+  } | null;
   quoteKind?: QuoteKind;
   opportunityId?: string;
 }
@@ -31,11 +51,13 @@ export const OPPORTUNITIES_FILTERS_INITIAL_STATE = {
   bookingPartyRep: undefined,
   archived: false,
   hold: false,
-  portsGroup: undefined,
-  placesGroup: undefined,
+  portsOfLoading: null,
+  portsOfDischarge: null,
+  placesOfDelivery: null,
+  placesOfReceipt: null,
   tags: [],
-  commodityGroup: undefined,
-  equipmentGroup: undefined,
+  commodity: null,
+  equipment: null,
   quoteKind: undefined,
   opportunityId: undefined,
 } as OpportunitiesContextFilters;

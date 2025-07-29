@@ -24,19 +24,41 @@ import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
-import { QUOTE_KIND_OPTIONS, QuoteKind } from '../../model/Opportunity';
+import { OpportunityMatchDefinition, QUOTE_KIND_OPTIONS, QuoteKind } from '../../model/Opportunity';
 import { TextField } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import Port from '../../model/Port';
+import ContainerType from '../../model/ContainerType';
 
 interface Props {
   filters: OpportunitiesContextFilters;
   setFilters: any;
   showAssigneeFilter?: boolean;
-  portsGroups?: OpportunityPortsGroup[];
-  placesGroups?: OpportunityPlacesGroup[];
+  portsGroups?:
+    | {
+        definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+        value: OpportunityPortsGroup | Port | string;
+      }[]
+    | null;
+  placesGroups?:
+    | {
+        definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+        value: OpportunityPlacesGroup | string;
+      }[]
+    | null;
   opportunityTags?: OpportunityTag[];
-  commodityGroups?: OpportunityCommodityGroup[];
-  equipmentGroups?: OpportunityEquipmentGroup[];
+  commodityGroups?:
+    | {
+        definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+        value: OpportunityCommodityGroup | string;
+      }[]
+    | null;
+  equipmentGroups?:
+    | {
+        definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+        value: OpportunityEquipmentGroup | ContainerType;
+      }[]
+    | null;
 }
 
 const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
@@ -51,13 +73,13 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
     statisticalClient,
     bookingParty,
     bookingPartyRep,
-    portsOfLoadingGroup,
-    portsOfDischargeGroup,
-    placesOfDeliveryGroup,
-    placesOfReceiptGroup,
+    portsOfLoading,
+    portsOfDischarge,
+    placesOfDelivery,
+    placesOfReceipt,
     tags: selectedOpportunityTags,
-    commodityGroup: selectedCommodityGroup,
-    equipmentGroup: selectedEquipmentGroup,
+    commodity: selectedCommodity,
+    equipment: selectedEquipment,
     assignee,
     quoteKind,
     opportunityId,
@@ -69,26 +91,26 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const setBookingPartyFilter = (client: Client | null | undefined) =>
     setFilters && setFilters(set('bookingParty', client || undefined)(filters));
 
-  const setPortsOfLoadingGroupFilter = (portsGroup: any | null | undefined) =>
-    setFilters && setFilters(set('portsOfLoadingGroup', portsGroup || undefined)(filters));
+  const setPortsOfLoadingFilter = (portsGroup: any | null | undefined) =>
+    setFilters && setFilters(set('portsOfLoading', portsGroup || undefined)(filters));
 
-  const setPortsOfDischargeGroupFilter = (portsGroup: any | null | undefined) =>
-    setFilters && setFilters(set('portsOfDischargeGroup', portsGroup || undefined)(filters));
+  const setPortsOfDischargeFilter = (portsGroup: any | null | undefined) =>
+    setFilters && setFilters(set('portsOfDischarge', portsGroup || undefined)(filters));
 
-  const setPlacesOfDeliveryGroupFilter = (placesGroup: any | null | undefined) =>
-    setFilters && setFilters(set('placesOfDeliveryGroup', placesGroup || undefined)(filters));
+  const setPlacesOfDeliveryFilter = (placesGroup: any | null | undefined) =>
+    setFilters && setFilters(set('placesOfDelivery', placesGroup || undefined)(filters));
 
-  const setPlacesOfReceiptGroupFilter = (placesGroup: any | null | undefined) =>
-    setFilters && setFilters(set('placesOfReceiptGroup', placesGroup || undefined)(filters));
+  const setPlacesOfReceiptFilter = (placesGroup: any | null | undefined) =>
+    setFilters && setFilters(set('placesOfReceipt', placesGroup || undefined)(filters));
 
   const setOpportunityTagsFilter = (tags: OpportunityTag[] | null | undefined) =>
     setFilters && setFilters(set('tags', tags || [])(filters));
 
-  const setCommodityGroupFilter = (group: any | null | undefined) =>
-    setFilters && setFilters(set('commodityGroup', group || undefined)(filters));
+  const setCommodityFilter = (group: any | null | undefined) =>
+    setFilters && setFilters(set('commodity', group || undefined)(filters));
 
-  const setEquipmentGroupFilter = (group: any | null | undefined) =>
-    setFilters && setFilters(set('equipmentGroup', group || undefined)(filters));
+  const setEquipmentFilter = (group: any | null | undefined) =>
+    setFilters && setFilters(set('equipment', group || undefined)(filters));
 
   const setUserFilter = (user: UserRecord | null | undefined) =>
     setFilters && setFilters(set('assignee', user || undefined)(filters));
@@ -151,8 +173,8 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             <OpportunityPortsGroupInput
               label="Port of Loading"
               options={portsOptions}
-              onChange={setPortsOfLoadingGroupFilter}
-              value={portsOfLoadingGroup}
+              onChange={setPortsOfLoadingFilter}
+              value={portsOfLoading}
             />
           </Grid>
         )}
@@ -161,8 +183,8 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             <OpportunityPortsGroupInput
               label="Port of Discharge"
               options={portsOptions}
-              onChange={setPortsOfDischargeGroupFilter}
-              value={portsOfDischargeGroup}
+              onChange={setPortsOfDischargeFilter}
+              value={portsOfDischarge}
             />
           </Grid>
         )}
@@ -171,8 +193,8 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             <OpportunityPlacesGroupInput
               label="Place of Delivery"
               options={placesOptions}
-              onChange={setPlacesOfDeliveryGroupFilter}
-              value={placesOfDeliveryGroup}
+              onChange={setPlacesOfDeliveryFilter}
+              value={placesOfDelivery}
             />
           </Grid>
         )}{' '}
@@ -181,8 +203,8 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             <OpportunityPlacesGroupInput
               label="Place of Receipt"
               options={placesOptions}
-              onChange={setPlacesOfReceiptGroupFilter}
-              value={placesOfReceiptGroup}
+              onChange={setPlacesOfReceiptFilter}
+              value={placesOfReceipt}
             />
           </Grid>
         )}
@@ -204,8 +226,8 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             <OpportunityCommodityGroupInput
               label="Commodity Groups"
               options={commodityOptions}
-              onChange={setCommodityGroupFilter}
-              value={selectedCommodityGroup || null}
+              onChange={setCommodityFilter}
+              value={selectedCommodity}
             />
           </Grid>
         )}
@@ -214,8 +236,8 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             <OpportunityEquipmentGroupInput
               label="Equipment Groups"
               options={equipmentOptions}
-              onChange={setEquipmentGroupFilter}
-              value={selectedEquipmentGroup || null}
+              onChange={setEquipmentFilter}
+              value={selectedEquipment}
             />
           </Grid>
         )}
