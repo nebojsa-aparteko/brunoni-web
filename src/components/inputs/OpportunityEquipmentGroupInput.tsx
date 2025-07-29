@@ -75,7 +75,9 @@ const OpportunityEquipmentGroupInput: React.FC<Props> = ({
       getOptionLabel={(option: {
         definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
         value: OpportunityEquipmentGroup | ContainerType;
-      }) => option.value.name}
+      }) =>
+        option.definition.type === 'groupId' ? option.value.name + ' (Group)' : option.value.name
+      }
       getOptionSelected={(option, value) => option.value.id === value?.value.id}
       options={options}
       loading={loading}
@@ -121,8 +123,10 @@ const OpportunityEquipmentGroupInput: React.FC<Props> = ({
       PopperComponent={Popup}
       PaperComponent={Papyrus}
       renderOption={(option, { inputValue }) => {
-        const matches = match(option.value.name, inputValue);
-        const parts = parse(option.value.name, matches);
+        const name =
+          option.definition.type === 'groupId' ? option.value.name + ' (Group)' : option.value.name;
+        const matches = match(name, inputValue);
+        const parts = parse(name, matches);
 
         return (
           <div>

@@ -83,7 +83,7 @@ const OpportunityPortsGroupInput: React.FC<Props> = ({
         if (option?.definition?.type === 'portId') {
           return (option.value as Port).city;
         }
-        return (option.value as OpportunityPortsGroup).name;
+        return (option.value as OpportunityPortsGroup).name + ' (Group)';
       }}
       getOptionSelected={(option, value) => {
         if (typeof option.value === 'string' && typeof value?.value === 'string') {
@@ -125,7 +125,7 @@ const OpportunityPortsGroupInput: React.FC<Props> = ({
         } else if (option?.definition?.type === 'portId') {
           name = (option.value as Port).city;
         } else {
-          name = (option.value as OpportunityPortsGroup).name;
+          name = (option.value as OpportunityPortsGroup).name + ' (Group)';
         }
         const matches = match(name, inputValue);
         const parts = parse(name, matches);

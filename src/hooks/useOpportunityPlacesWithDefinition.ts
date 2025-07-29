@@ -8,11 +8,11 @@ const useOpportunityPlacesWithDefinition = ():
       definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
       value: OpportunityPlacesGroup | string;
     }[]
-  | undefined => {
+  | null => {
   const placesGroupsCollection = useFirestoreCollection('opportunity-places-groups');
 
   return useMemo(() => {
-    if (!placesGroupsCollection) return undefined;
+    if (!placesGroupsCollection) return null;
 
     const placesCollection = placesGroupsCollection.docs.map(doc => ({
       id: doc.id,

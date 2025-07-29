@@ -73,7 +73,7 @@ const OpportunityPlacesGroupInput: React.FC<Props> = ({
       getOptionLabel={(option: {
         definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
         value: OpportunityPlacesGroup | string;
-      }) => (typeof option.value === 'string' ? option.value : option.value.name)}
+      }) => (typeof option.value === 'string' ? option.value : option.value.name + ' (Group)')}
       getOptionSelected={(option, value) => {
         if (typeof option.value === 'string' && typeof value?.value === 'string') {
           return option.value === value.value;
@@ -107,7 +107,8 @@ const OpportunityPlacesGroupInput: React.FC<Props> = ({
       PopperComponent={Popup}
       PaperComponent={Papyrus}
       renderOption={(option, { inputValue }) => {
-        const name = typeof option.value === 'string' ? option.value : option.value.name;
+        const name =
+          typeof option.value === 'string' ? option.value : option.value.name + ' (Group)';
         const matches = match(name, inputValue);
         const parts = parse(name, matches);
 

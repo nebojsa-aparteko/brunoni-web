@@ -9,11 +9,11 @@ const useOpportunityPortsWithDefinition = ():
       definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
       value: OpportunityPortsGroup | Port | string;
     }[]
-  | undefined => {
+  | null => {
   const portsGroupsCollectionSnapshot = useFirestoreCollection('opportunity-ports-groups');
   const portsCollectionSnapshot = useFirestoreCollection('ports');
   return useMemo(() => {
-    if (!portsGroupsCollectionSnapshot) return undefined;
+    if (!portsGroupsCollectionSnapshot) return null;
 
     const portsCollection = portsGroupsCollectionSnapshot.docs.map(doc => ({
       id: doc.id,
