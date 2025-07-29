@@ -6,6 +6,7 @@ import {
   DialogActions,
   Button,
   TextField,
+  Grid,
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import OpportunityTagInput from '../inputs/OpportunityTagsInput';
@@ -222,145 +223,158 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Edit Opportunity</DialogTitle>
       <DialogContent>
-        <UserInput
-          label="Sales Representative"
-          users={users?.filter(user => user.role === 'sales') || []}
-          onChange={(_, user) => setSalesRep(user)}
-          value={salesRep}
-        />
-        <Autocomplete
-          options={clients || []}
-          getOptionLabel={option =>
-            option?.name ? `${option.name} - ${option.city} (${option.id})` : ''
-          }
-          value={statisticalClient}
-          onChange={(_, value) => setStatisticalClient(value)}
-          renderInput={params => (
-            <TextField {...params} label="Statistical Client" margin="dense" variant="outlined" />
-          )}
-        />
-        <TextField
-          margin="dense"
-          label="Booking Party"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={bookingParty?.name || 'Not specified'}
-          InputProps={{
-            readOnly: true,
-          }}
-          disabled
-        />
-        <UserInput
-          label="Booking Party Representative"
-          users={bookingPartyUsers || []}
-          onChange={(_, user) => setBookingPartyRep(user)}
-          value={bookingPartyRep}
-        />
-        <TextField
-          margin="dense"
-          label="Agreement ID"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={agreementId}
-          onChange={e => setAgreementId(e.target.value)}
-        />
-        <Autocomplete
-          options={[...QUOTE_KIND_OPTIONS]}
-          getOptionLabel={option => option}
-          value={quoteKind || null}
-          onChange={(_, value) => setQuoteKind(value || '')}
-          renderInput={params => (
-            <TextField {...params} label="Quote Kind" margin="dense" variant="outlined" />
-          )}
-        />
-        <OpportunityEquipmentGroupInput
-          label="Equipment Groups"
-          options={equipmentOptions || []}
-          value={equipment}
-          onChange={group => setEquipment(group)}
-          margin="dense"
-        />
-        <OpportunityCommodityGroupInput
-          label="Commodity Groups"
-          options={commodityOptions || []}
-          value={commodity}
-          onChange={group => setCommodity(group)}
-          margin="dense"
-        />
-        <OpportunityPlacesGroupInput
-          label="Place of Receipt"
-          options={placesOptions || []}
-          value={placeOfReceipt}
-          onChange={group => setPlaceOfReceipt(group)}
-          margin="dense"
-        />
-        <OpportunityPortsGroupInput
-          label="Port of Loading"
-          options={portsOptions || []}
-          value={portOfLoading}
-          onChange={group => setPortOfLoading(group)}
-          margin="dense"
-        />
-        <OpportunityPortsGroupInput
-          label="Port of Discharge"
-          options={portsOptions || []}
-          value={portOfDischarge}
-          onChange={group => setPortOfDischarge(group)}
-          margin="dense"
-        />
-        <OpportunityPlacesGroupInput
-          label="Place of Delivery"
-          options={placesOptions || []}
-          value={placeOfDelivery}
-          onChange={group => setPlaceOfDelivery(group)}
-          margin="dense"
-        />
-        <OpportunityTagInput
-          label="Tags"
-          options={opportunityTags || []}
-          value={tags}
-          onChange={(_, value) => setTags(Array.isArray(value) ? value : value ? [value] : [])}
-        />
-        <TextField
-          margin="dense"
-          label="Note"
-          type="text"
-          fullWidth
-          variant="outlined"
-          multiline
-          minRows={3}
-          value={note}
-          onChange={e => setNote(e.target.value)}
-        />
-        <TextField
-          margin="dense"
-          label="Capacity TEU"
-          type="number"
-          fullWidth
-          variant="outlined"
-          value={capacityTEU}
-          onChange={e => setCapacityTEU(e.target.value)}
-          error={capacityTEU !== '' && Number(capacityTEU) <= 0}
-          helperText={
-            capacityTEU !== '' && Number(capacityTEU) <= 0 ? 'Capacity must be greater than 0' : ''
-          }
-          inputProps={{ min: 1 }}
-        />
-        <DateInput
-          label="Validity"
-          value={validity}
-          onChange={date => setValidity(date)}
-          open={validityPickerOpen}
-          onOpen={() => setValidityPickerOpen(true)}
-          onClose={() => setValidityPickerOpen(false)}
-          margin="dense"
-          fullWidth
-        />
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <UserInput
+              label="Sales Representative"
+              users={users?.filter(user => user.role === 'sales') || []}
+              onChange={(_, user) => setSalesRep(user)}
+              value={salesRep}
+            />
+            <Autocomplete
+              options={clients || []}
+              getOptionLabel={option =>
+                option?.name ? `${option.name} - ${option.city} (${option.id})` : ''
+              }
+              value={statisticalClient}
+              onChange={(_, value) => setStatisticalClient(value)}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Statistical Client"
+                  margin="dense"
+                  variant="outlined"
+                />
+              )}
+            />
+            <TextField
+              margin="dense"
+              label="Booking Party"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={bookingParty?.name || 'Not specified'}
+              InputProps={{
+                readOnly: true,
+              }}
+              disabled
+            />
+            <UserInput
+              label="Booking Party Representative"
+              users={bookingPartyUsers || []}
+              onChange={(_, user) => setBookingPartyRep(user)}
+              value={bookingPartyRep}
+            />
+            <TextField
+              margin="dense"
+              label="Agreement ID"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={agreementId}
+              onChange={e => setAgreementId(e.target.value)}
+            />
+            <Autocomplete
+              options={[...QUOTE_KIND_OPTIONS]}
+              getOptionLabel={option => option}
+              value={quoteKind || null}
+              onChange={(_, value) => setQuoteKind(value || '')}
+              renderInput={params => (
+                <TextField {...params} label="Quote Kind" margin="dense" variant="outlined" />
+              )}
+            />
+            <OpportunityEquipmentGroupInput
+              label="Equipment Groups"
+              options={equipmentOptions || []}
+              value={equipment}
+              onChange={group => setEquipment(group)}
+              margin="dense"
+            />
+            <OpportunityCommodityGroupInput
+              label="Commodity Groups"
+              options={commodityOptions || []}
+              value={commodity}
+              onChange={group => setCommodity(group)}
+              margin="dense"
+            />
+            <OpportunityTagInput
+              label="Tags"
+              options={opportunityTags || []}
+              value={tags}
+              onChange={(_, value) => setTags(Array.isArray(value) ? value : value ? [value] : [])}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <OpportunityPlacesGroupInput
+              label="Place of Receipt"
+              options={placesOptions || []}
+              value={placeOfReceipt}
+              onChange={group => setPlaceOfReceipt(group)}
+              margin="dense"
+            />
+            <OpportunityPortsGroupInput
+              label="Port of Loading"
+              options={portsOptions || []}
+              value={portOfLoading}
+              onChange={group => setPortOfLoading(group)}
+              margin="dense"
+            />
+            <OpportunityPortsGroupInput
+              label="Port of Discharge"
+              options={portsOptions || []}
+              value={portOfDischarge}
+              onChange={group => setPortOfDischarge(group)}
+              margin="dense"
+            />
+            <OpportunityPlacesGroupInput
+              label="Place of Delivery"
+              options={placesOptions || []}
+              value={placeOfDelivery}
+              onChange={group => setPlaceOfDelivery(group)}
+              margin="dense"
+            />
+            <TextField
+              margin="dense"
+              label="Note"
+              type="text"
+              fullWidth
+              variant="outlined"
+              multiline
+              minRows={3}
+              value={note}
+              onChange={e => setNote(e.target.value)}
+            />
+            <TextField
+              margin="dense"
+              label="Capacity TEU"
+              type="number"
+              fullWidth
+              variant="outlined"
+              value={capacityTEU}
+              onChange={e => setCapacityTEU(e.target.value)}
+              error={capacityTEU !== '' && Number(capacityTEU) <= 0}
+              helperText={
+                capacityTEU !== '' && Number(capacityTEU) <= 0
+                  ? 'Capacity must be greater than 0'
+                  : ''
+              }
+              inputProps={{ min: 1 }}
+            />
+            <DateInput
+              label="Validity"
+              value={validity}
+              onChange={date => setValidity(date)}
+              open={validityPickerOpen}
+              onOpen={() => setValidityPickerOpen(true)}
+              onClose={() => setValidityPickerOpen(false)}
+              margin="dense"
+              fullWidth
+            />
+          </Grid>
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button
