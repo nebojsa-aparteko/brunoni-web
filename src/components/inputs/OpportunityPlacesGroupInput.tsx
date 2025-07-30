@@ -9,16 +9,27 @@ import {
   TextField,
   Theme,
 } from '@material-ui/core';
+import { OpportunityMatchDefinition } from '../../model/Opportunity';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
 
 interface Props {
   label: string;
-  options: OpportunityPlacesGroup[];
-  inputRef?: MutableRefObject<HTMLInputElement | undefined>;
-  value?: OpportunityPlacesGroup | null | undefined;
-  onChange: (group: OpportunityPlacesGroup | null | undefined) => void;
+  options: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  }[];
+  value: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  } | null;
+  onChange: (
+    group: {
+      definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+      value: OpportunityPlacesGroup | string;
+    } | null,
+  ) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
@@ -37,7 +48,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 const OpportunityPlacesGroupInput: React.FC<Props> = ({
   label,
   options,
-  inputRef,
   value,
   onChange,
   open,
@@ -54,22 +64,30 @@ const OpportunityPlacesGroupInput: React.FC<Props> = ({
       {...rest}
       className={classes.root}
       value={value || null}
-      onChange={(_: ChangeEvent<{}>, group: OpportunityPlacesGroup | null | undefined) =>
-        onChange(group)
-      }
+      onChange={(_, newValue) => onChange(newValue)}
       autoSelect
       autoHighlight
       open={open}
       onOpen={onOpen}
       onClose={onClose}
-      getOptionLabel={(option: OpportunityPlacesGroup) => option.name}
-      getOptionSelected={(option, value) => option.id === value?.id}
+      getOptionLabel={(option: {
+        definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+        value: OpportunityPlacesGroup | string;
+      }) => (typeof option.value === 'string' ? option.value : option.value.name + ' (Group)')}
+      getOptionSelected={(option, value) => {
+        if (typeof option.value === 'string' && typeof value?.value === 'string') {
+          return option.value === value.value;
+        }
+        if (typeof option.value === 'object' && typeof value?.value === 'object') {
+          return option.value.id === value.value.id;
+        }
+        return false;
+      }}
       options={options}
       loading={loading}
       renderInput={params => (
         <TextField
           {...params}
-          inputRef={inputRef}
           label={label}
           fullWidth
           variant="outlined"
@@ -89,8 +107,10 @@ const OpportunityPlacesGroupInput: React.FC<Props> = ({
       PopperComponent={Popup}
       PaperComponent={Papyrus}
       renderOption={(option, { inputValue }) => {
-        const matches = match(option.name, inputValue);
-        const parts = parse(option.name, matches);
+        const name =
+          typeof option.value === 'string' ? option.value : option.value.name + ' (Group)';
+        const matches = match(name, inputValue);
+        const parts = parse(name, matches);
 
         return (
           <div>

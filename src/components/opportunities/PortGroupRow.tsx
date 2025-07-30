@@ -74,17 +74,6 @@ const PortGroupRow: React.FC<Props> = ({
     }
   }, [onSave, activePortGroup, changed]);
 
-  const handleReset = useCallback(() => {
-    setActivePortGroup(portGroup);
-    setChanged(false);
-  }, [portGroup]);
-
-  const handleDelete = useCallback(() => {
-    if (onDelete && window.confirm(`Are you sure you want to delete "${portGroup.name}"?`)) {
-      onDelete(portGroup.id);
-    }
-  }, [onDelete, portGroup]);
-
   return (
     <TableRow {...other}>
       <TableCell padding="checkbox">

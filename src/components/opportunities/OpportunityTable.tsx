@@ -1,27 +1,31 @@
 import React, { Fragment } from 'react';
-import {
-  Chip,
-  createStyles,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-} from '@material-ui/core';
-import { lighten, makeStyles, Theme } from '@material-ui/core/styles';
+import Table from '@material-ui/core/Table';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableBody from '@material-ui/core/TableBody';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import { Chip, makeStyles, Theme, Tooltip, IconButton } from '@material-ui/core';
+import { Notes as NotesIcon } from '@material-ui/icons';
+import Avatar from 'react-avatar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { NormalizedOpportunity } from '../../model/Opportunity';
+import { format } from 'date-fns';
 
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 
 const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
   switch (key) {
+    case 'id':
+      return opportunity.opportunityId || '';
     case 'salesRep':
       return opportunity.salesRepId
         ? `${opportunity.salesRepId.lastName} ${opportunity.salesRepId.firstName}`
+        : '';
+    case 'bookingPartyRep':
+      return opportunity.bookingPartyRepId
+        ? `${opportunity.bookingPartyRepId.lastName} ${opportunity.bookingPartyRepId.firstName}`
         : '';
     case 'bookingParty':
       return opportunity.bookingPartyId?.name || '';
@@ -32,17 +36,71 @@ const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
     case 'quoteKind':
       return opportunity.quoteKind || '';
     case 'placeOfReceipt':
-      return opportunity.placeOfReceiptGroupId?.name || '';
+      return opportunity.placeOfReceipt?.definition.type === 'groupId'
+        ? (typeof opportunity.placeOfReceipt.value === 'object' &&
+          opportunity.placeOfReceipt.value &&
+          'name' in opportunity.placeOfReceipt.value
+            ? opportunity.placeOfReceipt.value.name
+            : '') || ''
+        : String(opportunity.placeOfReceipt?.value || '');
     case 'portOfLoading':
-      return opportunity.portOfLoadingGroupId?.name || '';
+      return opportunity.portOfLoading?.definition.type === 'groupId'
+        ? (typeof opportunity.portOfLoading.value === 'object' &&
+          opportunity.portOfLoading.value &&
+          'name' in opportunity.portOfLoading.value
+            ? opportunity.portOfLoading.value.name
+            : '') || ''
+        : opportunity.portOfLoading?.definition.type === 'freeText'
+          ? String(opportunity.portOfLoading.value || '')
+          : (typeof opportunity.portOfLoading.value === 'object' &&
+            opportunity.portOfLoading.value &&
+            'city' in opportunity.portOfLoading.value
+              ? opportunity.portOfLoading.value.city
+              : '') || '';
     case 'portOfDischarge':
-      return opportunity.portOfDischargeGroupId?.name || '';
+      return opportunity.portOfDischarge?.definition.type === 'groupId'
+        ? (typeof opportunity.portOfDischarge.value === 'object' &&
+          opportunity.portOfDischarge.value &&
+          'name' in opportunity.portOfDischarge.value
+            ? opportunity.portOfDischarge.value.name
+            : '') || ''
+        : opportunity.portOfDischarge?.definition.type === 'freeText'
+          ? String(opportunity.portOfDischarge.value || '')
+          : (typeof opportunity.portOfDischarge.value === 'object' &&
+            opportunity.portOfDischarge.value &&
+            'city' in opportunity.portOfDischarge.value
+              ? opportunity.portOfDischarge.value.city
+              : '') || '';
     case 'placeOfDelivery':
-      return opportunity.placeOfDeliveryGroupId?.name || '';
+      return opportunity.placeOfDelivery?.definition.type === 'groupId'
+        ? (typeof opportunity.placeOfDelivery.value === 'object' &&
+          opportunity.placeOfDelivery.value &&
+          'name' in opportunity.placeOfDelivery.value
+            ? opportunity.placeOfDelivery.value.name
+            : '') || ''
+        : String(opportunity.placeOfDelivery?.value || '');
     case 'commodityGroup':
-      return opportunity.commodityGroupId?.name || '';
+      return opportunity.commodity?.definition.type === 'groupId'
+        ? (typeof opportunity.commodity.value === 'object' &&
+          opportunity.commodity.value &&
+          'name' in opportunity.commodity.value
+            ? opportunity.commodity.value.name
+            : '') || ''
+        : String(opportunity.commodity.value || '');
     case 'equipmentGroup':
-      return opportunity.equipmentGroupId?.name || '';
+      return opportunity.equipment?.definition.type === 'groupId'
+        ? (typeof opportunity.equipment?.value === 'object' &&
+          opportunity.equipment?.value &&
+          'name' in opportunity.equipment?.value
+            ? opportunity.equipment.value.name
+            : '') || ''
+        : String(
+            (typeof opportunity.equipment?.value === 'object' &&
+            opportunity.equipment?.value &&
+            'name' in opportunity.equipment?.value
+              ? opportunity.equipment.value.name
+              : opportunity.equipment?.value) || '',
+          );
     case 'tags':
       return opportunity.tagIds?.length || 0;
     case 'validity':
@@ -85,60 +143,6 @@ const sortOpportunities = (
   });
 };
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    toolbarRoot: {
-      paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(1),
-    },
-    toolbarHighlight:
-      theme.palette.type === 'light'
-        ? {
-            color: theme.palette.secondary.main,
-            backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-          }
-        : {
-            color: theme.palette.secondary.dark,
-            backgroundColor: theme.palette.secondary.dark,
-          },
-    toolbarTitle: {
-      flex: '1 1 100%',
-    },
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-    dialogBody: {
-      width: theme.spacing(100),
-    },
-    dialogContent: {
-      paddingBottom: theme.spacing(3),
-    },
-    tableRow: {
-      cursor: 'pointer',
-      '&:hover': {
-        backgroundColor: 'rgba(161,213,255,0.20) !important',
-      },
-    },
-    progress: {
-      backgroundColor: '#e0e0e0',
-      borderRadius: '8px',
-      overflow: 'hidden',
-      height: '8px',
-      width: '100%',
-      marginTop: '4px',
-    },
-    progressBar: {
-      height: '100%',
-      backgroundColor: '#3f51b5',
-      transition: 'width 0.3s ease-in-out',
-    },
-  }),
-);
-
 export type SortOrder = 'asc' | 'desc';
 
 export interface SortConfig {
@@ -171,6 +175,7 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   sortConfig,
   onSort,
 }) => {
+  const classes = opportunityTableStyles();
   const active = sortConfig?.key === sortKey;
   const direction = active ? sortConfig.direction : 'asc';
 
@@ -179,7 +184,7 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   };
 
   return (
-    <TableCell align="center">
+    <TableCell align="center" className={classes.headerCell}>
       <TableSortLabel active={active} direction={direction} onClick={handleClick}>
         {children}
       </TableSortLabel>
@@ -188,35 +193,116 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
 };
 
 const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, onRowClick }) => {
-  const classes = useStyles();
+  const classes = opportunityTableStyles();
 
   const handleRowClick = () => {
     onRowClick?.(opportunity);
   };
+  const placeOfReceipt =
+    opportunity.placeOfReceipt?.definition.type === 'groupId'
+      ? String(
+          (typeof opportunity.placeOfReceipt.value === 'object' &&
+          opportunity.placeOfReceipt.value &&
+          'name' in opportunity.placeOfReceipt.value
+            ? opportunity.placeOfReceipt.value.name
+            : opportunity.placeOfReceipt.value) || '',
+        )
+      : String(opportunity.placeOfReceipt?.value || '');
+
+  const placeOfDelivery =
+    opportunity.placeOfDelivery?.definition.type === 'groupId'
+      ? String(
+          (typeof opportunity.placeOfDelivery.value === 'object' &&
+          opportunity.placeOfDelivery.value &&
+          'name' in opportunity.placeOfDelivery.value
+            ? opportunity.placeOfDelivery.value.name
+            : opportunity.placeOfDelivery.value) || '',
+        )
+      : String(opportunity.placeOfDelivery?.value || '');
+
+  const equipment = String(opportunity.equipment?.value?.name || '');
+  const commodity =
+    opportunity.commodity?.definition.type === 'groupId'
+      ? String(
+          (typeof opportunity.commodity?.value === 'object' &&
+          opportunity.commodity?.value &&
+          'name' in opportunity.commodity.value
+            ? opportunity.commodity.value.name
+            : opportunity.commodity?.value) || '',
+        )
+      : String(opportunity.commodity?.value || '');
+
+  const portOfLoading =
+    opportunity.portOfLoading?.definition.type === 'freeText'
+      ? String(opportunity.portOfLoading?.value || '')
+      : opportunity.portOfLoading?.definition.type === 'groupId'
+        ? String(
+            (typeof opportunity.portOfLoading?.value === 'object' &&
+            opportunity.portOfLoading?.value &&
+            'name' in opportunity.portOfLoading.value
+              ? opportunity.portOfLoading.value.name
+              : opportunity.portOfLoading?.value) || '',
+          )
+        : String(
+            (typeof opportunity.portOfLoading?.value === 'object' &&
+            opportunity.portOfLoading?.value &&
+            'city' in opportunity.portOfLoading.value
+              ? opportunity.portOfLoading.value.city
+              : opportunity.portOfLoading?.value) || '',
+          );
+
+  const portOfDischarge =
+    opportunity.portOfDischarge?.definition.type === 'freeText'
+      ? String(opportunity.portOfDischarge?.value || '')
+      : opportunity.portOfDischarge?.definition.type === 'groupId'
+        ? String(
+            (typeof opportunity.portOfDischarge?.value === 'object' &&
+            opportunity.portOfDischarge?.value &&
+            'name' in opportunity.portOfDischarge.value
+              ? opportunity.portOfDischarge.value.name
+              : opportunity.portOfDischarge?.value) || '',
+          )
+        : String(
+            (typeof opportunity.portOfDischarge?.value === 'object' &&
+            opportunity.portOfDischarge?.value &&
+            'city' in opportunity.portOfDischarge.value
+              ? opportunity.portOfDischarge.value.city
+              : opportunity.portOfDischarge?.value) || '',
+          );
 
   return (
-    <TableRow hover className={classes.tableRow} tabIndex={-1} onClick={handleRowClick}>
-      <TableCell padding="checkbox"></TableCell>
-      <TableCell align="center">
-        {opportunity.salesRepId
-          ? `${opportunity.salesRepId.firstName} ${opportunity.salesRepId.lastName}`
-          : ''}
+    <TableRow hover className={classes.row} tabIndex={-1} onClick={handleRowClick}>
+      <TableCell component="th" scope="row" style={{ paddingLeft: 4 }}>
+        {opportunity.opportunityId}
       </TableCell>
       <TableCell align="center">{opportunity.bookingPartyId?.name || ''}</TableCell>
+      <TableCell align="center">
+        {opportunity.bookingPartyRepId ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+            <Avatar
+              name={`${opportunity.bookingPartyRepId.firstName} ${opportunity.bookingPartyRepId.lastName}`}
+              title={`${opportunity.bookingPartyRepId.firstName} ${opportunity.bookingPartyRepId.lastName} ${opportunity.bookingPartyRepId.emailAddress}`}
+              size="32"
+              round={true}
+            />
+          </div>
+        ) : (
+          ''
+        )}
+      </TableCell>
       <TableCell align="center">{opportunity.statisticalClientId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.agreementId || ''}</TableCell>
+      <TableCell align="center">{placeOfReceipt || ''}</TableCell>
+      <TableCell align="center">{portOfLoading || ''}</TableCell>
+      <TableCell align="center">{portOfDischarge || ''}</TableCell>
+      <TableCell align="center">{placeOfDelivery || ''}</TableCell>
+      <TableCell align="center">{equipment || ''}</TableCell>
+      <TableCell align="center">{commodity || ''}</TableCell>
       <TableCell align="center">{opportunity.quoteKind || ''}</TableCell>
-      <TableCell align="center">{opportunity.placeOfReceiptGroupId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.portOfLoadingGroupId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.portOfDischargeGroupId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.placeOfDeliveryGroupId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.commodityGroupId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.equipmentGroupId?.name || ''}</TableCell>
+      <TableCell align="center">{opportunity.agreementId || ''}</TableCell>
 
       <TableCell align="center">
-        {opportunity.validity ? new Date(opportunity.validity).toLocaleDateString() : ''}
+        {opportunity.validity ? format(new Date(opportunity.validity), 'd.MMMM') : ''}
       </TableCell>
-      <TableCell align="center">{opportunity.note || ''}</TableCell>
       <TableCell align="center">
         {opportunity.capacityTEU ? `${opportunity.capacityTEU} TEU` : ''}
       </TableCell>
@@ -226,12 +312,12 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
           <div style={{ minWidth: 80 }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
               <span style={{ fontSize: 12, marginRight: 6 }}>
-                {opportunity.booked !== null && opportunity.quoted !== null
+                {opportunity.booked != null && opportunity.quoted != null
                   ? `${opportunity.booked} / ${opportunity.quoted}`
                   : '—'}
               </span>
-              {opportunity.booked !== null &&
-                opportunity.quoted !== null &&
+              {opportunity.booked != null &&
+                opportunity.quoted != null &&
                 opportunity.quoted > 0 && (
                   <span style={{ fontSize: 10, color: '#666', marginLeft: 'auto' }}>
                     ({Math.round((opportunity.booked / opportunity.quoted) * 100)}%)
@@ -242,7 +328,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
               <div
                 style={{
                   width:
-                    opportunity.booked !== null && opportunity.quoted
+                    opportunity.booked != null && opportunity.quoted != null
                       ? `${Math.min((opportunity.booked / (opportunity.quoted === 0 ? 1 : opportunity.quoted)) * 100, 100)}%`
                       : '0%',
                   background: '#43a047',
@@ -262,12 +348,12 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
           <div style={{ minWidth: 80 }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
               <span style={{ fontSize: 12, marginRight: 6 }}>
-                {opportunity.bookedTEU !== null && opportunity.capacityTEU
+                {opportunity.bookedTEU != null && opportunity.capacityTEU != null
                   ? `${opportunity.bookedTEU} / ${opportunity.capacityTEU}`
                   : '—'}
               </span>
-              {opportunity.bookedTEU !== null &&
-                opportunity.capacityTEU &&
+              {opportunity.bookedTEU != null &&
+                opportunity.capacityTEU != null &&
                 opportunity.capacityTEU > 0 && (
                   <span style={{ fontSize: 10, color: '#666', marginLeft: 'auto' }}>
                     ({Math.round((opportunity.bookedTEU / opportunity.capacityTEU) * 100)}%)
@@ -278,7 +364,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
               <div
                 style={{
                   width:
-                    opportunity.bookedTEU !== null && opportunity.capacityTEU
+                    opportunity.bookedTEU != null && opportunity.capacityTEU != null
                       ? `${Math.min((opportunity.bookedTEU / opportunity.capacityTEU) * 100, 100)}%`
                       : '0%',
                   background: '#3f51b5',
@@ -289,6 +375,22 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
               />
             </div>
           </div>
+        ) : (
+          ''
+        )}
+      </TableCell>
+      <TableCell align="center">
+        {opportunity.note ? (
+          <Tooltip
+            title={opportunity.note}
+            arrow
+            placement="top"
+            classes={{ tooltip: classes.largeTooltip }}
+          >
+            <IconButton size="small">
+              <NotesIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         ) : (
           ''
         )}
@@ -307,6 +409,20 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
             ))
           : ''}
       </TableCell>
+      <TableCell align="center">
+        {opportunity.salesRepId ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+            <Avatar
+              name={`${opportunity.salesRepId.firstName} ${opportunity.salesRepId.lastName}`}
+              title={`${opportunity.salesRepId.firstName} ${opportunity.salesRepId.lastName} ${opportunity.salesRepId.emailAddress}`}
+              size="32"
+              round={true}
+            />
+          </div>
+        ) : (
+          ''
+        )}
+      </TableCell>
     </TableRow>
   );
 };
@@ -317,6 +433,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
   sortConfig,
   onSort,
 }) => {
+  const classes = opportunityTableStyles();
   const baseOpportunities = opportunities || [];
   const displayOpportunities = sortConfig
     ? sortOpportunities(baseOpportunities, sortConfig)
@@ -329,88 +446,160 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
           message={'No opportunities found for your filter criteria. Try changing filters.'}
         />
       ) : (
-        <Paper>
-          <TableContainer component={Paper}>
-            <Table aria-label="opportunities table">
-              <TableHead>
-                <TableRow>
-                  <TableCell align="left" style={{ paddingLeft: 4 }}></TableCell>
-                  <SortableHeader sortKey="salesRep" sortConfig={sortConfig} onSort={onSort}>
-                    Sales Representative
-                  </SortableHeader>
-                  <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
-                    Booking Party
-                  </SortableHeader>
-                  <SortableHeader
-                    sortKey="statisticalClient"
-                    sortConfig={sortConfig}
-                    onSort={onSort}
-                  >
-                    Statistical Client
-                  </SortableHeader>
-                  <SortableHeader sortKey="agreement" sortConfig={sortConfig} onSort={onSort}>
-                    Agreement
-                  </SortableHeader>
-                  <SortableHeader sortKey="quoteKind" sortConfig={sortConfig} onSort={onSort}>
-                    Quote Kind
-                  </SortableHeader>
-                  <SortableHeader sortKey="placeOfReceipt" sortConfig={sortConfig} onSort={onSort}>
-                    Place of Receipt
-                  </SortableHeader>
-                  <SortableHeader sortKey="portOfLoading" sortConfig={sortConfig} onSort={onSort}>
-                    Port of Loading
-                  </SortableHeader>
-                  <SortableHeader sortKey="portOfDischarge" sortConfig={sortConfig} onSort={onSort}>
-                    Port of Discharge
-                  </SortableHeader>
-                  <SortableHeader sortKey="placeOfDelivery" sortConfig={sortConfig} onSort={onSort}>
-                    Place of Delivery
-                  </SortableHeader>
-                  <SortableHeader sortKey="commodityGroup" sortConfig={sortConfig} onSort={onSort}>
-                    Commodity Groups
-                  </SortableHeader>
-                  <SortableHeader sortKey="equipmentGroup" sortConfig={sortConfig} onSort={onSort}>
-                    Equipment Groups
-                  </SortableHeader>
-                  <SortableHeader sortKey="validity" sortConfig={sortConfig} onSort={onSort}>
-                    Validity
-                  </SortableHeader>
-                  <SortableHeader sortKey="note" sortConfig={sortConfig} onSort={onSort}>
-                    Note
-                  </SortableHeader>
-                  <SortableHeader sortKey="capacityTEU" sortConfig={sortConfig} onSort={onSort}>
-                    Potential
-                  </SortableHeader>
-                  <SortableHeader sortKey="quotedProgress" sortConfig={sortConfig} onSort={onSort}>
-                    Quoted
-                  </SortableHeader>
-                  <SortableHeader sortKey="bookedProgress" sortConfig={sortConfig} onSort={onSort}>
-                    Booked
-                  </SortableHeader>
-                  <SortableHeader sortKey="tags" sortConfig={sortConfig} onSort={onSort}>
-                    Tags
-                  </SortableHeader>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {displayOpportunities ? (
-                  displayOpportunities.map(opportunity => (
-                    <OpportunityTableRow
-                      key={opportunity.id}
-                      opportunity={opportunity}
-                      onRowClick={onRowClick}
-                    />
-                  ))
-                ) : (
-                  <ChartsCircularProgress />
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+        <TableContainer className={classes.container}>
+          <Table
+            stickyHeader
+            size="small"
+            aria-label="opportunities table"
+            className={classes.root}
+          >
+            <TableHead className={classes.table}>
+              <TableRow>
+                <SortableHeader sortKey="id" sortConfig={sortConfig} onSort={onSort}>
+                  ID
+                </SortableHeader>
+                <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
+                  B/Party
+                </SortableHeader>
+                <SortableHeader sortKey="bookingPartyRep" sortConfig={sortConfig} onSort={onSort}>
+                  B/Party Rep
+                </SortableHeader>
+                <SortableHeader sortKey="statisticalClient" sortConfig={sortConfig} onSort={onSort}>
+                  S/Client
+                </SortableHeader>
+                <SortableHeader sortKey="placeOfReceipt" sortConfig={sortConfig} onSort={onSort}>
+                  PLR
+                </SortableHeader>
+                <SortableHeader sortKey="portOfLoading" sortConfig={sortConfig} onSort={onSort}>
+                  POL
+                </SortableHeader>
+                <SortableHeader sortKey="portOfDischarge" sortConfig={sortConfig} onSort={onSort}>
+                  POD
+                </SortableHeader>
+                <SortableHeader sortKey="placeOfDelivery" sortConfig={sortConfig} onSort={onSort}>
+                  PLD
+                </SortableHeader>
+                <SortableHeader sortKey="equipmentGroup" sortConfig={sortConfig} onSort={onSort}>
+                  Equipment
+                </SortableHeader>
+                <SortableHeader sortKey="commodityGroup" sortConfig={sortConfig} onSort={onSort}>
+                  Commodity
+                </SortableHeader>
+                <SortableHeader sortKey="quoteKind" sortConfig={sortConfig} onSort={onSort}>
+                  Quote
+                </SortableHeader>
+                <SortableHeader sortKey="agreement" sortConfig={sortConfig} onSort={onSort}>
+                  Agreement
+                </SortableHeader>
+                <SortableHeader sortKey="validity" sortConfig={sortConfig} onSort={onSort}>
+                  Validity
+                </SortableHeader>
+                <SortableHeader sortKey="capacityTEU" sortConfig={sortConfig} onSort={onSort}>
+                  Potential
+                </SortableHeader>
+                <SortableHeader sortKey="quotedProgress" sortConfig={sortConfig} onSort={onSort}>
+                  <div>
+                    <div>Quoted</div>
+                    <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>Booked / Quoted</div>
+                  </div>
+                </SortableHeader>
+                <SortableHeader sortKey="bookedProgress" sortConfig={sortConfig} onSort={onSort}>
+                  <div>
+                    <div>Booked</div>
+                    <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>
+                      Booked TEU / Potential
+                    </div>
+                  </div>
+                </SortableHeader>
+                <SortableHeader sortKey="note" sortConfig={sortConfig} onSort={onSort}>
+                  Note
+                </SortableHeader>
+                <SortableHeader sortKey="tags" sortConfig={sortConfig} onSort={onSort}>
+                  Tags
+                </SortableHeader>
+                <SortableHeader sortKey="salesRep" sortConfig={sortConfig} onSort={onSort}>
+                  S/Rep
+                </SortableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody className={classes.table}>
+              {displayOpportunities ? (
+                displayOpportunities.map(opportunity => (
+                  <OpportunityTableRow
+                    key={opportunity.id}
+                    opportunity={opportunity}
+                    onRowClick={onRowClick}
+                  />
+                ))
+              ) : (
+                <ChartsCircularProgress />
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
     </Fragment>
   );
 };
 
 export default OpportunityTable;
+
+const opportunityTableStyles = makeStyles((theme: Theme) => ({
+  container: {
+    marginBottom: theme.spacing(3),
+  },
+  row: {
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: 'rgba(161,213,255,0.20) !important',
+      '& > td': {
+        backgroundColor: 'inherit',
+      },
+    },
+  },
+  defaultCell: {
+    border: `1px solid ${theme.palette.divider}`,
+    fontSize: theme.typography.body2.fontSize,
+    backgroundColor: 'white',
+  },
+  statusCell: {
+    alignItems: 'center',
+    fontSize: theme.typography.body2.fontSize,
+    borderCollapse: 'collapse',
+  },
+  headerCell: {
+    fontSize: theme.typography.body2.fontSize,
+    backgroundColor: theme.palette.grey['100'],
+  },
+  cityCell: {
+    fontSize: theme.typography.body2.fontSize,
+  },
+  borderRight: {
+    borderRight: `3px solid ${theme.palette.divider}`,
+  },
+  tightCell: {
+    lineHeight: 1,
+  },
+  stickySide: {
+    position: 'sticky',
+    left: 0,
+    zIndex: 3,
+  },
+  hoverColorControl: {
+    backgroundColor: theme.palette.background.paper,
+  },
+  list: {
+    minWidth: '20rem',
+  },
+  root: {
+    position: 'relative',
+    left: theme.spacing(3),
+    paddingRight: theme.spacing(3),
+    border: `1px solid ${theme.palette.divider}`,
+  },
+  table: {},
+  largeTooltip: {
+    fontSize: theme.typography.body1.fontSize,
+    maxWidth: 300,
+  },
+}));

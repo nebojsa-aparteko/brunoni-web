@@ -41,7 +41,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
       normalizeOpportunity({ id: doc.id, ...doc.data() }),
     );
   }, [opportunitySnapshot?.docs, normalizeOpportunity]);
-
   const [filters, setFilters] = useOpportunitiesListFilterContext();
   const [opportunityPaginationContextData, setOpportnityPaginationContextData] =
     useOpportunityListPaginationContext();
@@ -66,27 +65,27 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
       }
 
       if (
-        filters.portsOfLoadingGroup &&
-        opportunity.portOfLoadingGroupId?.id !== filters.portsOfLoadingGroup.id
+        filters.portsOfLoading &&
+        opportunity.portOfLoading?.definition.value !== filters.portsOfLoading.definition.value
       ) {
         return false;
       }
       if (
-        filters.portsOfDischargeGroup &&
-        opportunity.portOfDischargeGroupId?.id !== filters.portsOfDischargeGroup.id
+        filters.portsOfDischarge &&
+        opportunity.portOfDischarge?.definition.value !== filters.portsOfDischarge.definition.value
       ) {
         return false;
       }
 
       if (
-        filters.placesOfDeliveryGroup &&
-        opportunity.placeOfDeliveryGroupId?.id !== filters.placesOfDeliveryGroup.id
+        filters.placesOfDelivery &&
+        opportunity.placeOfDelivery?.definition.value !== filters.placesOfDelivery.definition.value
       ) {
         return false;
       }
       if (
-        filters.placesOfReceiptGroup &&
-        opportunity.placeOfReceiptGroupId?.id !== filters.placesOfReceiptGroup.id
+        filters.placesOfReceipt &&
+        opportunity.placeOfReceipt?.definition.value !== filters.placesOfReceipt.definition.value
       ) {
         return false;
       }
@@ -100,19 +99,31 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
       }
 
       if (
-        filters.commodityGroup &&
-        opportunity.commodityGroupId?.id !== filters.commodityGroup.id
+        filters.commodity &&
+        opportunity.commodity?.definition.value !== filters.commodity.definition.value
       ) {
         return false;
       }
 
       if (
-        filters.equipmentGroup &&
-        opportunity.equipmentGroupId?.id !== filters.equipmentGroup.id
+        filters.equipment &&
+        opportunity.equipment?.definition.value !== filters.equipment.definition.value
       ) {
         return false;
       }
 
+      if (filters.quoteKind && opportunity.quoteKind !== filters.quoteKind) {
+        return false;
+      }
+
+      if (filters.opportunityId && filters.opportunityId.trim() !== '') {
+        const searchTerm = filters.opportunityId.toLowerCase().trim();
+        const opportunityId = (opportunity.opportunityId || '').toLowerCase();
+        if (!opportunityId.includes(searchTerm)) {
+          return false;
+        }
+      }
+      console.debug('filters', filters);
       return true;
     });
   }, [opportunities, filters]);
@@ -163,12 +174,11 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
   };
 
   const handleUpdateOpportunity = (updatedOpportunity: NormalizedOpportunity) => {
-    console.debug('Opportunity updated:', updatedOpportunity);
-    // You might want to refresh the data or update local state here if needed
+    // console.debug('Opportunity updated:', updatedOpportunity);
   };
 
   const handleDeleteOpportunity = (opportunityId: string) => {
-    console.debug('Opportunity deleted:', opportunityId);
+    // console.debug('Opportunity deleted:', opportunityId);
   };
 
   return (

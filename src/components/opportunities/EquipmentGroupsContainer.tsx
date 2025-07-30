@@ -64,25 +64,33 @@ const AddGroupDialog: React.FC<AddEquipmentGroupDialogProps> = ({ isOpen, handle
   const classes = useStyles();
   const [groupName, setGroupName] = useState('');
   const [equipmentTypeId, setEquipmentTypeId] = useState<string[]>([]);
+  const [equipmentTypeNames, setEquipmentTypeNames] = useState<string[]>([]);
 
-  const handleEquipmentChange = (selectedEquipmentIds: string[]) => {
+  const handleEquipmentChange = (
+    selectedEquipmentIds: string[],
+    selectedEquipmentNames: string[],
+  ) => {
     setEquipmentTypeId(selectedEquipmentIds);
+    setEquipmentTypeNames(selectedEquipmentNames);
   };
 
   const handleAddGroup = useCallback(() => {
     onAdd({
       name: groupName,
       equipmentTypeId: equipmentTypeId,
+      equipmentTypeNames: equipmentTypeNames,
     });
     // Reset form
     setGroupName('');
     setEquipmentTypeId([]);
+    setEquipmentTypeNames([]);
     handleClose();
-  }, [groupName, equipmentTypeId, handleClose, onAdd]);
+  }, [groupName, equipmentTypeId, equipmentTypeNames, handleClose, onAdd]);
 
   const handleDialogClose = () => {
     setGroupName('');
     setEquipmentTypeId([]);
+    setEquipmentTypeNames([]);
     handleClose();
   };
 
@@ -114,6 +122,7 @@ const AddGroupDialog: React.FC<AddEquipmentGroupDialogProps> = ({ isOpen, handle
           <div style={{ flex: 1 }}>
             <EquipmentMultiInput
               selectedEquipmentIds={equipmentTypeId}
+              selectedEquipmentNames={equipmentTypeNames}
               onChange={handleEquipmentChange}
             />
           </div>
@@ -221,6 +230,7 @@ const EquipmentGroupsContainer: React.FC = () => {
         await firebase.firestore().collection(COLLECTION_NAME).doc(updatedGroup.id).update({
           name: updatedGroup.name,
           equipmentTypeId: updatedGroup.equipmentTypeId,
+          equipmentTypeNames: updatedGroup.equipmentTypeNames,
         });
 
         setEquipmentGroups(prev =>

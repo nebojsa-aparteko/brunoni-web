@@ -6,6 +6,7 @@ import {
   DialogActions,
   Button,
   TextField,
+  Grid,
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import OpportunityTagInput from '../inputs/OpportunityTagsInput';
@@ -13,13 +14,13 @@ import OpportunityEquipmentGroupInput from '../inputs/OpportunityEquipmentGroupI
 import OpportunityCommodityGroupInput from '../inputs/OpportunityCommodityGroupInput';
 import OpportunityPlacesGroupInput from '../inputs/OpportunityPlacesGroupInput';
 import OpportunityPortsGroupInput from '../inputs/OpportunityPortsGroupInput';
-import useOpportunityPortsGroups from '../../hooks/useOpportunityPortsGroups';
-import useOpportunityPlacesGroups from '../../hooks/useOpportunityPlacesGroups';
+import useOpportunityPortsWithDefinition from '../../hooks/useOpportunityPortsWithDefinition';
 import useOpportunityTags from '../../hooks/useOpportunityTags';
-import useOpportunityCommodityGroups from '../../hooks/useOpportunityCommodityGroups';
-import useOpportunityEquipmentGroups from '../../hooks/useOpportunityEquipmentGroups';
+import useOpportunityCommodityWithDefinition from '../../hooks/useOpportunityCommodityWithDefinition';
+import useOpportunityEquipmentWithDefinition from '../../hooks/useOpportunityEquipmentWithDefinition';
 import useClients from '../../hooks/useClients';
-import userRecords from '../../contexts/UserRecordsContext';
+import useAdminUsers from '../../hooks/useAdminUsers';
+import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import UserInput from '../inputs/UserInput';
 import firebase from '../../firebase';
 import Client from '../../model/Client';
@@ -28,6 +29,13 @@ import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup
 import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
 import { OpportunityPortsGroup } from '../../model/OpportunityPortsGroup';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
+import { QUOTE_KIND_OPTIONS } from '../../model/Opportunity';
+import useBookingPartyUsers from '../../hooks/useBookingPartyUsers';
+import DateInput from '../inputs/DateInput';
+import { OpportunityMatchDefinition } from '../../model/Opportunity';
+import ContainerType from '../../model/ContainerType';
+import useOpportunityPlacesWithDefinition from '../../hooks/useOpportunityPlacesWithDefinition';
+import Port from '../../model/Port';
 
 interface AddOpportunityDialogProps {
   open: boolean;
@@ -38,69 +46,93 @@ interface AddOpportunityDialogProps {
 const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClose, onAdd }) => {
   const [salesRep, setSalesRep] = useState<UserRecord | null>(null);
   const [bookingParty, setBookingParty] = useState<Client | null>(null);
+  const [bookingPartyRep, setBookingPartyRep] = useState<UserRecord | null>(null);
   const [statisticalClient, setStatisticalClient] = useState<Client | null>(null);
-  const [equipmentGroups, setEquipmentGroups] = useState<OpportunityEquipmentGroup | null>(null);
-  const [placeOfReceiptGroup, setPlaceOfReceiptGroup] = useState<OpportunityPlacesGroup | null>(
-    null,
-  );
-  const [portOfLoadingGroup, setPortOfLoadingGroup] = useState<OpportunityPortsGroup | null>(null);
-  const [portOfDischargeGroup, setPortOfDischargeGroup] = useState<OpportunityPortsGroup | null>(
-    null,
-  );
-  const [placeOfDeliveryGroup, setPlaceOfDeliveryGroup] = useState<OpportunityPlacesGroup | null>(
-    null,
-  );
-  const [commodityGroups, setCommodityGroups] = useState<OpportunityCommodityGroup | null>(null);
+  const [equipment, setEquipment] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+    value: OpportunityEquipmentGroup | ContainerType;
+  } | null>(null);
+  const [placeOfReceipt, setPlaceOfReceipt] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  } | null>(null);
+  const [portOfLoading, setPortOfLoading] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText' | 'portId'>;
+    value: OpportunityPortsGroup | string | Port;
+  } | null>(null);
+  const [portOfDischarge, setPortOfDischarge] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText' | 'portId'>;
+    value: OpportunityPortsGroup | string | Port;
+  } | null>(null);
+  const [placeOfDelivery, setPlaceOfDelivery] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  } | null>(null);
+  const [commodity, setCommodity] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityCommodityGroup | string;
+  } | null>(null);
   const [tags, setTags] = useState<any[]>([]);
   const [note, setNote] = useState<string>('');
   const [capacityTEU, setCapacityTEU] = useState<string>('');
-  const [validity, setValidity] = useState<string>('');
+  const [validity, setValidity] = useState<Date | null>(null);
+  const [validityPickerOpen, setValidityPickerOpen] = useState(false);
   const [agreementId, setAgreementId] = useState<string>('');
   const [quoteKind, setQuoteKind] = useState<string>('');
 
-  const portsGroups = useOpportunityPortsGroups();
-  const placesGroups = useOpportunityPlacesGroups();
+  const portsOptions = useOpportunityPortsWithDefinition();
+  const placesOptions = useOpportunityPlacesWithDefinition();
   const opportunityTags = useOpportunityTags();
-  const commodityGroupsOptions = useOpportunityCommodityGroups();
-  const equipmentGroupsOptions = useOpportunityEquipmentGroups();
-  const users = useContext(userRecords);
+  const commodityOptions = useOpportunityCommodityWithDefinition();
+  const equipmentOptions = useOpportunityEquipmentWithDefinition();
+  const users = useAdminUsers(CUSTOMER_FACING_ROLES);
   const clients = useClients();
+  const bookingPartyUsers = useBookingPartyUsers(bookingParty?.id);
 
   useEffect(() => {
     if (!open) {
       setSalesRep(null);
       setBookingParty(null);
+      setBookingPartyRep(null);
       setStatisticalClient(null);
-      setEquipmentGroups(null);
-      setCommodityGroups(null);
-      setPlaceOfReceiptGroup(null);
-      setPortOfLoadingGroup(null);
-      setPortOfDischargeGroup(null);
-      setPlaceOfDeliveryGroup(null);
+      setEquipment(null);
+      setCommodity(null);
+      setPlaceOfReceipt(null);
+      setPortOfLoading(null);
+      setPortOfDischarge(null);
+      setPlaceOfDelivery(null);
       setTags([]);
       setNote('');
       setCapacityTEU('');
-      setValidity('');
+      setValidity(null);
+      setValidityPickerOpen(false);
       setAgreementId('');
       setQuoteKind('');
     }
   }, [open]);
 
+  // Reset booking party rep when booking party changes
+  useEffect(() => {
+    setBookingPartyRep(null);
+  }, [bookingParty]);
+
+  const tagIds = tags.map(tag => tag.id || tag);
   const handleAdd = async () => {
     const opportunityData = {
       salesRepId: salesRep?.id || '',
       bookingPartyId: bookingParty?.id || '',
+      bookingPartyRepId: bookingPartyRep?.id || '',
       statisticalClientId: statisticalClient?.id || '',
-      equipmentGroupId: equipmentGroups?.id || '',
-      commodityGroupId: commodityGroups?.id || '',
-      placeOfReceiptGroupId: placeOfReceiptGroup?.id || '',
-      portOfLoadingGroupId: portOfLoadingGroup?.id || '',
-      portOfDischargeGroupId: portOfDischargeGroup?.id || '',
-      placeOfDeliveryGroupId: placeOfDeliveryGroup?.id || '',
-      tagIds: tags,
+      equipment: equipment?.definition || '',
+      commodity: commodity?.definition || '',
+      placeOfReceipt: placeOfReceipt?.definition || '',
+      portOfLoading: portOfLoading?.definition || '',
+      portOfDischarge: portOfDischarge?.definition || '',
+      placeOfDelivery: placeOfDelivery?.definition || '',
+      tagIds,
       note,
       capacityTEU: capacityTEU === '' ? null : Number(capacityTEU) > 0 ? Number(capacityTEU) : null,
-      validity: validity === '' ? null : new Date(validity),
+      validity: validity,
       agreementId,
       quoteKind,
       createdAt: new Date(),
@@ -112,145 +144,166 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       console.debug('Adding new opportunity with data:', opportunityData);
       onClose();
     } catch (error) {
-      console.error('Failed to add opportunity:', error);
+      console.error('Failed to add opportunity:', error, opportunityData);
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Add New Opportunity</DialogTitle>
       <DialogContent>
-        <UserInput
-          label="Sales Representative"
-          users={users || []}
-          onChange={(_, user) => setSalesRep(user)}
-          value={salesRep}
-        />
-        <Autocomplete
-          options={clients || []}
-          getOptionLabel={option => option?.name || ''}
-          value={statisticalClient}
-          onChange={(_, value) => setStatisticalClient(value)}
-          renderInput={params => (
-            <TextField {...params} label="Statistical Client" margin="dense" variant="outlined" />
-          )}
-        />
-        <Autocomplete
-          options={clients || []}
-          getOptionLabel={option => option?.name || ''}
-          value={bookingParty}
-          onChange={(_, value) => setBookingParty(value)}
-          renderInput={params => (
-            <TextField
-              {...params}
-              label="Booking Party *"
-              margin="dense"
-              variant="outlined"
-              required
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <UserInput
+              label="Sales Representative"
+              users={users || []}
+              onChange={(_, user) => setSalesRep(user)}
+              value={salesRep}
             />
-          )}
-        />
-        <TextField
-          margin="dense"
-          label="Agreement ID"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={agreementId}
-          onChange={e => setAgreementId(e.target.value)}
-        />
-        <TextField
-          margin="dense"
-          label="Quote Kind"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={quoteKind}
-          onChange={e => setQuoteKind(e.target.value)}
-        />
-        <OpportunityEquipmentGroupInput
-          label="Equipment Groups"
-          options={equipmentGroupsOptions || []}
-          value={equipmentGroups}
-          onChange={group => setEquipmentGroups(group)}
-          margin="dense"
-        />
-        <OpportunityCommodityGroupInput
-          label="Commodity Groups"
-          options={commodityGroupsOptions || []}
-          value={commodityGroups}
-          onChange={group => setCommodityGroups(group)}
-          margin="dense"
-        />
-        <OpportunityPlacesGroupInput
-          label="Place of Receipt"
-          options={placesGroups || []}
-          value={placeOfReceiptGroup}
-          onChange={group => setPlaceOfReceiptGroup(group ?? null)}
-          margin="dense"
-        />
-        <OpportunityPortsGroupInput
-          label="Port of Loading"
-          options={portsGroups || []}
-          value={portOfLoadingGroup}
-          onChange={group => setPortOfLoadingGroup(group ?? null)}
-          margin="dense"
-        />
-        <OpportunityPortsGroupInput
-          label="Port of Discharge"
-          options={portsGroups || []}
-          value={portOfDischargeGroup}
-          onChange={group => setPortOfDischargeGroup(group ?? null)}
-          margin="dense"
-        />
-        <OpportunityPlacesGroupInput
-          label="Place of Delivery"
-          options={placesGroups || []}
-          value={placeOfDeliveryGroup}
-          onChange={group => setPlaceOfDeliveryGroup(group ?? null)}
-          margin="dense"
-        />
-        <OpportunityTagInput
-          label="Tags"
-          options={opportunityTags || []}
-          value={tags}
-          onChange={(_, value) => setTags(Array.isArray(value) ? value : value ? [value] : [])}
-        />
-        <TextField
-          margin="dense"
-          label="Note"
-          type="text"
-          fullWidth
-          variant="outlined"
-          multiline
-          minRows={3}
-          value={note}
-          onChange={e => setNote(e.target.value)}
-        />
-        <TextField
-          margin="dense"
-          label="Capacity TEU"
-          type="number"
-          fullWidth
-          variant="outlined"
-          value={capacityTEU}
-          onChange={e => setCapacityTEU(e.target.value)}
-          error={capacityTEU !== '' && Number(capacityTEU) <= 0}
-          helperText={
-            capacityTEU !== '' && Number(capacityTEU) <= 0 ? 'Capacity must be greater than 0' : ''
-          }
-          inputProps={{ min: 1 }}
-        />
-        <TextField
-          margin="dense"
-          label="Validity"
-          type="date"
-          fullWidth
-          variant="outlined"
-          InputLabelProps={{ shrink: true }}
-          value={validity}
-          onChange={e => setValidity(e.target.value)}
-        />
+            <Autocomplete
+              options={clients || []}
+              getOptionLabel={option =>
+                option?.name ? `${option.name} - ${option.city} (${option.id})` : ''
+              }
+              value={statisticalClient}
+              onChange={(_, value) => setStatisticalClient(value)}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Statistical Client"
+                  margin="dense"
+                  variant="outlined"
+                />
+              )}
+            />
+            <Autocomplete
+              options={clients || []}
+              getOptionLabel={option => option?.name || ''}
+              value={bookingParty}
+              onChange={(_, value) => setBookingParty(value)}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Booking Party *"
+                  margin="dense"
+                  variant="outlined"
+                  required
+                />
+              )}
+            />
+            <UserInput
+              label="Booking Party Representative"
+              users={bookingPartyUsers || []}
+              onChange={(_, user) => setBookingPartyRep(user)}
+              value={bookingPartyRep}
+            />
+            <TextField
+              margin="dense"
+              label="Agreement ID"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={agreementId}
+              onChange={e => setAgreementId(e.target.value)}
+            />
+            <Autocomplete
+              options={[...QUOTE_KIND_OPTIONS]}
+              getOptionLabel={option => option}
+              value={quoteKind || null}
+              onChange={(_, value) => setQuoteKind(value || '')}
+              renderInput={params => (
+                <TextField {...params} label="Quote Kind" margin="dense" variant="outlined" />
+              )}
+            />
+            <OpportunityEquipmentGroupInput
+              label="Equipment Groups"
+              options={equipmentOptions || []}
+              value={equipment}
+              onChange={group => setEquipment(group)}
+              margin="dense"
+            />
+            <OpportunityCommodityGroupInput
+              label="Commodity Groups"
+              options={commodityOptions || []}
+              value={commodity}
+              onChange={group => setCommodity(group)}
+              margin="dense"
+            />
+            <OpportunityTagInput
+              label="Tags"
+              options={opportunityTags || []}
+              value={tags}
+              onChange={(_, value) => setTags(Array.isArray(value) ? value : value ? [value] : [])}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <OpportunityPlacesGroupInput
+              label="Place of Receipt"
+              options={placesOptions || []}
+              value={placeOfReceipt}
+              onChange={group => setPlaceOfReceipt(group)}
+              margin="dense"
+            />
+            <OpportunityPortsGroupInput
+              label="Port of Loading"
+              options={portsOptions || []}
+              value={portOfLoading}
+              onChange={group => setPortOfLoading(group)}
+              margin="dense"
+            />
+            <OpportunityPortsGroupInput
+              label="Port of Discharge"
+              options={portsOptions || []}
+              value={portOfDischarge}
+              onChange={group => setPortOfDischarge(group)}
+              margin="dense"
+            />
+            <OpportunityPlacesGroupInput
+              label="Place of Delivery"
+              options={placesOptions || []}
+              value={placeOfDelivery}
+              onChange={group => setPlaceOfDelivery(group)}
+              margin="dense"
+            />
+            <TextField
+              margin="dense"
+              label="Note"
+              type="text"
+              fullWidth
+              variant="outlined"
+              multiline
+              minRows={3}
+              value={note}
+              onChange={e => setNote(e.target.value)}
+            />
+            <TextField
+              margin="dense"
+              label="Capacity TEU**"
+              type="number"
+              fullWidth
+              variant="outlined"
+              value={capacityTEU}
+              onChange={e => setCapacityTEU(e.target.value)}
+              error={capacityTEU !== '' && Number(capacityTEU) <= 0}
+              helperText={
+                capacityTEU !== '' && Number(capacityTEU) <= 0
+                  ? 'Capacity must be greater than 0'
+                  : ''
+              }
+              inputProps={{ min: 1 }}
+            />
+            <DateInput
+              label="Validity"
+              value={validity}
+              onChange={date => setValidity(date)}
+              open={validityPickerOpen}
+              onOpen={() => setValidityPickerOpen(true)}
+              onClose={() => setValidityPickerOpen(false)}
+              margin="dense"
+              fullWidth
+            />
+          </Grid>
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
@@ -258,7 +311,7 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
           onClick={handleAdd}
           color="primary"
           variant="contained"
-          disabled={!bookingParty || (capacityTEU !== '' && Number(capacityTEU) <= 0)}
+          disabled={!bookingParty || Number(capacityTEU) <= 0}
         >
           Add
         </Button>
