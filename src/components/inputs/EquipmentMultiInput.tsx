@@ -7,7 +7,8 @@ import ContainerTypes from '../../contexts/ContainerTypes';
 interface EquipmentMultiInputProps {
   label?: string;
   selectedEquipmentIds?: string[];
-  onChange?: (equipmentIds: string[]) => void;
+  selectedEquipmentNames?: string[];
+  onChange?: (equipmentIds: string[], equipmentNames: string[]) => void;
   placeholder?: string;
 }
 
@@ -25,6 +26,7 @@ const useStyles = makeStyles({
 const EquipmentMultiInput: React.FC<EquipmentMultiInputProps> = ({
   label = 'Equipment',
   selectedEquipmentIds = [],
+  selectedEquipmentNames = [],
   onChange,
   placeholder = 'Select equipment type ↵',
 }) => {
@@ -34,22 +36,72 @@ const EquipmentMultiInput: React.FC<EquipmentMultiInputProps> = ({
   // Create options with both ID and display text
   const equipmentOptions = containerTypes || [];
 
-  // Get selected container types based on IDs
-  const selectedContainerTypes =
-    containerTypes?.filter(ct => selectedEquipmentIds.includes(ct.id)) || [];
+  // Get equipment display name
+  const getEquipmentDisplayName = (equipment: any): string => {
+    return equipment.description || equipment.name || equipment.id;
+  };
+
+  // Create display values combining both selected database equipment and custom equipment names
+  const getDisplayValues = () => {
+    const values: string[] = [];
+
+    // Add selected database equipment (by their display names)
+    selectedEquipmentIds.forEach(equipmentId => {
+      const equipment = equipmentOptions.find(eq => eq.id === equipmentId);
+      if (equipment) {
+        values.push(getEquipmentDisplayName(equipment));
+      }
+    });
+
+    // Add custom equipment names
+    values.push(...selectedEquipmentNames);
+
+    return values;
+  };
+
+  // Create options from database equipment
+  const displayOptions = equipmentOptions.map(equipment => getEquipmentDisplayName(equipment));
 
   return (
     <Autocomplete
       classes={{ root: classes.customTextField }}
       multiple
-      options={equipmentOptions}
-      value={selectedContainerTypes}
+      options={displayOptions}
+      value={getDisplayValues()}
       onChange={(_, newValue) => {
-        const selectedIds = newValue.map(containerType => containerType.id);
-        onChange?.(selectedIds);
+        const newEquipmentIds: string[] = [];
+        const newEquipmentNames: string[] = [];
+
+        newValue.forEach(value => {
+          if (typeof value === 'string') {
+            const cleanValue = value.trim();
+
+            if (!cleanValue) {
+              return;
+            }
+
+            // Only allow database equipment - find matching equipment
+            const foundEquipment = equipmentOptions.find(
+              equipment => getEquipmentDisplayName(equipment) === cleanValue,
+            );
+
+            if (foundEquipment) {
+              newEquipmentIds.push(foundEquipment.id);
+            }
+          }
+        });
+
+        const uniqueEquipmentIds = [...new Set(newEquipmentIds)];
+
+        onChange?.(uniqueEquipmentIds, []);
       }}
-      getOptionLabel={option => option.description || option.name || option.id}
-      getOptionSelected={(option, value) => option.id === value.id}
+      filterOptions={(options, params) => {
+        const { inputValue } = params;
+
+        // Filter existing equipment only
+        return options.filter(option => option.toLowerCase().includes(inputValue.toLowerCase()));
+      }}
+      getOptionLabel={option => option}
       renderInput={params => (
         <TextField {...params} label={label} placeholder={placeholder} variant="outlined" />
       )}

@@ -61,12 +61,16 @@ const EquipmentGroupRow: React.FC<Props> = ({
     }));
   }, []);
 
-  const handleEquipmentChange = useCallback((equipmentTypeId: string[]) => {
-    setActiveEquipmentGroup(prev => ({
-      ...prev,
-      equipmentTypeId,
-    }));
-  }, []);
+  const handleEquipmentChange = useCallback(
+    (equipmentTypeId: string[], equipmentTypeNames: string[]) => {
+      setActiveEquipmentGroup(prev => ({
+        ...prev,
+        equipmentTypeId,
+        equipmentTypeNames,
+      }));
+    },
+    [],
+  );
 
   const handleSave = useCallback(() => {
     if (onSave && changed) {
@@ -98,6 +102,7 @@ const EquipmentGroupRow: React.FC<Props> = ({
 
       <TableCell className={classes.equipmentCell}>
         <EquipmentMultiInput
+          selectedEquipmentNames={activeEquipmentGroup.equipmentTypeNames}
           selectedEquipmentIds={activeEquipmentGroup.equipmentTypeId}
           onChange={handleEquipmentChange}
           label=""

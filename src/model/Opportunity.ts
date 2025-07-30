@@ -5,24 +5,33 @@ import { OpportunityEquipmentGroup } from '../model/OpportunityEquipmentGroup';
 import { OpportunityTag } from '../model/OpportunityTag';
 import UserRecord from '../model/UserRecord';
 import Client from '../model/Client';
+import Port from './Port';
+import ContainerType from './ContainerType';
+export const QUOTE_KIND_OPTIONS = ['SPOT', 'QUARTERLY', 'TENDER'] as const;
+export type QuoteKind = (typeof QUOTE_KIND_OPTIONS)[number];
 
-// opportunities Firestore collection
+export interface OpportunityMatchDefinition<T = string> {
+  type: T; //'groupId' | 'portId' | 'containerTypeId' | 'freeText';
+  value: string;
+}
+
 export interface Opportunity {
   id: string;
+  opportunityId: string; // Auto generated counter
   salesRepId: string; // User ID of the sales representative
   bookingPartyId: string; // Client is always Booking Party for Import & Export
   statisticalClientId: string; // Export = Shipper, Import = Consignee
   agreementId: string; // e.g. Contract ID
   quoteKind: string; // e.g. Spot, Tender, Project
-  placeOfReceiptGroupId: string; // e.g. free text or group
-  portOfLoadingGroupId: string; // e.g. ports + free text possibility
-  portOfDischargeGroupId: string; // e.g. ports + free text possibility
-  placeOfDeliveryGroupId: string; // e.g. free text or group
-  commodityGroupId: string; // e.g. Food - Milkpowder, Fish, etc
-  equipmentGroupId: string; // e.g. Tank - 22T2S, etc.
+  placeOfReceipt: OpportunityMatchDefinition<'groupId' | 'freeText'>; // e.g. group or free text
+  portOfLoading: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>; // e.g. group or port
+  portOfDischarge: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>; // e.g. group or port
+  placeOfDelivery: OpportunityMatchDefinition<'groupId' | 'freeText'>; // e.g. group or free text
+  commodity: OpportunityMatchDefinition<'groupId' | 'freeText'>; // e.g. group or commodity
+  equipment: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>; // e.g. group or container type
   tagIds: string[]; // e.g. Lost, Secured, Follow-up, Partial
   validity: Date; // user defined validity date
-  note: string; // e.g. Free text note
+  note: string; // user note
   capacityTEU: number; // total capacity in number of TEU per year
   createdAt: Date;
   createdBy: string; // User ID of the creator
@@ -40,21 +49,41 @@ export interface OpportunityCounter {
 
 export interface NormalizedOpportunity {
   id: string;
+  opportunityId: string; // Unique identifier for the opportunity
   salesRepId: UserRecord | null; // Normalized user object or null
   bookingPartyId: Client | null; // Normalized client object or null
+  bookingPartyRepId: UserRecord | null; // Normalized user object or null
   statisticalClientId: Client | null; // Normalized client object or null
   agreementId: string;
   quoteKind: string;
-  placeOfReceiptGroupId: OpportunityPlacesGroup | null; // Normalized group object or null
-  portOfLoadingGroupId: OpportunityPortsGroup | null; // Normalized group object or null
-  portOfDischargeGroupId: OpportunityPortsGroup | null; // Normalized group object or null
-  placeOfDeliveryGroupId: OpportunityPlacesGroup | null; // Normalized group object or null
-  commodityGroupId: OpportunityCommodityGroup | null; // Normalized group object or null
-  equipmentGroupId: OpportunityEquipmentGroup | null; // Normalized group object or null
+  placeOfReceipt: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  } | null; // Normalized group object or null
+  portOfLoading: {
+    definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+    value: OpportunityPortsGroup | Port | string;
+  } | null; // Normalized group object or null
+  portOfDischarge: {
+    definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+    value: OpportunityPortsGroup | Port | string;
+  } | null; // Normalized group object or null
+  placeOfDelivery: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  } | null; // Normalized group object or null
+  commodity: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityCommodityGroup | string;
+  } | null; // Normalized group object or null
+  equipment: {
+    definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+    value: OpportunityEquipmentGroup | ContainerType;
+  } | null; // Normalized group object or null
   tagIds: OpportunityTag[]; // Array of normalized tag objects
-  validity: Date;
-  note: string;
-  capacityTEU: number;
+  validity: Date | null;
+  note: string | null;
+  capacityTEU: number | null; // Total capacity in number of TEU per year, or null if not set
   booked: number; // Sum of booking counts for current year
   quoted: number; // Sum of quote counts for current year
   bookedTEU: number; // Sum of TEU counts for bookings in current year

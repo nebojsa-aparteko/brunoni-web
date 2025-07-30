@@ -31,19 +31,11 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
     const idsToFetch = stableOpportunityIds.filter(id => !fetchedIds.has(id));
 
     if (!idsToFetch.length) {
-      console.debug('useOpportunityCounters: All counters already fetched, skipping');
       return;
     }
 
-    console.debug(
-      'useOpportunityCounters: Fetching counters for',
-      idsToFetch.length,
-      'new opportunities',
-    );
-
     const fetchCounters = async () => {
       const counterPromises = idsToFetch.map(async opportunityId => {
-        console.debug('useOpportunityCounters: Fetching counters for opportunity', opportunityId);
         try {
           const countersSnapshot = await firebase
             .firestore()
