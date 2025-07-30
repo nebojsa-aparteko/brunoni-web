@@ -178,7 +178,9 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
             />
             <Autocomplete
               options={clients || []}
-              getOptionLabel={option => option?.name || ''}
+              getOptionLabel={option =>
+                option?.name ? `${option.name} - ${option.city} (${option.id})` : ''
+              }
               value={bookingParty}
               onChange={(_, value) => setBookingParty(value)}
               renderInput={params => (

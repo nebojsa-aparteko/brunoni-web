@@ -256,7 +256,11 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
               type="text"
               fullWidth
               variant="outlined"
-              value={bookingParty?.name || 'Not specified'}
+              value={
+                bookingParty?.name
+                  ? `${bookingParty.name} - ${bookingParty.city} (${bookingParty.id})`
+                  : 'Not specified'
+              }
               InputProps={{
                 readOnly: true,
               }}
