@@ -349,7 +349,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
             />
             <TextField
               margin="dense"
-              label="Capacity TEU"
+              label="Capacity TEU**"
               type="number"
               fullWidth
               variant="outlined"
@@ -392,7 +392,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
           onClick={handleUpdate}
           color="primary"
           variant="contained"
-          disabled={isLoading || (capacityTEU !== '' && Number(capacityTEU) <= 0)}
+          disabled={isLoading || Number(capacityTEU) <= 0}
         >
           {isLoading ? 'Saving...' : 'Update'}
         </Button>

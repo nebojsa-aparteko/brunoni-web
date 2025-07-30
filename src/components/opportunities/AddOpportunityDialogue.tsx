@@ -278,7 +278,7 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
             />
             <TextField
               margin="dense"
-              label="Capacity TEU"
+              label="Capacity TEU**"
               type="number"
               fullWidth
               variant="outlined"
@@ -311,7 +311,7 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
           onClick={handleAdd}
           color="primary"
           variant="contained"
-          disabled={!bookingParty || (capacityTEU !== '' && Number(capacityTEU) <= 0)}
+          disabled={!bookingParty || Number(capacityTEU) <= 0}
         >
           Add
         </Button>
