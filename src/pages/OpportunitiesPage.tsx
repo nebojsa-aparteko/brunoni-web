@@ -5,7 +5,9 @@ import AssessmentIcon from '@material-ui/icons/Assessment';
 import HelpIcon from '@material-ui/icons/Help';
 import { TabPanel } from './BookingsPage';
 import OpportunitiesFilterProvider from '../providers/OpportunitiesFilterProvider';
+import ManualMatchingFilterProvider from '../providers/ManualMatchingFilterProvider';
 import OpportunitiesView from '../components/opportunities/OpportunitiesView';
+import ManualMatchingView from '../components/opportunities/ManualMatchingView';
 
 const useStyles = makeStyles((theme: Theme) => ({
   tabContainer: {
@@ -55,7 +57,9 @@ const OpportunitiesPage: React.FC = () => {
             <OpportunitiesView isAdmin={true} archived={false} showDateRangeFilter={true} />
           </TabPanel>
           <TabPanel value={selectedTab} index={1}>
-            {/* TODO: Implement "Manual Matching" view - for now using same component */}
+            <ManualMatchingFilterProvider>
+              <ManualMatchingView isAdmin={true} />
+            </ManualMatchingFilterProvider>
           </TabPanel>
         </Box>
       </OpportunitiesFilterProvider>
