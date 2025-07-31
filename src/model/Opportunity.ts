@@ -135,8 +135,8 @@ export interface EntityOpportunityMatch {
 }
 
 export interface NormalizedBookingQuoteMatchData {
-  bookingPartyId: string;
-  statisticalClientId: string;
+  bookingPartyId: Client;
+  statisticalClientId: Client;
   agreementId: string;
   placeOfReceipt: {
     definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;

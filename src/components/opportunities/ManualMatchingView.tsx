@@ -5,6 +5,10 @@ import ManualMatchingFiltersBar from './ManualMatchingFiltersBar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { useManualMatchingListFilterContext } from '../../providers/ManualMatchingFilterProvider';
 import ManualMatchingTable, { SortConfig } from './ManualMatchingTable';
+import ManualMatchingEmptyResults from './ManualMatchingEmptyResults';
+import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import useNormalizedOpportunityMatch from '../../hooks/useNormalizedOpportunityMatch';
+import { EntityOpportunityMatch } from '../../model/Opportunity';
 
 interface Props {
   isAdmin?: boolean;
@@ -20,17 +24,49 @@ const useStyles = makeStyles(theme => ({
 
 const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
   const classes = useStyles();
-  const isLoading = false; // Replace with actual loading state when implementing data fetching
   const [filters, setFilters] = useManualMatchingListFilterContext();
 
-  // TODO: Implement data fetching for EntityOpportunityMatch
-  // const entityOpportunityMatches = useFirestoreCollection('opportunity-matches');
+  // Fetch opportunity matches from Firestore
+  const opportunityMatchSnapshot = useFirestoreCollection('opportunity-matches');
+  if (opportunityMatchSnapshot?.empty && opportunityMatchSnapshot?.size === 0) {
+    console.log('opportunity-matches collection is empty or inaccessible');
+  }
+  // Convert snapshot to EntityOpportunityMatch array
+  const entityOpportunityMatches = useMemo(() => {
+    if (!opportunityMatchSnapshot) return [];
+    if (!opportunityMatchSnapshot.docs) return [];
+    return opportunityMatchSnapshot.docs.map(doc => doc.data() as EntityOpportunityMatch);
+  }, [opportunityMatchSnapshot]);
+
+  // Get the normalization function
+  const normalizeOpportunityMatch = useNormalizedOpportunityMatch();
+
+  // Normalize the opportunity matches
+  const normalizedMatches = useMemo(() => {
+    if (!entityOpportunityMatches || !normalizeOpportunityMatch) return [];
+    return entityOpportunityMatches.map(match => normalizeOpportunityMatch(match));
+  }, [entityOpportunityMatches, normalizeOpportunityMatch]);
 
   const filteredData = useMemo(() => {
-    // TODO: Implement filtering logic based on selected opportunity
-    // For now, return empty array
-    return [];
-  }, [filters]);
+    if (!normalizedMatches) return [];
+
+    return normalizedMatches.filter(match => {
+      // Filter by selected opportunity
+      if (filters.opportunity && filters.opportunity !== 'unmatched') {
+        return match.opportunityId === filters.opportunity;
+      }
+
+      // Show unmatched items (items without an opportunityId or with null/undefined opportunityId)
+      if (filters.opportunity === 'unmatched') {
+        return !match.opportunityId;
+      }
+
+      // Default: show all matches if no specific filter is applied
+      return true;
+    });
+  }, [normalizedMatches, filters]);
+
+  const isLoading = !opportunityMatchSnapshot || !normalizeOpportunityMatch;
 
   // Sorting state
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: 'asc' });
@@ -53,7 +89,25 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
       </Grid>
       <div>
         {!isLoading ? (
-          <ManualMatchingTable sortConfig={sortConfig} onSort={handleSort} />
+          <Fragment>
+            {filteredData && filteredData.length === 0 ? (
+              <ManualMatchingEmptyResults
+                message={
+                  filters.opportunity === 'unmatched'
+                    ? 'No unmatched opportunities found.'
+                    : filters.opportunity
+                      ? 'No matches found for the selected opportunity.'
+                      : 'No manual matching opportunities found for your filter criteria. Try changing filters.'
+                }
+              />
+            ) : (
+              <ManualMatchingTable
+                sortConfig={sortConfig}
+                onSort={handleSort}
+                opportunityMatches={filteredData}
+              />
+            )}
+          </Fragment>
         ) : (
           <Paper className={classes.root}>
             <ChartsCircularProgress />
