@@ -108,16 +108,73 @@ export enum OpportunityMatchStatus {
   Discarded = 'discarded',
 }
 
-// opportunity-matches Firestore collection
+export interface BookingQuoteMatchData {
+  bookingPartyId: string;
+  statisticalClientId: string;
+  agreementId: string;
+  placeOfReceipt: OpportunityMatchDefinition<'groupId' | 'freeText'>[];
+  portOfLoading: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>[];
+  portOfDischarge: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>[];
+  placeOfDelivery: OpportunityMatchDefinition<'groupId' | 'freeText'>[];
+  commodity: OpportunityMatchDefinition<'groupId' | 'freeText'>[];
+  equipment: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>[];
+}
 export interface EntityOpportunityMatch {
   entity: OpportunityMatchEntity;
   entityId: string; // ID of the matched quote or booking
+  year: number; // Entity year
+  month: number; // Entity month
   bookingPartyId: string; // Booking party id, can't be changed but we need it for potential re-matching
+  teuCount?: number; // TEUs for the matched entity, can be null if not applicable
+  entityMatchData: BookingQuoteMatchData; // Data used for matching
   matches: OpportunityMatch[]; // List of matched opportunities
   opportunityId?: string; // ID of the opportunity, in case of single > 90% match
   status: OpportunityMatchStatus; // Status of the match
-  createdAt: Date; // Timestamp of when the match was created
-  createdBy: string; // User ID of the creator
-  updatedAt: Date; // Timestamp of when the match was last updated
-  updatedBy: string; // User ID of the last updater
+  matchedAt: Date; // Timestamp of when the match was created
+  matchedBy: string; // User ID of the creator
+}
+
+export interface NormalizedBookingQuoteMatchData {
+  bookingPartyId: string;
+  statisticalClientId: string;
+  agreementId: string;
+  placeOfReceipt: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  }[];
+  portOfLoading: {
+    definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+    value: OpportunityPortsGroup | Port | string;
+  }[];
+  portOfDischarge: {
+    definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+    value: OpportunityPortsGroup | Port | string;
+  }[];
+  placeOfDelivery: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  }[];
+  commodity: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityCommodityGroup | string;
+  }[];
+  equipment: {
+    definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+    value: OpportunityEquipmentGroup | ContainerType;
+  }[];
+}
+
+export interface NormalizedEntityOpportunityMatch {
+  entity: OpportunityMatchEntity;
+  entityId: string; // ID of the matched quote or booking
+  year: number; // Entity year
+  month: number; // Entity month
+  bookingPartyId: string; // Booking party id, can't be changed but we need it for potential re-matching
+  teuCount?: number; // TEUs for the matched entity, can be null if not applicable
+  entityMatchData: NormalizedBookingQuoteMatchData; // Data used for matching
+  matches: OpportunityMatch[]; // List of matched opportunities
+  opportunityId?: string; // ID of the opportunity, in case of single > 90% match
+  status: OpportunityMatchStatus; // Status of the match
+  matchedAt: Date; // Timestamp of when the match was created
+  matchedBy: string; // User ID of the creator
 }
