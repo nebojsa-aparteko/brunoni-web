@@ -28,7 +28,7 @@ import {
 } from '../../bookings/checklist/ActivityModel';
 import { MentionItem } from 'react-mentions';
 import { flow, isNil, omitBy } from 'lodash/fp';
-import { Fragment, useCallback, useContext, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
 import UserRecordContext from '../../../contexts/UserRecordContext';
 import { useSnackbar } from 'notistack';
 import firebase from '../../../firebase';
