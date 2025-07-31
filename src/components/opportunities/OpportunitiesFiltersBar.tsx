@@ -194,7 +194,7 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
               label="Place of Delivery"
               options={placesOptions}
               onChange={setPlacesOfDeliveryFilter}
-              value={placesOfDelivery}
+              value={placesOfDelivery || null}
             />
           </Grid>
         )}{' '}
@@ -204,7 +204,7 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
               label="Place of Receipt"
               options={placesOptions}
               onChange={setPlacesOfReceiptFilter}
-              value={placesOfReceipt}
+              value={placesOfReceipt || null}
             />
           </Grid>
         )}
@@ -224,20 +224,20 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
         {commodityOptions && (
           <Grid item sm={3} xs={12}>
             <OpportunityCommodityGroupInput
-              label="Commodity Groups"
+              label="Commodity"
               options={commodityOptions}
               onChange={setCommodityFilter}
-              value={selectedCommodity}
+              value={selectedCommodity || null}
             />
           </Grid>
         )}
         {equipmentOptions && (
           <Grid item sm={3} xs={12}>
             <OpportunityEquipmentGroupInput
-              label="Equipment Groups"
+              label="Equipment"
               options={equipmentOptions}
               onChange={setEquipmentFilter}
-              value={selectedEquipment}
+              value={selectedEquipment || null}
             />
           </Grid>
         )}
