@@ -81,7 +81,8 @@ const OpportunityPortsGroupInput: React.FC<Props> = ({
           return option.value;
         }
         if (option?.definition?.type === 'portId') {
-          return (option.value as Port).city;
+          const port = option.value as Port;
+          return port.city + ' (' + port.id + ')';
         }
         return (option.value as OpportunityPortsGroup).name + ' (Group)';
       }}
@@ -123,7 +124,8 @@ const OpportunityPortsGroupInput: React.FC<Props> = ({
         if (typeof option?.value === 'string') {
           name = option.value;
         } else if (option?.definition?.type === 'portId') {
-          name = (option.value as Port).city;
+          const port = option.value as Port;
+          name = port.city + ' (' + port.id + ')';
         } else {
           name = (option.value as OpportunityPortsGroup).name + ' (Group)';
         }

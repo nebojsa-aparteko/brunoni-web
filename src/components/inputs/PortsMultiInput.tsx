@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import firebase from 'firebase/compat/app';
+import firebase from '../../firebase';
 
 interface Port {
   id: string;

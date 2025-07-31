@@ -3,6 +3,7 @@ import { Box, makeStyles, Paper, Tab, Tabs, Theme } from '@material-ui/core';
 import Meta from '../components/Meta';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import HelpIcon from '@material-ui/icons/Help';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import { TabPanel } from './BookingsPage';
 import OpportunitiesFilterProvider from '../providers/OpportunitiesFilterProvider';
 import ManualMatchingFilterProvider from '../providers/ManualMatchingFilterProvider';
@@ -51,15 +52,19 @@ const OpportunitiesPage: React.FC = () => {
             >
               <Tab icon={<AssessmentIcon />} label="Opportunities" {...a11yProps(0)} />
               <Tab icon={<HelpIcon />} label="Manual Matching" {...a11yProps(1)} />
+              <Tab icon={<CheckCircleIcon />} label="Tasks" {...a11yProps(2)} />
             </Tabs>
           </Paper>
           <TabPanel value={selectedTab} index={0}>
-            <OpportunitiesView isAdmin={true} archived={false} showDateRangeFilter={true} />
+            <OpportunitiesView isAdmin={true} />
           </TabPanel>
           <TabPanel value={selectedTab} index={1}>
             <ManualMatchingFilterProvider>
               <ManualMatchingView isAdmin={true} />
             </ManualMatchingFilterProvider>
+          </TabPanel>
+          <TabPanel value={selectedTab} index={2}>
+            {/* <OpportunityTasksView isAdmin={true} /> */}
           </TabPanel>
         </Box>
       </OpportunitiesFilterProvider>

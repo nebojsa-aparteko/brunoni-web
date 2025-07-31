@@ -160,7 +160,7 @@ export const normalizeQuote = (
   const normalizeContainers = flow(
     asArray,
     map(normalizeContainer),
-    filter(container => container.containerType !== null),
+    filter((container: Container) => container.containerType !== null),
   );
 
   return flow(

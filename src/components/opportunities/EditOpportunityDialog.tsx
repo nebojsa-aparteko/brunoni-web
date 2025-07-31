@@ -291,14 +291,14 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
               )}
             />
             <OpportunityEquipmentGroupInput
-              label="Equipment Groups"
+              label="Equipment"
               options={equipmentOptions || []}
               value={equipment}
               onChange={group => setEquipment(group)}
               margin="dense"
             />
             <OpportunityCommodityGroupInput
-              label="Commodity Groups"
+              label="Commodity"
               options={commodityOptions || []}
               value={commodity}
               onChange={group => setCommodity(group)}

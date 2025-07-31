@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter }) => {
+const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
   const classes = useStyles();
   const isLoading = false; // Replace with actual loading state if needed
   const opportunitySnapshot = useFirestoreCollection('opportunities');

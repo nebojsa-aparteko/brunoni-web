@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { Box, Paper, Typography, Button, Chip } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
-import firebase from 'firebase/compat/app';
+import firebase from '../../firebase';
 import { GlobalContext } from '../../store/GlobalStore';
 import TagsMultiInput from '../inputs/TagsMultiInput';
 import { OpportunityTag } from '../../model/OpportunityTag';

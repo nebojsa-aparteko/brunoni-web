@@ -8,7 +8,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
-import firebase from 'firebase/compat/app';
+import firebase from '../../firebase';
 import { isEqual, omit, set } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
