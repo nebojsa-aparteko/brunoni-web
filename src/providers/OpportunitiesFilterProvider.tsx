@@ -34,12 +34,12 @@ export interface OpportunitiesContextFilters extends ContextFilters {
   } | null;
   tags?: OpportunityTag[];
   commodity?: {
-    definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
-    value: OpportunityCommodityGroup | ContainerType;
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityCommodityGroup | string;
   } | null;
   equipment?: {
-    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
-    value: OpportunityEquipmentGroup | string;
+    definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+    value: OpportunityEquipmentGroup | ContainerType;
   } | null;
   quoteKind?: QuoteKind;
   opportunityId?: string;
