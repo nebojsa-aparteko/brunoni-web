@@ -302,6 +302,7 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
               onOpen={() => setValidityPickerOpen(true)}
               onClose={() => setValidityPickerOpen(false)}
               margin="dense"
+              format="dd.MM.yyyy"
               fullWidth
             />
           </Grid>
