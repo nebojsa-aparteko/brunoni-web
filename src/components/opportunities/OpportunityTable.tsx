@@ -18,7 +18,7 @@ import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
   switch (key) {
     case 'id':
-      return opportunity.opportunityId || '';
+      return opportunity.opportunityId ? Number(opportunity.opportunityId) : 0;
     case 'salesRep':
       return opportunity.salesRepId
         ? `${opportunity.salesRepId.lastName} ${opportunity.salesRepId.firstName}`
@@ -65,10 +65,10 @@ const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
             ? opportunity.portOfDischarge.value.name
             : '') || ''
         : opportunity.portOfDischarge?.definition.type === 'freeText'
-          ? String(opportunity.portOfDischarge.value || '')
+          ? String(opportunity.portOfDischarge?.value || '')
           : (typeof opportunity.portOfDischarge?.value === 'object' &&
-            opportunity.portOfDischarge.value &&
-            'city' in opportunity.portOfDischarge.value
+            opportunity.portOfDischarge?.value &&
+            'city' in opportunity.portOfDischarge?.value
               ? opportunity.portOfDischarge.value.city
               : '') || '';
     case 'placeOfDelivery':
@@ -301,7 +301,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
       <TableCell align="center">{opportunity.agreementId || ''}</TableCell>
 
       <TableCell align="center">
-        {opportunity.validity ? format(new Date(opportunity.validity), 'd.MMMM') : ''}
+        {opportunity.validity ? format(new Date(opportunity.validity), 'dd.MM.yyyy') : ''}
       </TableCell>
       <TableCell align="center">
         {opportunity.capacityTEU ? `${opportunity.capacityTEU} TEU` : ''}
