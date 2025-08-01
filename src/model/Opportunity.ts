@@ -178,3 +178,18 @@ export interface NormalizedEntityOpportunityMatch {
   matchedAt: Date; // Timestamp of when the match was created
   matchedBy: string; // User ID of the creator
 }
+
+export enum TaskStatus {
+  Active = 'active',
+  Resolved = 'resolved',
+}
+export interface OpportunityTask {
+  opportunityId: string; // current opportunity
+  createdAt: Date; // current date
+  createdBy: string; // user id
+  assignedTo: string; // user id
+  status: TaskStatus; // ACTIVE, RESOLVED
+  dueDate: Date; // due date (dd.MM.yyyyT00:00:00) swiss time, no hours
+  //  "content1": string, // preselected text - POSTPONED, check with Nenad what are possible values
+  content: string; // free text - check naming
+}
