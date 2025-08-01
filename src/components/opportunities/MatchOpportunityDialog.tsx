@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -6,15 +6,25 @@ import {
   DialogActions,
   Button,
   TextField,
+  Tooltip,
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { NormalizedOpportunity } from '../../model/Opportunity';
+import {
+  NormalizedOpportunity,
+  NormalizedEntityOpportunityMatch,
+  OpportunityMatch,
+} from '../../model/Opportunity';
 
 interface MatchOpportunityDialogProps {
   open: boolean;
   onClose: () => void;
   onMatch: (opportunityId: string) => void;
   opportunities: NormalizedOpportunity[];
+  currentMatch?: NormalizedEntityOpportunityMatch;
+}
+
+interface EnhancedOpportunity extends NormalizedOpportunity {
+  matchInfo?: OpportunityMatch;
 }
 
 const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
@@ -22,10 +32,52 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
   onClose,
   onMatch,
   opportunities,
+  currentMatch,
 }) => {
-  const [selectedOpportunity, setSelectedOpportunity] = useState<NormalizedOpportunity | null>(
-    null,
-  );
+  const [selectedOpportunity, setSelectedOpportunity] = useState<EnhancedOpportunity | null>(null);
+
+  // Create enhanced opportunities list with match info
+  const enhancedOpportunities = useMemo(() => {
+    const matches = currentMatch?.matches || [];
+    const matchedOpportunityIds = new Set(matches.map(m => m.opportunityId));
+
+    const matched: EnhancedOpportunity[] = [];
+    const unmatched: EnhancedOpportunity[] = [];
+
+    opportunities.forEach(opportunity => {
+      const matchInfo = matches.find(m => m.opportunityId === opportunity.id);
+      if (matchInfo) {
+        matched.push({ ...opportunity, matchInfo });
+      } else {
+        unmatched.push(opportunity);
+      }
+    });
+
+    // Sort matched by probability descending
+    matched.sort((a, b) => (b.matchInfo?.probability || 0) - (a.matchInfo?.probability || 0));
+
+    return [...matched, ...unmatched];
+  }, [opportunities, currentMatch]);
+
+  // Helper function to get color based on probability
+  const getProbabilityColor = (probability: number): string => {
+    if (probability >= 0.8) return '#4caf50'; // Green for 80%+
+    if (probability >= 0.6) return '#ff9800'; // Orange for 60-79%
+    if (probability >= 0.4) return '#f44336'; // Red for 40-59%
+    return '#9e9e9e'; // Gray for <40%
+  };
+
+  // Helper function to format location data
+  const formatLocation = (location: any): string => {
+    if (!location) return '';
+    if (location.definition?.type === 'groupId') {
+      return location.value?.name || location.value || '';
+    }
+    if (location.definition?.type === 'portId') {
+      return `${location.value?.city || ''} ${location.value?.id || ''}`.trim();
+    }
+    return location.value || '';
+  };
 
   useEffect(() => {
     if (!open) {
@@ -45,12 +97,48 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
       <DialogTitle>Match with Opportunity</DialogTitle>
       <DialogContent>
         <Autocomplete
-          options={opportunities || []}
-          getOptionLabel={option =>
-            `${option.opportunityId} - ${option.bookingPartyId?.name || ''} - ${option.agreementId || ''}`
-          }
+          options={enhancedOpportunities || []}
+          getOptionLabel={(option: EnhancedOpportunity) => {
+            const bookingParty = option.bookingPartyId?.name || '';
+            const placeOfReceipt = formatLocation(option.placeOfReceipt);
+            const portOfLoading = formatLocation(option.portOfLoading);
+            const portOfDischarge = formatLocation(option.portOfDischarge);
+            const placeOfDelivery = formatLocation(option.placeOfDelivery);
+
+            let label = `${option.opportunityId} - ${bookingParty} - ${placeOfReceipt} - ${portOfLoading} - ${portOfDischarge} - ${placeOfDelivery}`;
+
+            if (option.matchInfo) {
+              const probability = Math.round(option.matchInfo.probability * 100);
+              label += ` - ${probability}%`;
+            }
+
+            return label;
+          }}
           value={selectedOpportunity}
           onChange={(_, value) => setSelectedOpportunity(value)}
+          renderOption={(option: EnhancedOpportunity) => {
+            const bookingParty = option.bookingPartyId?.name || '';
+            const placeOfReceipt = formatLocation(option.placeOfReceipt);
+            const portOfLoading = formatLocation(option.portOfLoading);
+            const portOfDischarge = formatLocation(option.portOfDischarge);
+            const placeOfDelivery = formatLocation(option.placeOfDelivery);
+
+            let label = `${option.opportunityId} - ${bookingParty} - ${placeOfReceipt} - ${portOfLoading} - ${portOfDischarge} - ${placeOfDelivery}`;
+
+            if (option.matchInfo) {
+              const probability = Math.round(option.matchInfo.probability * 100);
+              const color = getProbabilityColor(option.matchInfo.probability);
+              label += ` - ${probability}%`;
+
+              return (
+                <Tooltip title={option.matchInfo.reason} arrow placement="right">
+                  <div style={{ color, fontWeight: 'bold', width: '100%' }}>{label}</div>
+                </Tooltip>
+              );
+            }
+
+            return <div>{label}</div>;
+          }}
           renderInput={params => (
             <TextField
               {...params}
@@ -64,7 +152,7 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
           filterOptions={(options, { inputValue }) => {
             const lowercaseInput = inputValue.toLowerCase();
             return options.filter(
-              option =>
+              (option: EnhancedOpportunity) =>
                 option.opportunityId.toLowerCase().includes(lowercaseInput) ||
                 option.bookingPartyId?.name?.toLowerCase().includes(lowercaseInput) ||
                 option.agreementId?.toLowerCase().includes(lowercaseInput),

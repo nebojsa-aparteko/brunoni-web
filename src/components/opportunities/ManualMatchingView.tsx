@@ -258,6 +258,7 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
         }}
         onMatch={handleOpportunityMatch}
         opportunities={opportunities || []}
+        currentMatch={selectedMatch || undefined}
       />
 
       {/* Add Opportunity Dialog */}
