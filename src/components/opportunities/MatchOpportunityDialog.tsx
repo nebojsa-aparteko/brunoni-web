@@ -39,7 +39,6 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
   // Create enhanced opportunities list with match info
   const enhancedOpportunities = useMemo(() => {
     const matches = currentMatch?.matches || [];
-    const matchedOpportunityIds = new Set(matches.map(m => m.opportunityId));
 
     const matched: EnhancedOpportunity[] = [];
     const unmatched: EnhancedOpportunity[] = [];
@@ -58,6 +57,12 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
 
     return [...matched, ...unmatched];
   }, [opportunities, currentMatch]);
+
+  // Find currently matched opportunity to set as default
+  const currentlyMatchedOpportunity = useMemo(() => {
+    if (!currentMatch?.opportunityId) return null;
+    return enhancedOpportunities.find(opp => opp.id === currentMatch.opportunityId) || null;
+  }, [currentMatch?.opportunityId, enhancedOpportunities]);
 
   // Helper function to get color based on probability
   const getProbabilityColor = (probability: number): string => {
@@ -82,8 +87,11 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
   useEffect(() => {
     if (!open) {
       setSelectedOpportunity(null);
+    } else if (currentlyMatchedOpportunity) {
+      // Set currently matched opportunity as default when dialog opens for rematch
+      setSelectedOpportunity(currentlyMatchedOpportunity);
     }
-  }, [open]);
+  }, [open, currentlyMatchedOpportunity]);
 
   const handleMatch = () => {
     if (selectedOpportunity) {
@@ -91,6 +99,9 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
       onClose();
     }
   };
+
+  // Check if the selected opportunity is the same as currently matched
+  const isAlreadyMatched = selectedOpportunity?.id === currentMatch?.opportunityId;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -166,9 +177,9 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
           onClick={handleMatch}
           color="primary"
           variant="contained"
-          disabled={!selectedOpportunity}
+          disabled={!selectedOpportunity || isAlreadyMatched}
         >
-          Match
+          {isAlreadyMatched ? 'Already Matched' : 'Match'}
         </Button>
       </DialogActions>
     </Dialog>

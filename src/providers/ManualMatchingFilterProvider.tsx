@@ -4,6 +4,7 @@ import useUser from '../hooks/useUser';
 
 export interface ManualMatchingContextFilters extends ContextFilters {
   opportunity?: string; // 'unmatched' or opportunity ID
+  entityId?: string; // booking/quote ID for search
 }
 
 export const MANUAL_MATCHING_FILTERS_INITIAL_STATE = {

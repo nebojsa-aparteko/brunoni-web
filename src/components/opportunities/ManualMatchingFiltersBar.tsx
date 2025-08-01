@@ -11,19 +11,43 @@ interface Props {
 
 const ManualMatchingFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const opportunities = useOpportunities();
-  const { opportunity } = filters;
+  const { opportunity, entityId } = filters;
 
   const setOpportunityFilter = (value: string | null) => {
     setFilters && setFilters(set('opportunity', value || 'unmatched')(filters));
   };
 
-  // Create options array with "Unmatched" as first option
+  const setEntityIdFilter = (value: string) => {
+    setFilters && setFilters(set('entityId', value)(filters));
+  };
+
+  const formatLocation = (location: any): string => {
+    if (!location) return '';
+    if (location.definition?.type === 'groupId') {
+      return location.value?.name || location.value || '';
+    }
+    if (location.definition?.type === 'portId') {
+      return `${location.value?.city || ''} ${location.value?.id || ''}`.trim();
+    }
+    return location.value || '';
+  };
+
   const filterOptions = [
     { id: 'unmatched', label: 'Unmatched' },
-    ...(opportunities || []).map(opp => ({
-      id: opp.id,
-      label: `${opp.opportunityId || opp.id} - ${opp.bookingPartyId?.name}`,
-    })),
+    ...(opportunities || []).map(opp => {
+      const bookingParty = opp.bookingPartyId?.name || '';
+      const placeOfReceipt = formatLocation(opp.placeOfReceipt);
+      const portOfLoading = formatLocation(opp.portOfLoading);
+      const portOfDischarge = formatLocation(opp.portOfDischarge);
+      const placeOfDelivery = formatLocation(opp.placeOfDelivery);
+
+      const label = `${opp.opportunityId} - ${bookingParty} - ${placeOfReceipt} - ${portOfLoading} - ${portOfDischarge} - ${placeOfDelivery}`;
+
+      return {
+        id: opp.id,
+        label,
+      };
+    }),
   ];
 
   const selectedValue = filterOptions.find(option => option.id === opportunity) || filterOptions[0];
@@ -47,6 +71,16 @@ const ManualMatchingFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             renderInput={params => (
               <TextField {...params} label="Opportunity" variant="outlined" fullWidth />
             )}
+          />
+        </Grid>
+        <Grid item sm={6} xs={12}>
+          <TextField
+            label="Entity ID"
+            variant="outlined"
+            fullWidth
+            value={entityId || ''}
+            onChange={e => setEntityIdFilter(e.target.value)}
+            placeholder="Search by booking/quote ID..."
           />
         </Grid>
       </Grid>
