@@ -32,7 +32,10 @@ import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup
 import { QUOTE_KIND_OPTIONS } from '../../model/Opportunity';
 import useBookingPartyUsers from '../../hooks/useBookingPartyUsers';
 import DateInput from '../inputs/DateInput';
-import { OpportunityMatchDefinition } from '../../model/Opportunity';
+import {
+  OpportunityMatchDefinition,
+  NormalizedEntityOpportunityMatch,
+} from '../../model/Opportunity';
 import ContainerType from '../../model/ContainerType';
 import useOpportunityPlacesWithDefinition from '../../hooks/useOpportunityPlacesWithDefinition';
 import Port from '../../model/Port';
@@ -40,10 +43,16 @@ import Port from '../../model/Port';
 interface AddOpportunityDialogProps {
   open: boolean;
   onClose: () => void;
-  onAdd: (data: any) => void;
+  onAdd?: (data: any) => void;
+  prefillFromMatch?: NormalizedEntityOpportunityMatch;
 }
 
-const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClose, onAdd }) => {
+const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({
+  open,
+  onClose,
+  onAdd,
+  prefillFromMatch,
+}) => {
   const [salesRep, setSalesRep] = useState<UserRecord | null>(null);
   const [bookingParty, setBookingParty] = useState<Client | null>(null);
   const [bookingPartyRep, setBookingPartyRep] = useState<UserRecord | null>(null);
@@ -111,6 +120,59 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
     }
   }, [open]);
 
+  // Prefill data from match when dialog opens
+  useEffect(() => {
+    if (open && prefillFromMatch && clients) {
+      const matchData = prefillFromMatch.entityMatchData;
+
+      // Set booking party
+      const bookingPartyClient = clients.find(c => c.id === prefillFromMatch.bookingPartyId);
+      if (bookingPartyClient) {
+        setBookingParty(bookingPartyClient);
+      }
+
+      // Set statistical client
+      if (matchData.statisticalClientId) {
+        setStatisticalClient(matchData.statisticalClientId);
+      }
+
+      // Set agreement ID
+      if (matchData.agreementId) {
+        setAgreementId(matchData.agreementId);
+      }
+
+      // Set equipment - take first item if available
+      if (matchData.equipment && matchData.equipment.length > 0) {
+        setEquipment(matchData.equipment[0]);
+      }
+
+      // Set commodity - take first item if available
+      if (matchData.commodity && matchData.commodity.length > 0) {
+        setCommodity(matchData.commodity[0]);
+      }
+
+      // Set place of receipt - take first item if available
+      if (matchData.placeOfReceipt && matchData.placeOfReceipt.length > 0) {
+        setPlaceOfReceipt(matchData.placeOfReceipt[0]);
+      }
+
+      // Set port of loading - take first item if available
+      if (matchData.portOfLoading && matchData.portOfLoading.length > 0) {
+        setPortOfLoading(matchData.portOfLoading[0]);
+      }
+
+      // Set port of discharge - take first item if available
+      if (matchData.portOfDischarge && matchData.portOfDischarge.length > 0) {
+        setPortOfDischarge(matchData.portOfDischarge[0]);
+      }
+
+      // Set place of delivery - take first item if available
+      if (matchData.placeOfDelivery && matchData.placeOfDelivery.length > 0) {
+        setPlaceOfDelivery(matchData.placeOfDelivery[0]);
+      }
+    }
+  }, [open, prefillFromMatch, clients]);
+
   // Reset booking party rep when booking party changes
   useEffect(() => {
     setBookingPartyRep(null);
@@ -140,7 +202,13 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       updatedBy: salesRep?.id || '',
     };
     try {
-      await firebase.firestore().collection('opportunities').add(opportunityData);
+      // If we have an onAdd handler (from match), use it to handle both opportunity creation and match update
+      if (onAdd) {
+        await onAdd(opportunityData);
+      } else {
+        // Otherwise, directly create the opportunity (legacy behavior)
+        await firebase.firestore().collection('opportunities').add(opportunityData);
+      }
       console.debug('Adding new opportunity with data:', opportunityData);
       onClose();
     } catch (error) {
@@ -150,7 +218,9 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Add New Opportunity</DialogTitle>
+      <DialogTitle>
+        {prefillFromMatch ? 'Create Opportunity from Match' : 'Add New Opportunity'}
+      </DialogTitle>
       <DialogContent>
         <Grid container spacing={2}>
           <Grid item xs={6}>
