@@ -190,6 +190,11 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
     }
   };
 
+  const handleRematchOpportunity = (match: NormalizedEntityOpportunityMatch) => {
+    setSelectedMatch(match);
+    setMatchDialogOpen(true);
+  };
+
   const handleRowClick = (match: NormalizedEntityOpportunityMatch) => {
     const entityId = match.entityId;
 
@@ -232,6 +237,7 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
                 onCreateNewOpportunity={handleCreateNewOpportunity}
                 onDiscardMatch={handleDiscardMatch}
                 onUnmatchOpportunity={handleUnmatchOpportunity}
+                onRematchOpportunity={handleRematchOpportunity}
                 onRowClick={handleRowClick}
               />
             )}
