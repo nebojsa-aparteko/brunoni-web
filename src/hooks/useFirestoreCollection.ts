@@ -47,6 +47,12 @@ export default function useFirestoreCollection(
           },
           error: (error: firebase.firestore.FirestoreError) => {
             console.error('useFirestoreCollection', name, 'threw an error', error);
+            // Set an empty snapshot on error to prevent infinite loading
+            setSnapshot({
+              docs: [],
+              empty: true,
+              size: 0,
+            } as firebase.firestore.QuerySnapshot);
           },
           next: (snapshot: firebase.firestore.QuerySnapshot) => {
             console.debug(

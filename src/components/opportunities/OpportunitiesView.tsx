@@ -4,7 +4,6 @@ import Meta from '../Meta';
 import OpportunitiesFiltersBar from './OpportunitiesFiltersBar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { useOpportunitiesListFilterContext } from '../../providers/OpportunitiesFilterProvider';
-import { useOpportunityListPaginationContext } from '../../providers/OpportunityListPaginationProvider';
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 import OpportunityTable, { SortConfig } from './OpportunityTable';
 import { NormalizedOpportunity } from '../../model/Opportunity';
@@ -42,9 +41,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
     );
   }, [opportunitySnapshot?.docs, normalizeOpportunity]);
   const [filters, setFilters] = useOpportunitiesListFilterContext();
-  const [opportunityPaginationContextData, setOpportnityPaginationContextData] =
-    useOpportunityListPaginationContext();
-  const { searchString, page, rowsPerPage } = opportunityPaginationContextData;
 
   const { assignee } = filters;
 
