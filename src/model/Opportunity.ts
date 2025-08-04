@@ -90,6 +90,37 @@ export interface NormalizedOpportunity {
   quotedTEU: number; // Sum of TEU counts for quotes in current year
 }
 
+// Helper function to format location data
+const formatLocation = (location: any): string => {
+  if (!location) return '';
+  if (location.definition?.type === 'groupId') {
+    return location.value?.name || location.value || '';
+  }
+  if (location.definition?.type === 'portId') {
+    return `${location.value?.city || ''} ${location.value?.id || ''}`.trim();
+  }
+  return location.value || '';
+};
+
+export function opportunityToString(opportunity: NormalizedOpportunity): string {
+  const bookingParty = opportunity.bookingPartyId?.name || '';
+  const statisticalClient = opportunity.statisticalClientId?.name || '';
+  const placeOfReceipt = formatLocation(opportunity.placeOfReceipt);
+  const portOfLoading = formatLocation(opportunity.portOfLoading);
+  const portOfDischarge = formatLocation(opportunity.portOfDischarge);
+  const placeOfDelivery = formatLocation(opportunity.placeOfDelivery);
+  const labels = [
+    bookingParty,
+    statisticalClient,
+    placeOfReceipt,
+    portOfLoading,
+    portOfDischarge,
+    placeOfDelivery,
+  ];
+  const nonEmptyLabels = labels.filter(label => label);
+  return `${opportunity.opportunityId} - ${nonEmptyLabels.join(' - ')}`;
+}
+
 export interface OpportunityMatch {
   opportunityId: string;
   probability: number; // e.g. 0.8 for 80% probability
