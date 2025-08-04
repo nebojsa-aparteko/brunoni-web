@@ -6,6 +6,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   makeStyles,
   Typography,
   Theme,
@@ -21,7 +22,45 @@ import { ManualMatchingTableToolbar } from './ManualMatchingTableToolbar';
 import { NormalizedEntityOpportunityMatch, OpportunityMatchStatus } from '../../model/Opportunity';
 import Port from '../../model/Port';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
-import { NormalizedBookingQuoteMatchData } from '../../model/Opportunity';
+import useUser from '../../hooks/useUser';
+
+const getSortValue = (match: NormalizedEntityOpportunityMatch, key: string): any => {
+  const matchData = match.entityMatchData;
+
+  switch (key) {
+    case 'id':
+      return match.entityId || '';
+    case 'bookingParty':
+      return matchData?.bookingPartyId?.name || '';
+    case 'agreement':
+      return matchData?.agreementId || '';
+    case 'statisticalClient':
+      return matchData?.statisticalClientId?.name || '';
+    default:
+      return '';
+  }
+};
+
+const sortMatches = (
+  matches: NormalizedEntityOpportunityMatch[],
+  sortConfig: SortConfig,
+): NormalizedEntityOpportunityMatch[] => {
+  if (!sortConfig.key) return matches;
+
+  return [...matches].sort((a, b) => {
+    const aValue = getSortValue(a, sortConfig.key);
+    const bValue = getSortValue(b, sortConfig.key);
+
+    let comparison = 0;
+    if (aValue > bValue) {
+      comparison = 1;
+    } else if (aValue < bValue) {
+      comparison = -1;
+    }
+
+    return sortConfig.direction === 'desc' ? -comparison : comparison;
+  });
+};
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     marginBottom: theme.spacing(3),
@@ -92,6 +131,36 @@ export interface SortConfig {
   direction: 'asc' | 'desc';
 }
 
+interface SortableHeaderProps {
+  sortKey: string;
+  children: React.ReactNode;
+  sortConfig?: SortConfig;
+  onSort?: (key: string) => void;
+}
+
+const SortableHeader: React.FC<SortableHeaderProps> = ({
+  sortKey,
+  children,
+  sortConfig,
+  onSort,
+}) => {
+  const classes = useStyles();
+  const active = sortConfig?.key === sortKey;
+  const direction = active ? sortConfig.direction : 'asc';
+
+  const handleClick = () => {
+    onSort?.(sortKey);
+  };
+
+  return (
+    <TableCell align="center" className={classes.headerCell}>
+      <TableSortLabel active={active} direction={direction} onClick={handleClick}>
+        {children}
+      </TableSortLabel>
+    </TableCell>
+  );
+};
+
 interface Props {
   sortConfig?: SortConfig;
   onSort?: (key: string) => void;
@@ -112,6 +181,8 @@ const ManualMatchingTable: React.FC<Props> = ({
   onUnmatchOpportunity,
   onAutoRematchOpportunity,
   onRowClick,
+  sortConfig,
+  onSort,
 }) => {
   console.debug('ManualMatchingTable props', {
     opportunityMatches,
@@ -202,9 +273,34 @@ const ManualMatchingTable: React.FC<Props> = ({
     }
   }, [selectedMatches, onBulkDiscardMatches]);
 
+  const [user] = useUser();
   const handleBulkAutoRematch = useCallback(
-    (selectedRows: Array<{ entity: string; entityId: string }>) => {
+    async (selectedRows: Array<{ entity: string; entityId: string }>) => {
       console.debug('Bulk auto rematch for selected rows:', selectedRows);
+
+      try {
+        const token = await user.getIdToken();
+        const response = await fetch(
+          `${import.meta.env.VITE_REACT_APP_API_URL}/opportunities/process-entities`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(selectedRows),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Auto rematch request completed:', result);
+      } catch (error) {
+        console.error('Failed to process auto rematch:', error);
+      }
     },
     [],
   );
@@ -217,7 +313,9 @@ const ManualMatchingTable: React.FC<Props> = ({
   }, [opportunityMatches, selectedMatches]);
 
   console.debug('opportunityMatches', opportunityMatches);
-  const matchIds = opportunityMatches?.map(match => `${match.entity}-${match.entityId}`) || [];
+  const baseMatches = opportunityMatches || [];
+  const displayMatches = sortConfig ? sortMatches(baseMatches, sortConfig) : baseMatches;
+  const matchIds = displayMatches.map(match => `${match.entity}-${match.entityId}`);
 
   return (
     <Fragment>
@@ -250,15 +348,15 @@ const ManualMatchingTable: React.FC<Props> = ({
                       color="primary"
                     />
                   </TableCell>
-                  <TableCell align="center" className={classes.headerCell}>
+                  <SortableHeader sortKey="id" sortConfig={sortConfig} onSort={onSort}>
                     ID
-                  </TableCell>
-                  <TableCell align="center" className={classes.headerCell}>
+                  </SortableHeader>
+                  <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
                     B/Party
-                  </TableCell>
-                  <TableCell align="center" className={classes.headerCell}>
+                  </SortableHeader>
+                  <SortableHeader sortKey="agreement" sortConfig={sortConfig} onSort={onSort}>
                     Agreement
-                  </TableCell>
+                  </SortableHeader>
                   <TableCell align="center" className={classes.headerCell}>
                     Commodity
                   </TableCell>
@@ -277,16 +375,20 @@ const ManualMatchingTable: React.FC<Props> = ({
                   <TableCell align="center" className={classes.headerCell}>
                     PLD
                   </TableCell>
-                  <TableCell align="center" className={classes.headerCell}>
+                  <SortableHeader
+                    sortKey="statisticalClient"
+                    sortConfig={sortConfig}
+                    onSort={onSort}
+                  >
                     S/Client
-                  </TableCell>
+                  </SortableHeader>
                   <TableCell align="center" className={classes.headerCell}>
                     Actions
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody className={classes.table}>
-                {opportunityMatches.map((match, index) => {
+                {displayMatches.map((match, index) => {
                   const matchData = match.entityMatchData;
 
                   const renderEquipmentArrayItems = (items: any[]) => {

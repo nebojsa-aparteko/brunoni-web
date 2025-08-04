@@ -92,6 +92,13 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
   // Sorting state
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: 'asc' });
 
+  const handleSort = (key: string) => {
+    setSortConfig(prevConfig => ({
+      key,
+      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
   // Dialog states
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
   const [addOpportunityDialogOpen, setAddOpportunityDialogOpen] = useState(false);
@@ -243,6 +250,7 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
             ) : (
               <ManualMatchingTable
                 sortConfig={sortConfig}
+                onSort={handleSort}
                 opportunityMatches={filteredData}
                 onMatchOpportunity={handleMatchOpportunity}
                 onCreateNewOpportunity={handleCreateNewOpportunity}
