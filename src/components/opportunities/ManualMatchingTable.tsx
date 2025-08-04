@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useCallback } from 'react';
+import React, { Fragment, useState, useCallback, useContext } from 'react';
 import {
   Table,
   TableBody,
@@ -24,6 +24,8 @@ import { NormalizedEntityOpportunityMatch, OpportunityMatchStatus } from '../../
 import Port from '../../model/Port';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
 import useUser from '../../hooks/useUser';
+import { GlobalContext } from '../../store/GlobalStore';
+import { SHOW_SUCCESS_SNACKBAR, SHOW_ERROR_SNACKBAR } from '../../store/types/globalAppState';
 
 const getSortValue = (match: NormalizedEntityOpportunityMatch, key: string): any => {
   const matchData = match.entityMatchData;
@@ -269,6 +271,7 @@ const ManualMatchingTable: React.FC<Props> = ({
   }, [selectedMatches, onBulkDiscardMatches]);
 
   const [user] = useUser();
+  const [, globalDispatch] = useContext(GlobalContext);
   const handleBulkAutoRematch = useCallback(
     async (selectedRows: Array<{ entity: string; entityId: string }>) => {
       console.debug('Bulk auto rematch for selected rows:', selectedRows);
@@ -293,11 +296,24 @@ const ManualMatchingTable: React.FC<Props> = ({
 
         const result = await response.json();
         console.log('Auto rematch request completed:', result);
+
+        // Show success message and clear selections
+        globalDispatch({
+          type: SHOW_SUCCESS_SNACKBAR,
+          message: `Auto rematch completed successfully for ${selectedRows.length} items`,
+          duration: 3000,
+        });
+        setSelectedMatches([]);
       } catch (error) {
         console.error('Failed to process auto rematch:', error);
+        globalDispatch({
+          type: SHOW_ERROR_SNACKBAR,
+          message: 'Failed to process auto rematch',
+          duration: 5000,
+        });
       }
     },
-    [],
+    [user, globalDispatch],
   );
 
   const getSelectedMatchObjects = useCallback(() => {
