@@ -61,7 +61,7 @@ export const ManualMatchingTableToolbar: React.FC<ManualMatchingTableToolbarProp
         <>
           {numSelected > 100 ? (
             <Typography color="error" variant="body2" style={{ flexShrink: 0, marginRight: 8 }}>
-              Too many entities selected, maximum allowed is 100
+              Too many entities selected for automatic rematching, maximum allowed is 100
             </Typography>
           ) : (
             <Button
