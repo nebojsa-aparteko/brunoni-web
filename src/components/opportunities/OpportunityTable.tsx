@@ -15,6 +15,8 @@ import { format } from 'date-fns';
 
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 import CreateOpportunityTaskDialog from './CreateOpportunityTaskDialog';
+import { is } from 'cheerio/lib/api/traversing';
+import { on } from 'events';
 
 const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
   switch (key) {
@@ -167,6 +169,7 @@ interface SortableHeaderProps {
   sortKey: string;
   children: React.ReactNode;
   sortConfig?: SortConfig;
+  isActive?: boolean;
   onSort?: (key: string) => void;
 }
 
@@ -174,11 +177,16 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   sortKey,
   children,
   sortConfig,
+  isActive = false,
   onSort,
 }) => {
   const classes = opportunityTableStyles();
+
   const active = sortConfig?.key === sortKey;
-  const direction = active ? sortConfig.direction : 'asc';
+  if (isActive && !active) {
+    onSort?.(sortKey);
+  }
+  const direction = active ? sortConfig?.direction : 'asc';
 
   const handleClick = () => {
     onSort?.(sortKey);
@@ -490,7 +498,12 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
           >
             <TableHead className={classes.table}>
               <TableRow>
-                <SortableHeader sortKey="id" sortConfig={sortConfig} onSort={onSort}>
+                <SortableHeader
+                  sortKey="id"
+                  sortConfig={sortConfig}
+                  onSort={onSort}
+                  isActive={true}
+                >
                   File Number
                 </SortableHeader>
                 <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
