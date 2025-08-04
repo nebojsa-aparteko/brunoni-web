@@ -491,7 +491,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
             <TableHead className={classes.table}>
               <TableRow>
                 <SortableHeader sortKey="id" sortConfig={sortConfig} onSort={onSort}>
-                  ID
+                  File Number
                 </SortableHeader>
                 <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
                   B/Party
