@@ -12,7 +12,6 @@ import {
   EntityOpportunityMatch,
   NormalizedEntityOpportunityMatch,
   OpportunityMatchStatus,
-  NormalizedOpportunity,
 } from '../../model/Opportunity';
 import MatchOpportunityDialog from './MatchOpportunityDialog';
 import AddOpportunityDialog from './AddOpportunityDialogue';
@@ -111,20 +110,24 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
     setAddOpportunityDialogOpen(true);
   };
 
-  const handleDiscardMatch = async (match: NormalizedEntityOpportunityMatch) => {
+  const handleBulkDiscardMatches = async (matchIds: string[]) => {
     try {
-      const matchRef = firebase
-        .firestore()
-        .collection('opportunity-matches')
-        .doc(`${match.entity}-${match.entityId}`);
-      await matchRef.update({
+      const batch = firebase.firestore().batch();
+      const updateData = {
         status: OpportunityMatchStatus.Discarded,
         updatedAt: new Date(),
         updatedBy: firebase.auth().currentUser?.uid || 'unknown',
+      };
+
+      matchIds.forEach(matchId => {
+        const matchRef = firebase.firestore().collection('opportunity-matches').doc(matchId);
+        batch.update(matchRef, updateData);
       });
-      console.log('Match discarded successfully');
+
+      await batch.commit();
+      console.log(`${matchIds.length} matches discarded successfully`);
     } catch (error) {
-      console.error('Failed to discard match:', error);
+      console.error('Failed to discard matches:', error);
     }
   };
 
@@ -243,7 +246,7 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
                 opportunityMatches={filteredData}
                 onMatchOpportunity={handleMatchOpportunity}
                 onCreateNewOpportunity={handleCreateNewOpportunity}
-                onDiscardMatch={handleDiscardMatch}
+                onBulkDiscardMatches={handleBulkDiscardMatches}
                 onUnmatchOpportunity={handleUnmatchOpportunity}
                 onRematchOpportunity={handleRematchOpportunity}
                 onRowClick={handleRowClick}

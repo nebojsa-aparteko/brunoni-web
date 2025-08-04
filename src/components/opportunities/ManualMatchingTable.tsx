@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useCallback } from 'react';
 import {
   Table,
   TableBody,
@@ -13,8 +13,11 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  Checkbox,
+  Paper,
 } from '@material-ui/core';
 import { MoreVert as MoreVertIcon } from '@material-ui/icons';
+import { ManualMatchingTableToolbar } from './ManualMatchingTableToolbar';
 import { NormalizedEntityOpportunityMatch, OpportunityMatchStatus } from '../../model/Opportunity';
 import Port from '../../model/Port';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
@@ -95,7 +98,7 @@ interface Props {
   opportunityMatches?: NormalizedEntityOpportunityMatch[];
   onMatchOpportunity?: (match: NormalizedEntityOpportunityMatch) => void;
   onCreateNewOpportunity?: (match: NormalizedEntityOpportunityMatch) => void;
-  onDiscardMatch?: (match: NormalizedEntityOpportunityMatch) => void;
+  onBulkDiscardMatches?: (matchIds: string[]) => void;
   onUnmatchOpportunity?: (match: NormalizedEntityOpportunityMatch) => void;
   onRematchOpportunity?: (match: NormalizedEntityOpportunityMatch) => void;
   onRowClick?: (match: NormalizedEntityOpportunityMatch) => void;
@@ -105,7 +108,7 @@ const ManualMatchingTable: React.FC<Props> = ({
   opportunityMatches,
   onMatchOpportunity,
   onCreateNewOpportunity,
-  onDiscardMatch,
+  onBulkDiscardMatches,
   onUnmatchOpportunity,
   onRematchOpportunity,
   onRowClick,
@@ -114,12 +117,13 @@ const ManualMatchingTable: React.FC<Props> = ({
     opportunityMatches,
     onMatchOpportunity,
     onCreateNewOpportunity,
-    onDiscardMatch,
+    onBulkDiscardMatches,
     onUnmatchOpportunity,
   });
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedMatch, setSelectedMatch] = useState<NormalizedEntityOpportunityMatch | null>(null);
+  const [selectedMatches, setSelectedMatches] = useState<string[]>([]);
 
   const handleMenuClick = (
     event: React.MouseEvent<HTMLElement>,
@@ -155,13 +159,6 @@ const ManualMatchingTable: React.FC<Props> = ({
     handleMenuClose();
   };
 
-  const handleDiscardMatch = () => {
-    if (selectedMatch && onDiscardMatch) {
-      onDiscardMatch(selectedMatch);
-    }
-    handleMenuClose();
-  };
-
   const handleUnmatchOpportunity = () => {
     if (selectedMatch && onUnmatchOpportunity) {
       onUnmatchOpportunity(selectedMatch);
@@ -176,7 +173,38 @@ const ManualMatchingTable: React.FC<Props> = ({
     handleMenuClose();
   };
 
+  const onSelectRow = useCallback(
+    (event: React.MouseEvent<HTMLElement>, matchId: string) => {
+      event.stopPropagation();
+      setSelectedMatches(prevState =>
+        selectedMatches.includes(matchId)
+          ? [...prevState.filter(id => id !== matchId)]
+          : [...prevState, matchId],
+      );
+    },
+    [selectedMatches],
+  );
+
+  const handleSelectDeselectAll = () => {
+    if (!opportunityMatches) return;
+    const matchIds = opportunityMatches.map(match => `${match.entity}-${match.entityId}`);
+    if (selectedMatches.length !== matchIds.length) {
+      setSelectedMatches(matchIds);
+    } else {
+      setSelectedMatches([]);
+    }
+  };
+
+  const handleBulkDiscard = useCallback(() => {
+    if (selectedMatches.length > 0 && onBulkDiscardMatches) {
+      onBulkDiscardMatches(selectedMatches);
+      setSelectedMatches([]);
+    }
+  }, [selectedMatches, onBulkDiscardMatches]);
+
   console.debug('opportunityMatches', opportunityMatches);
+  const matchIds = opportunityMatches?.map(match => `${match.entity}-${match.entityId}`) || [];
+
   return (
     <Fragment>
       {!opportunityMatches || opportunityMatches.length === 0 ? (
@@ -185,303 +213,326 @@ const ManualMatchingTable: React.FC<Props> = ({
           with opportunities.
         </Typography>
       ) : (
-        <TableContainer className={classes.container}>
-          <Table
-            stickyHeader
-            size="small"
-            aria-label="manual matching table"
-            className={classes.root}
-          >
-            <TableHead className={classes.table}>
-              <TableRow>
-                <TableCell align="center" className={classes.headerCell}>
-                  ID
-                </TableCell>
-                <TableCell align="center" className={classes.headerCell}>
-                  B/Party
-                </TableCell>
-                <TableCell align="center" className={classes.headerCell}>
-                  Agreement
-                </TableCell>
-                <TableCell align="center" className={classes.headerCell}>
-                  Commodity
-                </TableCell>
-                <TableCell align="center" className={classes.headerCell}>
-                  Equipment
-                </TableCell>
-                <TableCell align="center" className={classes.headerCell}>
-                  PLR
-                </TableCell>
-                <TableCell align="center" className={classes.headerCell}>
-                  POL
-                </TableCell>
-                <TableCell align="center" className={classes.headerCell}>
-                  POD
-                </TableCell>
-                <TableCell align="center" className={classes.headerCell}>
-                  PLD
-                </TableCell>
-                <TableCell align="center" className={classes.headerCell}>
-                  S/Client
-                </TableCell>
-                <TableCell align="center" className={classes.headerCell}>
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody className={classes.table}>
-              {opportunityMatches.map((match, index) => {
-                const matchData = match.entityMatchData;
+        <Paper>
+          <ManualMatchingTableToolbar
+            numSelected={selectedMatches.length}
+            onDiscard={handleBulkDiscard}
+          />
+          <TableContainer className={classes.container}>
+            <Table
+              stickyHeader
+              size="small"
+              aria-label="manual matching table"
+              className={classes.root}
+            >
+              <TableHead className={classes.table}>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedMatches.length === matchIds.length && matchIds.length > 0}
+                      onClick={handleSelectDeselectAll}
+                      color="primary"
+                    />
+                  </TableCell>
+                  <TableCell align="center" className={classes.headerCell}>
+                    ID
+                  </TableCell>
+                  <TableCell align="center" className={classes.headerCell}>
+                    B/Party
+                  </TableCell>
+                  <TableCell align="center" className={classes.headerCell}>
+                    Agreement
+                  </TableCell>
+                  <TableCell align="center" className={classes.headerCell}>
+                    Commodity
+                  </TableCell>
+                  <TableCell align="center" className={classes.headerCell}>
+                    Equipment
+                  </TableCell>
+                  <TableCell align="center" className={classes.headerCell}>
+                    PLR
+                  </TableCell>
+                  <TableCell align="center" className={classes.headerCell}>
+                    POL
+                  </TableCell>
+                  <TableCell align="center" className={classes.headerCell}>
+                    POD
+                  </TableCell>
+                  <TableCell align="center" className={classes.headerCell}>
+                    PLD
+                  </TableCell>
+                  <TableCell align="center" className={classes.headerCell}>
+                    S/Client
+                  </TableCell>
+                  <TableCell align="center" className={classes.headerCell}>
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody className={classes.table}>
+                {opportunityMatches.map((match, index) => {
+                  const matchData = match.entityMatchData;
 
-                const renderEquipmentArrayItems = (items: any[]) => {
-                  if (!items || items.length === 0) return '';
+                  const renderEquipmentArrayItems = (items: any[]) => {
+                    if (!items || items.length === 0) return '';
 
-                  const visibleItems = items.slice(0, 2);
-                  const remainingItems = items.slice(2);
+                    const visibleItems = items.slice(0, 2);
+                    const remainingItems = items.slice(2);
 
-                  return (
-                    <div>
-                      {visibleItems.map((item, idx) => (
-                        <div
-                          key={idx}
-                          style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
-                        >
-                          {item.value.name}
-                        </div>
-                      ))}
-                      {remainingItems.length > 0 && (
-                        <Tooltip
-                          title={
-                            <div>
-                              {remainingItems.map((item, idx) => (
-                                <div key={idx}>{item.value.name}</div>
-                              ))}
-                            </div>
-                          }
-                          arrow
-                          placement="top"
-                        >
-                          <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
-                            +{remainingItems.length} more
-                          </span>
-                        </Tooltip>
-                      )}
-                    </div>
-                  );
-                };
-                const renderCommodityArrayItems = (items: any[]) => {
-                  if (!items || items.length === 0) return '';
+                    return (
+                      <div>
+                        {visibleItems.map((item, idx) => (
+                          <div
+                            key={idx}
+                            style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
+                          >
+                            {item.value.name}
+                          </div>
+                        ))}
+                        {remainingItems.length > 0 && (
+                          <Tooltip
+                            title={
+                              <div>
+                                {remainingItems.map((item, idx) => (
+                                  <div key={idx}>{item.value.name}</div>
+                                ))}
+                              </div>
+                            }
+                            arrow
+                            placement="top"
+                          >
+                            <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
+                              +{remainingItems.length} more
+                            </span>
+                          </Tooltip>
+                        )}
+                      </div>
+                    );
+                  };
+                  const renderCommodityArrayItems = (items: any[]) => {
+                    if (!items || items.length === 0) return '';
 
-                  const visibleItems = items.slice(0, 2);
-                  const remainingItems = items.slice(2);
+                    const visibleItems = items.slice(0, 2);
+                    const remainingItems = items.slice(2);
 
-                  return (
-                    <div>
-                      {visibleItems.map((item, idx) => (
-                        <div
-                          key={idx}
-                          style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
-                        >
-                          {item.definition.type === 'groupId'
-                            ? (item.value as OpportunityCommodityGroup).name || item.value
-                            : item.value}
-                        </div>
-                      ))}
-                      {remainingItems.length > 0 && (
-                        <Tooltip
-                          title={
-                            <div>
-                              {remainingItems.map((item, idx) => (
-                                <div key={idx}>
-                                  {item.definition.type === 'groupId'
-                                    ? (item.value as OpportunityCommodityGroup).name || item.value
-                                    : item.value}
-                                </div>
-                              ))}
-                            </div>
-                          }
-                          arrow
-                          placement="top"
-                        >
-                          <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
-                            +{remainingItems.length} more
-                          </span>
-                        </Tooltip>
-                      )}
-                    </div>
-                  );
-                };
-                const renderPlacesArrayItems = (items: any[]) => {
-                  if (!items || items.length === 0) return '';
-
-                  const visibleItems = items.slice(0, 2);
-                  const remainingItems = items.slice(2);
-
-                  return (
-                    <div>
-                      {visibleItems.map((item, idx) => (
-                        <div
-                          key={idx}
-                          style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
-                        >
-                          {item.definition.type === 'groupId'
-                            ? (item.value as OpportunityCommodityGroup).name || item.value
-                            : item.value}
-                        </div>
-                      ))}
-                      {remainingItems.length > 0 && (
-                        <Tooltip
-                          title={
-                            <div>
-                              {remainingItems.map((item, idx) => (
-                                <div key={idx}>
-                                  {item.definition.type === 'groupId'
-                                    ? (item.value as OpportunityCommodityGroup).name || item.value
-                                    : item.value}
-                                </div>
-                              ))}
-                            </div>
-                          }
-                          arrow
-                          placement="top"
-                        >
-                          <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
-                            +{remainingItems.length} more
-                          </span>
-                        </Tooltip>
-                      )}
-                    </div>
-                  );
-                };
-                const renderPortsArrayItems = (items: any[]) => {
-                  if (!items || items.length === 0) return '';
-
-                  const visibleItems = items.slice(0, 2);
-                  const remainingItems = items.slice(2);
-
-                  return (
-                    <div>
-                      {visibleItems.map((item, idx) => (
-                        <div
-                          key={idx}
-                          style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
-                        >
-                          {item.definition.type === 'groupId'
-                            ? (item.value as OpportunityCommodityGroup).name || item.value
-                            : item.definition.type === 'portId'
-                              ? `${(item.value as Port).city} ${(item.value as Port).id}`
+                    return (
+                      <div>
+                        {visibleItems.map((item, idx) => (
+                          <div
+                            key={idx}
+                            style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
+                          >
+                            {item.definition.type === 'groupId'
+                              ? (item.value as OpportunityCommodityGroup).name || item.value
                               : item.value}
-                        </div>
-                      ))}
-                      {remainingItems.length > 0 && (
-                        <Tooltip
-                          title={
-                            <div>
-                              {remainingItems.map((item, idx) => (
-                                <div key={idx}>
-                                  {item.definition.type === 'groupId'
-                                    ? (item.value as OpportunityCommodityGroup).name || item.value
-                                    : item.definition.type === 'portId'
-                                      ? `${(item.value as Port).city} ${(item.value as Port).id}`
+                          </div>
+                        ))}
+                        {remainingItems.length > 0 && (
+                          <Tooltip
+                            title={
+                              <div>
+                                {remainingItems.map((item, idx) => (
+                                  <div key={idx}>
+                                    {item.definition.type === 'groupId'
+                                      ? (item.value as OpportunityCommodityGroup).name || item.value
                                       : item.value}
-                                </div>
-                              ))}
-                            </div>
-                          }
-                          arrow
-                          placement="top"
-                        >
-                          <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
-                            +{remainingItems.length} more
-                          </span>
-                        </Tooltip>
-                      )}
-                    </div>
-                  );
-                };
+                                  </div>
+                                ))}
+                              </div>
+                            }
+                            arrow
+                            placement="top"
+                          >
+                            <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
+                              +{remainingItems.length} more
+                            </span>
+                          </Tooltip>
+                        )}
+                      </div>
+                    );
+                  };
+                  const renderPlacesArrayItems = (items: any[]) => {
+                    if (!items || items.length === 0) return '';
 
-                const renderCompanyInfo = (company: any) => {
-                  if (!company) return '';
+                    const visibleItems = items.slice(0, 2);
+                    const remainingItems = items.slice(2);
+
+                    return (
+                      <div>
+                        {visibleItems.map((item, idx) => (
+                          <div
+                            key={idx}
+                            style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
+                          >
+                            {item.definition.type === 'groupId'
+                              ? (item.value as OpportunityCommodityGroup).name || item.value
+                              : item.value}
+                          </div>
+                        ))}
+                        {remainingItems.length > 0 && (
+                          <Tooltip
+                            title={
+                              <div>
+                                {remainingItems.map((item, idx) => (
+                                  <div key={idx}>
+                                    {item.definition.type === 'groupId'
+                                      ? (item.value as OpportunityCommodityGroup).name || item.value
+                                      : item.value}
+                                  </div>
+                                ))}
+                              </div>
+                            }
+                            arrow
+                            placement="top"
+                          >
+                            <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
+                              +{remainingItems.length} more
+                            </span>
+                          </Tooltip>
+                        )}
+                      </div>
+                    );
+                  };
+                  const renderPortsArrayItems = (items: any[]) => {
+                    if (!items || items.length === 0) return '';
+
+                    const visibleItems = items.slice(0, 2);
+                    const remainingItems = items.slice(2);
+
+                    return (
+                      <div>
+                        {visibleItems.map((item, idx) => (
+                          <div
+                            key={idx}
+                            style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
+                          >
+                            {item.definition.type === 'groupId'
+                              ? (item.value as OpportunityCommodityGroup).name || item.value
+                              : item.definition.type === 'portId'
+                                ? `${(item.value as Port).city} ${(item.value as Port).id}`
+                                : item.value}
+                          </div>
+                        ))}
+                        {remainingItems.length > 0 && (
+                          <Tooltip
+                            title={
+                              <div>
+                                {remainingItems.map((item, idx) => (
+                                  <div key={idx}>
+                                    {item.definition.type === 'groupId'
+                                      ? (item.value as OpportunityCommodityGroup).name || item.value
+                                      : item.definition.type === 'portId'
+                                        ? `${(item.value as Port).city} ${(item.value as Port).id}`
+                                        : item.value}
+                                  </div>
+                                ))}
+                              </div>
+                            }
+                            arrow
+                            placement="top"
+                          >
+                            <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
+                              +{remainingItems.length} more
+                            </span>
+                          </Tooltip>
+                        )}
+                      </div>
+                    );
+                  };
+
+                  const renderCompanyInfo = (company: any) => {
+                    if (!company) return '';
+                    return (
+                      <div>
+                        <div>{company.name || ''}</div>
+                        {company.city && (
+                          <div style={{ fontSize: '0.875em', color: '#666' }}>{company.city}</div>
+                        )}
+                      </div>
+                    );
+                  };
+
+                  const renderEntityInfo = (item: NormalizedEntityOpportunityMatch) => {
+                    if (!item) return '';
+                    return (
+                      <div>
+                        <div>{item.entityId || ''}</div>
+                        {item.entity && (
+                          <div style={{ fontSize: '0.875em', color: '#666' }}>{item.entity}</div>
+                        )}
+                      </div>
+                    );
+                  };
+
+                  const matchId = `${match.entity}-${match.entityId}`;
+                  const isSelected = selectedMatches.includes(matchId);
+
                   return (
-                    <div>
-                      <div>{company.name || ''}</div>
-                      {company.city && (
-                        <div style={{ fontSize: '0.875em', color: '#666' }}>{company.city}</div>
-                      )}
-                    </div>
+                    <TableRow
+                      key={`${match.entity}-${match.entityId}-${index}`}
+                      hover
+                      className={classes.row}
+                      tabIndex={-1}
+                      onClick={() => handleRowClick(match)}
+                      style={{ cursor: 'pointer' }}
+                      selected={isSelected}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={isSelected}
+                          onClick={event => onSelectRow(event, matchId)}
+                          color="primary"
+                        />
+                      </TableCell>
+                      <TableCell align="center">{renderEntityInfo(match)}</TableCell>
+                      <TableCell align="center">
+                        {renderCompanyInfo(matchData?.bookingPartyId)}
+                      </TableCell>
+                      <TableCell align="center">{matchData?.agreementId || ''}</TableCell>
+                      <TableCell align="center">
+                        {renderCommodityArrayItems(matchData?.commodity || [])}
+                      </TableCell>
+                      <TableCell align="center">
+                        {renderEquipmentArrayItems(matchData?.equipment || [])}
+                      </TableCell>
+                      <TableCell align="center">
+                        {renderPlacesArrayItems(matchData?.placeOfReceipt || [])}
+                      </TableCell>
+                      <TableCell align="center">
+                        {renderPortsArrayItems(matchData?.portOfLoading || [])}
+                      </TableCell>
+                      <TableCell align="center">
+                        {renderPortsArrayItems(matchData?.portOfDischarge || [])}
+                      </TableCell>
+                      <TableCell align="center">
+                        {renderPlacesArrayItems(matchData?.placeOfDelivery || [])}
+                      </TableCell>
+                      <TableCell align="center">
+                        {renderCompanyInfo(matchData?.statisticalClientId)}
+                      </TableCell>
+                      <TableCell align="center">
+                        {(match.status === OpportunityMatchStatus.Unmatched ||
+                          match.status === OpportunityMatchStatus.Matched) && (
+                          <Tooltip title="Actions">
+                            <IconButton size="small" onClick={e => handleMenuClick(e, match)}>
+                              <MoreVertIcon />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </TableCell>
+                    </TableRow>
                   );
-                };
-
-                const renderEntityInfo = (item: NormalizedEntityOpportunityMatch) => {
-                  if (!item) return '';
-                  return (
-                    <div>
-                      <div>{item.entityId || ''}</div>
-                      {item.entity && (
-                        <div style={{ fontSize: '0.875em', color: '#666' }}>{item.entity}</div>
-                      )}
-                    </div>
-                  );
-                };
-
-                return (
-                  <TableRow
-                    key={`${match.entity}-${match.entityId}-${index}`}
-                    hover
-                    className={classes.row}
-                    tabIndex={-1}
-                    onClick={() => handleRowClick(match)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <TableCell align="center">{renderEntityInfo(match)}</TableCell>
-                    <TableCell align="center">
-                      {renderCompanyInfo(matchData?.bookingPartyId)}
-                    </TableCell>
-                    <TableCell align="center">{matchData?.agreementId || ''}</TableCell>
-                    <TableCell align="center">
-                      {renderCommodityArrayItems(matchData?.commodity || [])}
-                    </TableCell>
-                    <TableCell align="center">
-                      {renderEquipmentArrayItems(matchData?.equipment || [])}
-                    </TableCell>
-                    <TableCell align="center">
-                      {renderPlacesArrayItems(matchData?.placeOfReceipt || [])}
-                    </TableCell>
-                    <TableCell align="center">
-                      {renderPortsArrayItems(matchData?.portOfLoading || [])}
-                    </TableCell>
-                    <TableCell align="center">
-                      {renderPortsArrayItems(matchData?.portOfDischarge || [])}
-                    </TableCell>
-                    <TableCell align="center">
-                      {renderPlacesArrayItems(matchData?.placeOfDelivery || [])}
-                    </TableCell>
-                    <TableCell align="center">
-                      {renderCompanyInfo(matchData?.statisticalClientId)}
-                    </TableCell>
-                    <TableCell align="center">
-                      {(match.status === OpportunityMatchStatus.Unmatched ||
-                        match.status === OpportunityMatchStatus.Matched) && (
-                        <Tooltip title="Actions">
-                          <IconButton size="small" onClick={e => handleMenuClick(e, match)}>
-                            <MoreVertIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
       )}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         {selectedMatch?.status === OpportunityMatchStatus.Unmatched && (
           <>
             <MenuItem onClick={handleMatchOpportunity}>Match Opportunity</MenuItem>
             <MenuItem onClick={handleCreateNewOpportunity}>Create New Opportunity</MenuItem>
-            <MenuItem onClick={handleDiscardMatch}>Discard</MenuItem>
           </>
         )}
         {selectedMatch?.status === OpportunityMatchStatus.Matched && (
