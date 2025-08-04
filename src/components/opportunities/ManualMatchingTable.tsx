@@ -100,7 +100,7 @@ interface Props {
   onCreateNewOpportunity?: (match: NormalizedEntityOpportunityMatch) => void;
   onBulkDiscardMatches?: (matchIds: string[]) => void;
   onUnmatchOpportunity?: (match: NormalizedEntityOpportunityMatch) => void;
-  onRematchOpportunity?: (match: NormalizedEntityOpportunityMatch) => void;
+  onAutoRematchOpportunity?: (match: NormalizedEntityOpportunityMatch) => void;
   onRowClick?: (match: NormalizedEntityOpportunityMatch) => void;
 }
 
@@ -110,7 +110,7 @@ const ManualMatchingTable: React.FC<Props> = ({
   onCreateNewOpportunity,
   onBulkDiscardMatches,
   onUnmatchOpportunity,
-  onRematchOpportunity,
+  onAutoRematchOpportunity,
   onRowClick,
 }) => {
   console.debug('ManualMatchingTable props', {
@@ -166,9 +166,9 @@ const ManualMatchingTable: React.FC<Props> = ({
     handleMenuClose();
   };
 
-  const handleRematchOpportunity = () => {
-    if (selectedMatch && onRematchOpportunity) {
-      onRematchOpportunity(selectedMatch);
+  const handleAutoRematchOpportunity = () => {
+    if (selectedMatch && onAutoRematchOpportunity) {
+      onAutoRematchOpportunity(selectedMatch);
     }
     handleMenuClose();
   };
@@ -202,6 +202,20 @@ const ManualMatchingTable: React.FC<Props> = ({
     }
   }, [selectedMatches, onBulkDiscardMatches]);
 
+  const handleBulkAutoRematch = useCallback(
+    (selectedRows: Array<{ entity: string; entityId: string }>) => {
+      console.debug('Bulk auto rematch for selected rows:', selectedRows);
+    },
+    [],
+  );
+
+  const getSelectedMatchObjects = useCallback(() => {
+    if (!opportunityMatches) return [];
+    return opportunityMatches
+      .filter(match => selectedMatches.includes(`${match.entity}-${match.entityId}`))
+      .map(match => ({ entity: match.entity, entityId: match.entityId }));
+  }, [opportunityMatches, selectedMatches]);
+
   console.debug('opportunityMatches', opportunityMatches);
   const matchIds = opportunityMatches?.map(match => `${match.entity}-${match.entityId}`) || [];
 
@@ -217,6 +231,8 @@ const ManualMatchingTable: React.FC<Props> = ({
           <ManualMatchingTableToolbar
             numSelected={selectedMatches.length}
             onDiscard={handleBulkDiscard}
+            onAutoRematch={handleBulkAutoRematch}
+            selectedRows={getSelectedMatchObjects()}
           />
           <TableContainer className={classes.container}>
             <Table
@@ -537,7 +553,7 @@ const ManualMatchingTable: React.FC<Props> = ({
         )}
         {selectedMatch?.status === OpportunityMatchStatus.Matched && (
           <>
-            <MenuItem onClick={handleRematchOpportunity}>Rematch</MenuItem>
+            <MenuItem onClick={handleAutoRematchOpportunity}>Auto Rematch</MenuItem>
             <MenuItem onClick={handleUnmatchOpportunity}>Unmatch</MenuItem>
           </>
         )}
