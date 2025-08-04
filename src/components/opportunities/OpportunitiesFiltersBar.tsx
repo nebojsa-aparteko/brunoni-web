@@ -136,12 +136,12 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
       <Grid container spacing={2}>
         <Grid item sm={3} xs={12}>
           <TextField
-            label="Opportunity ID"
+            label="File Number"
             variant="outlined"
             fullWidth
             value={opportunityId || ''}
             onChange={e => setOpportunityIdFilter(e.target.value)}
-            placeholder="Search by ID..."
+            placeholder="Search by File Number..."
           />
         </Grid>
         {clients && (
