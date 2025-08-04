@@ -129,24 +129,27 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
       display="flex"
       flexDirection="row-reverse"
       flexWrap="wrap"
-      my={2}
       justifyContent="space-between"
       alignContent="space-around"
+      minWidth={800}
+      maxWidth={1920}
+      my={3}
+      mr={1}
     >
       <Grid container spacing={2}>
         <Grid item sm={3} xs={12}>
           <TextField
-            label="Opportunity ID"
+            label="File Number"
             variant="outlined"
             fullWidth
             value={opportunityId || ''}
             onChange={e => setOpportunityIdFilter(e.target.value)}
-            placeholder="Search by ID..."
+            placeholder="Search by File Number..."
           />
         </Grid>
         {clients && (
           <Grid item sm={3} xs={12}>
-            <Box display="flex">
+            <Box display="flex" width={'100%'}>
               <ClientInput
                 label="Statistical Client"
                 clients={clients || []}

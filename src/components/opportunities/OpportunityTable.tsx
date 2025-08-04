@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -6,14 +6,17 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableBody from '@material-ui/core/TableBody';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import { Chip, makeStyles, Theme, Tooltip, IconButton } from '@material-ui/core';
-import { Notes as NotesIcon } from '@material-ui/icons';
+import { Chip, makeStyles, Theme, Tooltip, IconButton, Menu, MenuItem } from '@material-ui/core';
+import { Notes as NotesIcon, MoreVert as MoreVertIcon } from '@material-ui/icons';
 import Avatar from 'react-avatar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { NormalizedOpportunity } from '../../model/Opportunity';
 import { format } from 'date-fns';
 
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
+import CreateOpportunityTaskDialog from './CreateOpportunityTaskDialog';
+import { is } from 'cheerio/lib/api/traversing';
+import { on } from 'events';
 
 const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
   switch (key) {
@@ -166,6 +169,7 @@ interface SortableHeaderProps {
   sortKey: string;
   children: React.ReactNode;
   sortConfig?: SortConfig;
+  isActive?: boolean;
   onSort?: (key: string) => void;
 }
 
@@ -173,11 +177,16 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   sortKey,
   children,
   sortConfig,
+  isActive = false,
   onSort,
 }) => {
   const classes = opportunityTableStyles();
+
   const active = sortConfig?.key === sortKey;
-  const direction = active ? sortConfig.direction : 'asc';
+  if (isActive && !active) {
+    onSort?.(sortKey);
+  }
+  const direction = active ? sortConfig?.direction : 'asc';
 
   const handleClick = () => {
     onSort?.(sortKey);
@@ -194,9 +203,28 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
 
 const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, onRowClick }) => {
   const classes = opportunityTableStyles();
+  const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleRowClick = () => {
-    onRowClick?.(opportunity);
+    if (!createTaskDialogOpen && !Boolean(anchorEl)) {
+      onRowClick?.(opportunity);
+    }
+  };
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCreateTaskClick = (event?: React.MouseEvent) => {
+    event?.stopPropagation();
+    setCreateTaskDialogOpen(true);
+    handleMenuClose();
   };
   const placeOfReceipt =
     opportunity.placeOfReceipt?.definition.type === 'groupId'
@@ -423,6 +451,21 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
           ''
         )}
       </TableCell>
+      <TableCell align="center">
+        <Tooltip title="Actions">
+          <IconButton size="small" onClick={handleMenuClick}>
+            <MoreVertIcon />
+          </IconButton>
+        </Tooltip>
+      </TableCell>
+      <CreateOpportunityTaskDialog
+        open={createTaskDialogOpen}
+        onClose={() => setCreateTaskDialogOpen(false)}
+        opportunity={opportunity}
+      />
+      {/* <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+        <MenuItem onClick={e => handleCreateTaskClick(e)}>Create New Task</MenuItem>
+      </Menu> */}
     </TableRow>
   );
 };
@@ -455,8 +498,13 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
           >
             <TableHead className={classes.table}>
               <TableRow>
-                <SortableHeader sortKey="id" sortConfig={sortConfig} onSort={onSort}>
-                  ID
+                <SortableHeader
+                  sortKey="id"
+                  sortConfig={sortConfig}
+                  onSort={onSort}
+                  isActive={true}
+                >
+                  File Number
                 </SortableHeader>
                 <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
                   B/Party
@@ -520,6 +568,9 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
                 <SortableHeader sortKey="salesRep" sortConfig={sortConfig} onSort={onSort}>
                   S/Rep
                 </SortableHeader>
+                <TableCell align="center" className={classes.headerCell}>
+                  Actions
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody className={classes.table}>

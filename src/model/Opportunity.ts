@@ -90,6 +90,37 @@ export interface NormalizedOpportunity {
   quotedTEU: number; // Sum of TEU counts for quotes in current year
 }
 
+// Helper function to format location data
+const formatLocation = (location: any): string => {
+  if (!location) return '';
+  if (location.definition?.type === 'groupId') {
+    return location.value?.name || location.value || '';
+  }
+  if (location.definition?.type === 'portId') {
+    return `${location.value?.city || ''} ${location.value?.id || ''}`.trim();
+  }
+  return location.value || '';
+};
+
+export function opportunityToString(opportunity: NormalizedOpportunity): string {
+  const bookingParty = opportunity.bookingPartyId?.name || '';
+  const statisticalClient = opportunity.statisticalClientId?.name || '';
+  const placeOfReceipt = formatLocation(opportunity.placeOfReceipt);
+  const portOfLoading = formatLocation(opportunity.portOfLoading);
+  const portOfDischarge = formatLocation(opportunity.portOfDischarge);
+  const placeOfDelivery = formatLocation(opportunity.placeOfDelivery);
+  const labels = [
+    bookingParty,
+    statisticalClient,
+    placeOfReceipt,
+    portOfLoading,
+    portOfDischarge,
+    placeOfDelivery,
+  ];
+  const nonEmptyLabels = labels.filter(label => label);
+  return `${opportunity.opportunityId} - ${nonEmptyLabels.join(' - ')}`;
+}
+
 export interface OpportunityMatch {
   opportunityId: string;
   probability: number; // e.g. 0.8 for 80% probability
@@ -177,4 +208,19 @@ export interface NormalizedEntityOpportunityMatch {
   status: OpportunityMatchStatus; // Status of the match
   matchedAt: Date; // Timestamp of when the match was created
   matchedBy: string; // User ID of the creator
+}
+
+export enum TaskStatus {
+  Active = 'active',
+  Resolved = 'resolved',
+}
+export interface OpportunityTask {
+  opportunityId: string; // current opportunity
+  createdAt: Date; // current date
+  createdBy: string; // user id
+  assignedTo: string; // user id
+  status: TaskStatus; // ACTIVE, RESOLVED
+  dueDate: Date; // due date (dd.MM.yyyyT00:00:00) swiss time, no hours
+  //  "content1": string, // preselected text - POSTPONED, check with Nenad what are possible values
+  content: string; // free text - check naming
 }

@@ -13,6 +13,7 @@ import {
   NormalizedOpportunity,
   NormalizedEntityOpportunityMatch,
   OpportunityMatch,
+  opportunityToString,
 } from '../../model/Opportunity';
 
 interface MatchOpportunityDialogProps {
@@ -47,7 +48,7 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
       const matchInfo = matches.find(m => m.opportunityId === opportunity.id);
       if (matchInfo) {
         matched.push({ ...opportunity, matchInfo });
-      } else {
+      } else if (opportunity.bookingPartyId?.id === currentMatch?.bookingPartyId) {
         unmatched.push(opportunity);
       }
     });
@@ -70,18 +71,6 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
     if (probability >= 0.6) return '#ff9800'; // Orange for 60-79%
     if (probability >= 0.4) return '#f44336'; // Red for 40-59%
     return '#9e9e9e'; // Gray for <40%
-  };
-
-  // Helper function to format location data
-  const formatLocation = (location: any): string => {
-    if (!location) return '';
-    if (location.definition?.type === 'groupId') {
-      return location.value?.name || location.value || '';
-    }
-    if (location.definition?.type === 'portId') {
-      return `${location.value?.city || ''} ${location.value?.id || ''}`.trim();
-    }
-    return location.value || '';
   };
 
   useEffect(() => {
@@ -110,13 +99,7 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
         <Autocomplete
           options={enhancedOpportunities || []}
           getOptionLabel={(option: EnhancedOpportunity) => {
-            const bookingParty = option.bookingPartyId?.name || '';
-            const placeOfReceipt = formatLocation(option.placeOfReceipt);
-            const portOfLoading = formatLocation(option.portOfLoading);
-            const portOfDischarge = formatLocation(option.portOfDischarge);
-            const placeOfDelivery = formatLocation(option.placeOfDelivery);
-
-            let label = `${option.opportunityId} - ${bookingParty} - ${placeOfReceipt} - ${portOfLoading} - ${portOfDischarge} - ${placeOfDelivery}`;
+            let label = opportunityToString(option);
 
             if (option.matchInfo) {
               const probability = Math.round(option.matchInfo.probability * 100);
@@ -128,13 +111,7 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
           value={selectedOpportunity}
           onChange={(_, value) => setSelectedOpportunity(value)}
           renderOption={(option: EnhancedOpportunity) => {
-            const bookingParty = option.bookingPartyId?.name || '';
-            const placeOfReceipt = formatLocation(option.placeOfReceipt);
-            const portOfLoading = formatLocation(option.portOfLoading);
-            const portOfDischarge = formatLocation(option.portOfDischarge);
-            const placeOfDelivery = formatLocation(option.placeOfDelivery);
-
-            let label = `${option.opportunityId} - ${bookingParty} - ${placeOfReceipt} - ${portOfLoading} - ${portOfDischarge} - ${placeOfDelivery}`;
+            let label = opportunityToString(option);
 
             if (option.matchInfo) {
               const probability = Math.round(option.matchInfo.probability * 100);

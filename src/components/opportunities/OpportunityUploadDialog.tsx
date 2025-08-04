@@ -75,7 +75,7 @@ const OpportunityUploadDialog: React.FC<OpportunityUploadDialogProps> = ({
     try {
       const token = await user.getIdToken();
       const response = await fetch(
-        'https://brunoni-allmarine.appspot.com/opportunities/xlsx-template',
+        `${import.meta.env.VITE_REACT_APP_API_URL}/opportunities/xlsx-template`,
         {
           method: 'GET',
           mode: 'cors',

@@ -7,8 +7,7 @@ import { useOpportunitiesListFilterContext } from '../../providers/Opportunities
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 import OpportunityTable, { SortConfig } from './OpportunityTable';
 import { NormalizedOpportunity } from '../../model/Opportunity';
-import useFirestoreCollection from '../../hooks/useFirestoreCollection';
-import useNormalizedOpportunity from '../../hooks/useNormalizedOpportunity';
+import useOpportunitiesWithSalesRep from '../../hooks/useOpportunities';
 import AddOpportunityDialog from './AddOpportunityDialogue';
 import EditOpportunityDialog from './EditOpportunityDialog';
 import OpportunityUploadDialog from './OpportunityUploadDialog';
@@ -30,16 +29,7 @@ const useStyles = makeStyles(theme => ({
 const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
   const classes = useStyles();
   const isLoading = false; // Replace with actual loading state if needed
-  const opportunitySnapshot = useFirestoreCollection('opportunities');
-  const opportunityIds = useMemo(() => {
-    return opportunitySnapshot?.docs?.map(doc => doc.id) || [];
-  }, [opportunitySnapshot?.docs]);
-  const normalizeOpportunity = useNormalizedOpportunity(opportunityIds);
-  const opportunities: NormalizedOpportunity[] | undefined = useMemo(() => {
-    return opportunitySnapshot?.docs?.map(doc =>
-      normalizeOpportunity({ id: doc.id, ...doc.data() }),
-    );
-  }, [opportunitySnapshot?.docs, normalizeOpportunity]);
+  const opportunities = useOpportunitiesWithSalesRep();
   const [filters, setFilters] = useOpportunitiesListFilterContext();
 
   const { assignee } = filters;
@@ -154,11 +144,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
 
-  const handleAddOpportunity = () => {
-    setOpenDialog(false);
-    setNewOpportunityName('');
-  };
-
   const handleEditOpportunity = (opportunity: NormalizedOpportunity) => {
     setSelectedOpportunity(opportunity);
     setEditDialogOpen(true);
@@ -199,11 +184,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
             Upload xlsx
           </Button>
 
-          <AddOpportunityDialog
-            open={openDialog}
-            onClose={handleCloseDialog}
-            onAdd={handleAddOpportunity}
-          />
+          <AddOpportunityDialog open={openDialog} onClose={handleCloseDialog} />
           <EditOpportunityDialog
             open={editDialogOpen}
             opportunity={selectedOpportunity}
