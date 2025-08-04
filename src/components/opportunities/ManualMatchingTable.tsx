@@ -264,6 +264,10 @@ const ManualMatchingTable: React.FC<Props> = ({
   };
 
   const handleBulkDiscard = useCallback(() => {
+    if (!window.confirm('Are you sure you want to discard selected entities?')) {
+      return;
+    }
+
     if (selectedMatches.length > 0 && onBulkDiscardMatches) {
       onBulkDiscardMatches(selectedMatches);
       setSelectedMatches([]);
