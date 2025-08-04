@@ -173,7 +173,6 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({
     }
   }, [open, prefillFromMatch, clients]);
 
-  // Reset booking party rep when booking party changes
   useEffect(() => {
     setBookingPartyRep(null);
   }, [bookingParty]);
@@ -202,11 +201,9 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({
       updatedBy: salesRep?.id || '',
     };
     try {
-      // If we have an onAdd handler (from match), use it to handle both opportunity creation and match update
       if (onAdd) {
         await onAdd(opportunityData);
       } else {
-        // Otherwise, directly create the opportunity (legacy behavior)
         await firebase.firestore().collection('opportunities').add(opportunityData);
       }
       console.debug('Adding new opportunity with data:', opportunityData);
