@@ -37,9 +37,12 @@ const ManualMatchingFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
       display="flex"
       flexDirection="row-reverse"
       flexWrap="wrap"
-      my={2}
       justifyContent="space-between"
       alignContent="space-around"
+      minWidth={400}
+      maxWidth={960}
+      my={3}
+      mr={1}
     >
       <Grid container spacing={2}>
         <Grid item sm={6} xs={12}>
