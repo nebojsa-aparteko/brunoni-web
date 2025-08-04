@@ -16,6 +16,7 @@ import {
   Tooltip,
   Checkbox,
   Paper,
+  Link,
 } from '@material-ui/core';
 import { MoreVert as MoreVertIcon } from '@material-ui/icons';
 import { ManualMatchingTableToolbar } from './ManualMatchingTableToolbar';
@@ -65,15 +66,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   container: {
     marginBottom: theme.spacing(3),
   },
-  row: {
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: 'rgba(161,213,255,0.20) !important',
-      '& > td': {
-        backgroundColor: 'inherit',
-      },
-    },
-  },
+
   defaultCell: {
     border: `1px solid ${theme.palette.divider}`,
     fontSize: theme.typography.body2.fontSize,
@@ -123,6 +116,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     textAlign: 'center',
     padding: theme.spacing(4),
     color: theme.palette.text.secondary,
+  },
+  entityLink: {
+    cursor: 'pointer',
+    color: theme.palette.primary.main,
+    textDecoration: 'none',
+    '&:hover': {
+      textDecoration: 'underline',
+    },
   },
 }));
 
@@ -203,12 +204,6 @@ const ManualMatchingTable: React.FC<Props> = ({
     event.stopPropagation(); // Prevent row click when clicking menu
     setAnchorEl(event.currentTarget);
     setSelectedMatch(match);
-  };
-
-  const handleRowClick = (match: NormalizedEntityOpportunityMatch) => {
-    if (onRowClick) {
-      onRowClick(match);
-    }
   };
 
   const handleMenuClose = () => {
@@ -572,13 +567,28 @@ const ManualMatchingTable: React.FC<Props> = ({
 
                   const renderEntityInfo = (item: NormalizedEntityOpportunityMatch) => {
                     if (!item) return '';
+                    const handleLinkClick = (e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      if (onRowClick) {
+                        onRowClick(item);
+                      }
+                    };
                     return (
-                      <div>
-                        <div>{item.entityId || ''}</div>
-                        {item.entity && (
-                          <div style={{ fontSize: '0.875em', color: '#666' }}>{item.entity}</div>
-                        )}
-                      </div>
+                      <Link
+                        component="button"
+                        variant="body2"
+                        className={classes.entityLink}
+                        onClick={handleLinkClick}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <div>
+                          <div>{item.entityId || ''}</div>
+                          {item.entity && (
+                            <div style={{ fontSize: '0.875em', color: '#666' }}>{item.entity}</div>
+                          )}
+                        </div>
+                      </Link>
                     );
                   };
 
@@ -588,11 +598,7 @@ const ManualMatchingTable: React.FC<Props> = ({
                   return (
                     <TableRow
                       key={`${match.entity}-${match.entityId}-${index}`}
-                      hover
-                      className={classes.row}
                       tabIndex={-1}
-                      onClick={() => handleRowClick(match)}
-                      style={{ cursor: 'pointer' }}
                       selected={isSelected}
                     >
                       <TableCell padding="checkbox">
