@@ -90,18 +90,27 @@ const OpportunityTasksView: React.FC = () => {
     [refreshCount],
   );
 
-  const handleDeleteTask = useCallback(
+  const handleDiscardTask = useCallback(
     async (taskId: string) => {
       try {
-        await firebase.firestore().collection('opportunity-tasks').doc(taskId).delete();
+        await firebase.firestore().collection('opportunity-tasks').doc(taskId).update({
+          status: TaskStatus.Discarded,
+          updatedAt: new Date(),
+        });
 
         // Update local state immediately
-        setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+        setTasks(prevTasks =>
+          prevTasks.map(task =>
+            task.id === taskId
+              ? { ...task, status: TaskStatus.Discarded, updatedAt: new Date() }
+              : task,
+          ),
+        );
 
         // Refresh badge count
         refreshCount();
       } catch (error) {
-        console.error('Failed to delete task:', error);
+        console.error('Failed to discard task:', error);
       }
     },
     [refreshCount],
@@ -225,7 +234,7 @@ const OpportunityTasksView: React.FC = () => {
                     tasks={tasks}
                     isAdmin={isDashboardUser(userRecord)}
                     onResolve={handleResolveTask}
-                    onDelete={handleDeleteTask}
+                    onDiscard={handleDiscardTask}
                   />
                 </CardContent>
               )}

@@ -1,22 +1,5 @@
-import React, { Fragment, useState } from 'react';
-import {
-  Box,
-  Button,
-  Card,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  makeStyles,
-  Menu,
-  MenuItem,
-  Tooltip,
-  Typography,
-  Theme,
-} from '@material-ui/core';
-import { MoreVert as MoreVertIcon } from '@material-ui/icons';
+import React, { Fragment } from 'react';
+import { Box, Button, Card, makeStyles, Typography, Theme } from '@material-ui/core';
 import { format } from 'date-fns';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import Avatar from 'react-avatar';
@@ -95,7 +78,7 @@ interface OpportunityTaskRowProps {
   task: OpportunityTask;
   isAdmin?: boolean;
   onResolve: (taskId: string) => void;
-  onDelete: (taskId: string) => void;
+  onDiscard: (taskId: string) => void;
 }
 
 const getStatusInfo = (task: OpportunityTask) => {
@@ -109,33 +92,21 @@ const getStatusInfo = (task: OpportunityTask) => {
 export const OpportunityTaskRow: React.FC<OpportunityTaskRowProps> = ({
   task,
   onResolve,
-  onDelete,
+  onDiscard,
 }) => {
   const classes = useStyles();
   const statusInfo = getStatusInfo(task);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
 
   const handleResolve = () => {
     if (task.id) {
       onResolve(task.id);
     }
-    handleMenuClose();
   };
 
-  const handleDelete = () => {
+  const handleDiscard = () => {
     if (task.id) {
-      onDelete(task.id);
+      onDiscard(task.id);
     }
-    handleMenuClose();
   };
 
   return (
@@ -231,22 +202,18 @@ export const OpportunityTaskRow: React.FC<OpportunityTaskRowProps> = ({
           />
         </Box>
 
-        {/* Action Menu */}
-        <Box className={classes.actionButtons}>
-          <Tooltip title="Actions">
-            <IconButton size="small" onClick={handleMenuClick}>
-              <MoreVertIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      </Box>
-
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        {task.status !== TaskStatus.Resolved && (
-          <MenuItem onClick={handleResolve}>Mark as Resolved</MenuItem>
+        {/* Action Buttons */}
+        {task.status === TaskStatus.Active && (
+          <Box className={classes.actionButtons}>
+            <Button variant="contained" color="primary" size="small" onClick={handleResolve}>
+              Resolve
+            </Button>
+            <Button variant="contained" color="secondary" size="small" onClick={handleDiscard}>
+              Discard
+            </Button>
+          </Box>
         )}
-        <MenuItem onClick={handleDelete}>Delete Task</MenuItem>
-      </Menu>
+      </Box>
     </StyledTaskRow>
   );
 };
@@ -255,66 +222,31 @@ interface OpportunityTasksTableProps {
   tasks: OpportunityTask[];
   isAdmin?: boolean;
   onResolve: (taskId: string) => void;
-  onDelete: (taskId: string) => void;
+  onDiscard: (taskId: string) => void;
 }
 
 const OpportunityTasksTable: React.FC<OpportunityTasksTableProps> = ({
   tasks,
   isAdmin,
   onResolve,
-  onDelete,
+  onDiscard,
 }) => {
   const classes = useStyles();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
-
-  const handleDeleteClick = (taskId: string) => {
-    setTaskToDelete(taskId);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = () => {
-    if (taskToDelete) {
-      onDelete(taskToDelete);
-      setDeleteDialogOpen(false);
-      setTaskToDelete(null);
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteDialogOpen(false);
-    setTaskToDelete(null);
-  };
 
   return (
     <Fragment>
-      {tasks.map(task => (
-        <Card key={task.id} className={classes.card}>
-          <OpportunityTaskRow
-            task={task}
-            isAdmin={isAdmin}
-            onResolve={onResolve}
-            onDelete={handleDeleteClick}
-          />
-        </Card>
-      ))}
-
-      <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
-        <DialogTitle>Delete Task</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this task? This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteCancel} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleDeleteConfirm} color="secondary" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {tasks
+        .filter(task => task.status !== TaskStatus.Discarded)
+        .map(task => (
+          <Card key={task.id} className={classes.card}>
+            <OpportunityTaskRow
+              task={task}
+              isAdmin={isAdmin}
+              onResolve={onResolve}
+              onDiscard={onDiscard}
+            />
+          </Card>
+        ))}
     </Fragment>
   );
 };
