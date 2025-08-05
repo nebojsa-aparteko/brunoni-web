@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import Avatar from 'react-avatar';
 import { OpportunityTask } from './OpportunityTasksView';
-import { TaskStatus } from '../../model/Opportunity';
+import { TaskStatus, opportunityToString } from '../../model/Opportunity';
 import { withStyles, createStyles } from '@material-ui/styles';
 import InfoBoxItem from '../InfoBoxItem';
 
@@ -79,6 +79,7 @@ interface OpportunityTaskRowProps {
   isAdmin?: boolean;
   onResolve: (taskId: string) => void;
   onDiscard: (taskId: string) => void;
+  onEdit: (taskId: string) => void;
 }
 
 const getStatusInfo = (task: OpportunityTask) => {
@@ -93,6 +94,7 @@ export const OpportunityTaskRow: React.FC<OpportunityTaskRowProps> = ({
   task,
   onResolve,
   onDiscard,
+  onEdit,
 }) => {
   const classes = useStyles();
   const statusInfo = getStatusInfo(task);
@@ -106,6 +108,12 @@ export const OpportunityTaskRow: React.FC<OpportunityTaskRowProps> = ({
   const handleDiscard = () => {
     if (task.id) {
       onDiscard(task.id);
+    }
+  };
+
+  const handleEdit = () => {
+    if (task.id) {
+      onEdit(task.id);
     }
   };
 
@@ -187,7 +195,9 @@ export const OpportunityTaskRow: React.FC<OpportunityTaskRowProps> = ({
             <InfoBoxItem
               title="Opportunity"
               label1={
-                <span className={classes.opportunityLink}>#{task.opportunity.opportunityId}</span>
+                <span className={classes.opportunityLink}>
+                  {opportunityToString(task.opportunity)}
+                </span>
               }
               label2={task.opportunity.bookingPartyId?.name || 'No booking party'}
               gutterBottom
@@ -205,6 +215,9 @@ export const OpportunityTaskRow: React.FC<OpportunityTaskRowProps> = ({
         {/* Action Buttons */}
         {task.status === TaskStatus.Active && (
           <Box className={classes.actionButtons}>
+            <Button variant="outlined" color="default" size="small" onClick={handleEdit}>
+              Edit
+            </Button>
             <Button variant="contained" color="primary" size="small" onClick={handleResolve}>
               Resolve
             </Button>
@@ -223,6 +236,7 @@ interface OpportunityTasksTableProps {
   isAdmin?: boolean;
   onResolve: (taskId: string) => void;
   onDiscard: (taskId: string) => void;
+  onEdit: (taskId: string) => void;
 }
 
 const OpportunityTasksTable: React.FC<OpportunityTasksTableProps> = ({
@@ -230,6 +244,7 @@ const OpportunityTasksTable: React.FC<OpportunityTasksTableProps> = ({
   isAdmin,
   onResolve,
   onDiscard,
+  onEdit,
 }) => {
   const classes = useStyles();
 
@@ -242,6 +257,7 @@ const OpportunityTasksTable: React.FC<OpportunityTasksTableProps> = ({
             isAdmin={isAdmin}
             onResolve={onResolve}
             onDiscard={onDiscard}
+            onEdit={onEdit}
           />
         </Card>
       ))}

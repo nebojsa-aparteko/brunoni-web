@@ -3,22 +3,42 @@ import { Box, Grid, TextField } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import set from 'lodash/fp/set';
 import UserRecord from '../../model/UserRecord';
+import { NormalizedOpportunity, opportunityToString } from '../../model/Opportunity';
 import { OpportunityTasksFilters } from './OpportunityTasksView';
 
 interface Props {
   filters: OpportunityTasksFilters;
   setFilters: (filters: OpportunityTasksFilters) => void;
   users: UserRecord[] | null;
+  opportunities: NormalizedOpportunity[] | null;
 }
 
-const OpportunityTasksFiltersBar: React.FC<Props> = ({ filters, setFilters, users }) => {
-  const { assignedUser, fileNumber } = filters;
+const OpportunityTasksFiltersBar: React.FC<Props> = ({
+  filters,
+  setFilters,
+  users,
+  opportunities,
+}) => {
+  const { assignedUser, opportunity } = filters;
 
   const setAssignedUserFilter = (user: UserRecord | null | undefined) =>
     setFilters && setFilters(set('assignedUser', user || undefined)(filters));
 
-  const setFileNumberFilter = (fileNumber: string) =>
-    setFilters && setFilters(set('fileNumber', fileNumber || '')(filters));
+  const setOpportunityFilter = (opportunity: NormalizedOpportunity | null) =>
+    setFilters && setFilters(set('opportunity', opportunity)(filters));
+
+  const opportunityFilterOptions = [
+    { id: 'all', label: 'All Opportunities', data: null },
+    ...(opportunities || []).map(opp => ({
+      id: opp.id,
+      label: opportunityToString(opp),
+      data: opp,
+    })),
+  ];
+
+  const selectedOpportunity = opportunity
+    ? opportunityFilterOptions.find(option => option.id === opportunity.id)
+    : opportunityFilterOptions[0];
 
   return (
     <Box
@@ -34,13 +54,14 @@ const OpportunityTasksFiltersBar: React.FC<Props> = ({ filters, setFilters, user
     >
       <Grid container spacing={2}>
         <Grid item sm={6} xs={12}>
-          <TextField
-            label="Opportunity ID"
-            variant="outlined"
-            fullWidth
-            value={fileNumber || ''}
-            onChange={e => setFileNumberFilter(e.target.value)}
-            placeholder="Search by Opportunity ID..."
+          <Autocomplete
+            options={opportunityFilterOptions}
+            getOptionLabel={option => option.label}
+            value={selectedOpportunity || opportunityFilterOptions[0]}
+            onChange={(_, value) => setOpportunityFilter(value?.data || null)}
+            renderInput={params => (
+              <TextField {...params} label="Opportunity" variant="outlined" fullWidth />
+            )}
           />
         </Grid>
         {users && (

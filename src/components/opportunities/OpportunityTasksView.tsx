@@ -12,6 +12,7 @@ import Meta from '../Meta';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import OpportunityTasksTable from './OpportunityTasksTable';
 import OpportunityTasksFiltersBar from './OpportunityTasksFiltersBar';
+import EditOpportunityTaskDialog from './EditOpportunityTaskDialog';
 import useUser from '../../hooks/useUser';
 import { isDashboardUser, CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import firebase from '../../firebase';
@@ -19,6 +20,7 @@ import { NormalizedOpportunity, TaskStatus } from '../../model/Opportunity';
 import UserRecord from '../../model/UserRecord';
 import useOverdueTasksCount from '../../hooks/useOverdueTasksCount';
 import useAdminUsers from '../../hooks/useAdminUsers';
+import useOpportunities from '../../hooks/useOpportunities';
 import UserRecordContext from '../../contexts/UserRecordContext';
 
 const useStyles = makeStyles(theme => ({
@@ -40,7 +42,7 @@ const useStyles = makeStyles(theme => ({
   content: {
     padding: 0,
     overflowX: 'auto',
-    width: 1200,
+    width: 1600,
   },
   inner: {
     minWidth: 700,
@@ -63,7 +65,7 @@ export interface OpportunityTask {
 
 export interface OpportunityTasksFilters {
   assignedUser: UserRecord | null | undefined;
-  fileNumber: string;
+  opportunity: NormalizedOpportunity | null;
 }
 
 const OpportunityTasksView: React.FC = () => {
@@ -74,10 +76,13 @@ const OpportunityTasksView: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState<OpportunityTasksFilters>({
     assignedUser: currentUser || undefined,
-    fileNumber: '',
+    opportunity: null,
   });
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<OpportunityTask | null>(null);
   const { refreshCount } = useOverdueTasksCount();
   const users = useAdminUsers(CUSTOMER_FACING_ROLES);
+  const opportunities = useOpportunities();
   const isInitialLoad = useRef(true);
 
   // Set default user only on initial load, not when manually cleared
@@ -102,10 +107,8 @@ const OpportunityTasksView: React.FC = () => {
         return false;
       }
 
-      if (filters.fileNumber && task.opportunity?.opportunityId) {
-        const searchTerm = filters.fileNumber.toLowerCase();
-        const fileNumber = task.opportunity.opportunityId.toLowerCase();
-        if (!fileNumber.includes(searchTerm)) {
+      if (filters.opportunity && task.opportunity?.id) {
+        if (task.opportunity.id !== filters.opportunity.id) {
           return false;
         }
       }
@@ -146,7 +149,6 @@ const OpportunityTasksView: React.FC = () => {
           updatedAt: new Date(),
         });
 
-        // Update local state immediately
         setTasks(prevTasks =>
           prevTasks.map(task =>
             task.id === taskId
@@ -154,14 +156,23 @@ const OpportunityTasksView: React.FC = () => {
               : task,
           ),
         );
-
-        // Refresh badge count
         refreshCount();
       } catch (error) {
         console.error('Failed to discard task:', error);
       }
     },
     [refreshCount],
+  );
+
+  const handleEditTask = useCallback(
+    (taskId: string) => {
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        setTaskToEdit(task);
+        setEditDialogOpen(true);
+      }
+    },
+    [tasks],
   );
 
   const fetchTasks = useCallback(async () => {
@@ -238,6 +249,11 @@ const OpportunityTasksView: React.FC = () => {
     }
   }, [userRecord]);
 
+  const handleUpdateTask = useCallback(() => {
+    fetchTasks();
+    refreshCount();
+  }, [fetchTasks, refreshCount]);
+
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
@@ -255,6 +271,7 @@ const OpportunityTasksView: React.FC = () => {
                   filters={filters}
                   setFilters={setFilters}
                   users={users}
+                  opportunities={opportunities}
                 />
               </CardContent>
 
@@ -278,6 +295,7 @@ const OpportunityTasksView: React.FC = () => {
                     isAdmin={isDashboardUser(userRecord)}
                     onResolve={handleResolveTask}
                     onDiscard={handleDiscardTask}
+                    onEdit={handleEditTask}
                   />
                 </CardContent>
               )}
@@ -287,6 +305,18 @@ const OpportunityTasksView: React.FC = () => {
           <Paper className={classes.root}>
             <ChartsCircularProgress />
           </Paper>
+        )}
+
+        {taskToEdit && (
+          <EditOpportunityTaskDialog
+            open={editDialogOpen}
+            onClose={() => {
+              setEditDialogOpen(false);
+              setTaskToEdit(null);
+            }}
+            task={taskToEdit}
+            onUpdate={handleUpdateTask}
+          />
         )}
       </div>
     </Fragment>
