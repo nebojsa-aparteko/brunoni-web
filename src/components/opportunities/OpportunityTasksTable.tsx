@@ -199,7 +199,6 @@ export const OpportunityTaskRow: React.FC<OpportunityTaskRowProps> = ({
                   {opportunityToString(task.opportunity)}
                 </span>
               }
-              label2={task.opportunity.bookingPartyId?.name || 'No booking party'}
               gutterBottom
             />
           )}
