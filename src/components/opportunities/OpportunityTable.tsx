@@ -463,9 +463,9 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         onClose={() => setCreateTaskDialogOpen(false)}
         opportunity={opportunity}
       />
-      {/* <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={e => handleCreateTaskClick(e)}>Create New Task</MenuItem>
-      </Menu> */}
+      </Menu>
     </TableRow>
   );
 };

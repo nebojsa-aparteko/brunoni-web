@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -15,6 +15,7 @@ import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import UserRecord from '../../model/UserRecord';
 import { NormalizedOpportunity, TaskStatus } from '../../model/Opportunity';
 import firebase from '../../firebase';
+import UserRecordContext from '../../contexts/UserRecordContext';
 
 interface CreateOpportunityTaskDialogProps {
   open: boolean;
@@ -27,6 +28,7 @@ const CreateOpportunityTaskDialog: React.FC<CreateOpportunityTaskDialogProps> = 
   onClose,
   opportunity,
 }) => {
+  const currentUser = useContext(UserRecordContext);
   const [content, setContent] = useState<string>('');
   const [assignedTo, setAssignedTo] = useState<UserRecord | null>(null);
   const [dueDate, setDueDate] = useState<Date | null>(null);
@@ -41,8 +43,10 @@ const CreateOpportunityTaskDialog: React.FC<CreateOpportunityTaskDialogProps> = 
       setAssignedTo(null);
       setDueDate(null);
       setDueDatePickerOpen(false);
+    } else {
+      setAssignedTo(currentUser || null);
     }
-  }, [open]);
+  }, [open, currentUser]);
 
   const handleCreate = async () => {
     if (!content.trim() || !assignedTo || !dueDate) {
