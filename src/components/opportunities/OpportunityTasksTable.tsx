@@ -235,18 +235,16 @@ const OpportunityTasksTable: React.FC<OpportunityTasksTableProps> = ({
 
   return (
     <Fragment>
-      {tasks
-        .filter(task => task.status !== TaskStatus.Discarded)
-        .map(task => (
-          <Card key={task.id} className={classes.card}>
-            <OpportunityTaskRow
-              task={task}
-              isAdmin={isAdmin}
-              onResolve={onResolve}
-              onDiscard={onDiscard}
-            />
-          </Card>
-        ))}
+      {tasks.map(task => (
+        <Card key={task.id} className={classes.card}>
+          <OpportunityTaskRow
+            task={task}
+            isAdmin={isAdmin}
+            onResolve={onResolve}
+            onDiscard={onDiscard}
+          />
+        </Card>
+      ))}
     </Fragment>
   );
 };

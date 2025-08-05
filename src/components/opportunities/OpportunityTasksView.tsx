@@ -1,22 +1,25 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  CardHeader,
-  makeStyles,
-  Paper,
-  Typography,
-} from '@material-ui/core';
+import React, {
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Card, CardContent, makeStyles, Paper, Typography } from '@material-ui/core';
 import Meta from '../Meta';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import OpportunityTasksTable from './OpportunityTasksTable';
+import OpportunityTasksFiltersBar from './OpportunityTasksFiltersBar';
 import useUser from '../../hooks/useUser';
-import { isDashboardUser } from '../../model/UserRecord';
+import { isDashboardUser, CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import firebase from '../../firebase';
 import { NormalizedOpportunity, TaskStatus } from '../../model/Opportunity';
 import UserRecord from '../../model/UserRecord';
 import useOverdueTasksCount from '../../hooks/useOverdueTasksCount';
+import useAdminUsers from '../../hooks/useAdminUsers';
+import UserRecordContext from '../../contexts/UserRecordContext';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -57,12 +60,58 @@ export interface OpportunityTask {
   opportunity?: NormalizedOpportunity;
 }
 
+export interface OpportunityTasksFilters {
+  assignedUser: UserRecord | null | undefined;
+  fileNumber: string;
+}
+
 const OpportunityTasksView: React.FC = () => {
   const classes = useStyles();
   const [, userRecord] = useUser();
+  const currentUser = useContext(UserRecordContext);
   const [tasks, setTasks] = useState<OpportunityTask[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [filters, setFilters] = useState<OpportunityTasksFilters>({
+    assignedUser: currentUser || undefined,
+    fileNumber: '',
+  });
   const { refreshCount } = useOverdueTasksCount();
+  const users = useAdminUsers(CUSTOMER_FACING_ROLES);
+  const isInitialLoad = useRef(true);
+
+  // Set default user only on initial load, not when manually cleared
+  useEffect(() => {
+    if (currentUser && isInitialLoad.current) {
+      setFilters(prev => ({ ...prev, assignedUser: currentUser }));
+      isInitialLoad.current = false;
+    }
+  }, [currentUser]);
+
+  const filteredTasks = useMemo(() => {
+    return tasks.filter(task => {
+      if (task.status === TaskStatus.Discarded) {
+        return false;
+      }
+
+      if (
+        filters.assignedUser &&
+        filters.assignedUser.id &&
+        task.assignedTo !== filters.assignedUser.id
+      ) {
+        return false;
+      }
+
+      if (filters.fileNumber && task.opportunity?.opportunityId) {
+        const searchTerm = filters.fileNumber.toLowerCase();
+        const fileNumber = task.opportunity.opportunityId.toLowerCase();
+        if (!fileNumber.includes(searchTerm)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [tasks, filters]);
 
   const handleResolveTask = useCallback(
     async (taskId: string) => {
@@ -72,7 +121,6 @@ const OpportunityTasksView: React.FC = () => {
           updatedAt: new Date(),
         });
 
-        // Update local state immediately
         setTasks(prevTasks =>
           prevTasks.map(task =>
             task.id === taskId
@@ -81,7 +129,6 @@ const OpportunityTasksView: React.FC = () => {
           ),
         );
 
-        // Refresh badge count
         refreshCount();
       } catch (error) {
         console.error('Failed to resolve task:', error);
@@ -202,36 +249,31 @@ const OpportunityTasksView: React.FC = () => {
         {!isLoading ? (
           <Fragment>
             <Card>
-              <CardHeader
-                title={
-                  <Box display="flex" alignItems="center">
-                    <Typography variant="subtitle1" display="inline">
-                      Opportunity Tasks
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" style={{ marginLeft: 16 }}>
-                      {isDashboardUser(userRecord)
-                        ? `Showing all tasks (${tasks.length})`
-                        : `Showing your tasks (${tasks.length})`}
-                    </Typography>
-                  </Box>
-                }
-              />
+              <CardContent>
+                <OpportunityTasksFiltersBar
+                  filters={filters}
+                  setFilters={setFilters}
+                  users={users}
+                />
+              </CardContent>
 
-              {tasks.length === 0 ? (
+              {filteredTasks.length === 0 ? (
                 <CardContent>
                   <Typography
                     variant="body1"
                     style={{ textAlign: 'center', padding: 32, color: '#666' }}
                   >
-                    {isDashboardUser(userRecord)
-                      ? 'No opportunity tasks found.'
-                      : 'No tasks assigned to you at the moment.'}
+                    {tasks.length === 0
+                      ? isDashboardUser(userRecord)
+                        ? 'No opportunity tasks found.'
+                        : 'No tasks assigned to you at the moment.'
+                      : 'No tasks match the current filters.'}
                   </Typography>
                 </CardContent>
               ) : (
                 <CardContent className={classes.content}>
                   <OpportunityTasksTable
-                    tasks={tasks}
+                    tasks={filteredTasks}
                     isAdmin={isDashboardUser(userRecord)}
                     onResolve={handleResolveTask}
                     onDiscard={handleDiscardTask}
