@@ -8,8 +8,8 @@ import OpportunitiesFilterProvider from '../providers/OpportunitiesFilterProvide
 import ManualMatchingFilterProvider from '../providers/ManualMatchingFilterProvider';
 import OpportunitiesView from '../components/opportunities/OpportunitiesView';
 import ManualMatchingView from '../components/opportunities/ManualMatchingView';
-import OpportunityTasksView from '../components/opportunities/OpportunityTasksView';
-import useOverdueTasksCount from '../hooks/useOverdueTasksCount';
+// import OpportunityTasksView from '../components/opportunities/OpportunityTasksView';
+// import useOverdueTasksCount from '../hooks/useOverdueTasksCount';
 import queryString from 'query-string';
 import { useNavigate } from 'react-router-dom';
 
@@ -63,7 +63,7 @@ function a11yProps(index: any) {
 const OpportunitiesPage: React.FC = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const { count: overdueTasksCount } = useOverdueTasksCount();
+  //   const { count: overdueTasksCount } = useOverdueTasksCount();
 
   const params = queryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
