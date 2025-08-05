@@ -13,7 +13,7 @@ import DateInput from '../inputs/DateInput';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import UserRecord from '../../model/UserRecord';
-import { NormalizedOpportunity } from '../../model/Opportunity';
+import { NormalizedOpportunity, TaskStatus } from '../../model/Opportunity';
 import firebase from '../../firebase';
 
 interface CreateOpportunityTaskDialogProps {
@@ -55,7 +55,7 @@ const CreateOpportunityTaskDialog: React.FC<CreateOpportunityTaskDialogProps> = 
         content: content.trim(),
         assignedTo: assignedTo.id,
         dueDate: dueDate,
-        status: 'Active',
+        status: TaskStatus.Active,
         opportunityId: opportunity.id,
         createdAt: new Date(),
         updatedAt: new Date(),

@@ -119,7 +119,19 @@ const OpportunitiesPage: React.FC = () => {
             >
               <Tab icon={<AssessmentIcon />} label="Opportunities" {...a11yProps(0)} />
               <Tab icon={<HelpIcon />} label="Manual Matching" {...a11yProps(1)} />
-              <Tab icon={<CheckCircleIcon />} label="Tasks" {...a11yProps(2)} />
+              <Tab
+                icon={
+                  <Badge
+                    badgeContent={overdueTasksCount > 0 ? overdueTasksCount : null}
+                    color="error"
+                    max={99}
+                  >
+                    <CheckCircleIcon />
+                  </Badge>
+                }
+                label="Tasks"
+                {...a11yProps(2)}
+              />
             </Tabs>
           </Paper>
           <TabPanel value={selectedTab} index={0}>
@@ -131,7 +143,7 @@ const OpportunitiesPage: React.FC = () => {
             </ManualMatchingFilterProvider>
           </TabPanel>
           <TabPanel value={selectedTab} index={2}>
-            {/* <OpportunityTasksView isAdmin={true} /> */}
+            <OpportunityTasksView />
           </TabPanel>
         </Box>
       </OpportunitiesFilterProvider>

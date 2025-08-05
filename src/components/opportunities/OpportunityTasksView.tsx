@@ -1,0 +1,244 @@
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  makeStyles,
+  Paper,
+  Typography,
+} from '@material-ui/core';
+import Meta from '../Meta';
+import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
+import OpportunityTasksTable from './OpportunityTasksTable';
+import useUser from '../../hooks/useUser';
+import { isDashboardUser } from '../../model/UserRecord';
+import firebase from '../../firebase';
+import { NormalizedOpportunity, TaskStatus } from '../../model/Opportunity';
+import UserRecord from '../../model/UserRecord';
+import useOverdueTasksCount from '../../hooks/useOverdueTasksCount';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4),
+    padding: theme.spacing(5),
+
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(2),
+      paddingTop: theme.spacing(3),
+    },
+
+    ['@media print']: {
+      marginTop: theme.spacing(0),
+      paddingTop: theme.spacing(0),
+    },
+  },
+  content: {
+    padding: 0,
+    overflowX: 'auto',
+  },
+  inner: {
+    minWidth: 700,
+  },
+}));
+
+export interface OpportunityTask {
+  id?: string;
+  content: string;
+  assignedTo: string;
+  dueDate: Date;
+  status: TaskStatus;
+  opportunityId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy?: string;
+  assignedToUser?: UserRecord;
+  opportunity?: NormalizedOpportunity;
+}
+
+const OpportunityTasksView: React.FC = () => {
+  const classes = useStyles();
+  const [, userRecord] = useUser();
+  const [tasks, setTasks] = useState<OpportunityTask[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { refreshCount } = useOverdueTasksCount();
+
+  const handleResolveTask = useCallback(
+    async (taskId: string) => {
+      try {
+        await firebase.firestore().collection('opportunity-tasks').doc(taskId).update({
+          status: TaskStatus.Resolved,
+          updatedAt: new Date(),
+        });
+
+        // Update local state immediately
+        setTasks(prevTasks =>
+          prevTasks.map(task =>
+            task.id === taskId
+              ? { ...task, status: TaskStatus.Resolved, updatedAt: new Date() }
+              : task,
+          ),
+        );
+
+        // Refresh badge count
+        refreshCount();
+      } catch (error) {
+        console.error('Failed to resolve task:', error);
+      }
+    },
+    [refreshCount],
+  );
+
+  const handleDeleteTask = useCallback(
+    async (taskId: string) => {
+      try {
+        await firebase.firestore().collection('opportunity-tasks').doc(taskId).delete();
+
+        // Update local state immediately
+        setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+
+        // Refresh badge count
+        refreshCount();
+      } catch (error) {
+        console.error('Failed to delete task:', error);
+      }
+    },
+    [refreshCount],
+  );
+
+  const fetchTasks = useCallback(async () => {
+    if (!userRecord?.id) return;
+
+    setIsLoading(true);
+    try {
+      const db = firebase.firestore();
+      let query = db.collection('opportunity-tasks');
+
+      // Filter tasks based on user role
+      if (!isDashboardUser(userRecord)) {
+        // Non-admin users only see tasks assigned to them or created by them
+        query = query.where('assignedTo', '==', userRecord.id);
+      }
+      // Admin users see all tasks (no additional filtering)
+
+      const snapshot = await query.orderBy('createdAt', 'desc').get();
+
+      const tasksData: OpportunityTask[] = [];
+      const userIds = new Set<string>();
+      const opportunityIds = new Set<string>();
+
+      // Collect task data and unique IDs
+      const rawTasks = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
+        updatedAt: doc.data().updatedAt?.toDate(),
+        dueDate: doc.data().dueDate?.toDate(),
+      })) as OpportunityTask[];
+
+      rawTasks.forEach(task => {
+        if (task.assignedTo) userIds.add(task.assignedTo);
+        if (task.createdBy) userIds.add(task.createdBy);
+        if (task.opportunityId) opportunityIds.add(task.opportunityId);
+      });
+
+      // Fetch user records
+      const userPromises = Array.from(userIds).map(async userId => {
+        const userDoc = await db.collection('users').doc(userId).get();
+        return { id: userId, ...userDoc.data() } as UserRecord & { id: string };
+      });
+
+      // Fetch opportunity records
+      const opportunityPromises = Array.from(opportunityIds).map(async oppId => {
+        const oppDoc = await db.collection('opportunities').doc(oppId).get();
+        return { id: oppId, ...oppDoc.data() } as NormalizedOpportunity & { id: string };
+      });
+
+      const [users, opportunities] = await Promise.all([
+        Promise.all(userPromises),
+        Promise.all(opportunityPromises),
+      ]);
+
+      const usersMap = new Map(users.map(user => [user.id, user]));
+      const opportunitiesMap = new Map(opportunities.map(opp => [opp.id, opp]));
+
+      // Enrich tasks with user and opportunity data
+      rawTasks.forEach(task => {
+        const enrichedTask = {
+          ...task,
+          assignedToUser: task.assignedTo ? usersMap.get(task.assignedTo) : undefined,
+          opportunity: task.opportunityId ? opportunitiesMap.get(task.opportunityId) : undefined,
+        };
+        tasksData.push(enrichedTask);
+      });
+
+      setTasks(tasksData);
+    } catch (error) {
+      console.error('Failed to fetch opportunity tasks:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userRecord]);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
+
+  return (
+    <Fragment>
+      <Meta title="Opportunity Tasks" />
+
+      <div>
+        {!isLoading ? (
+          <Fragment>
+            <Card>
+              <CardHeader
+                title={
+                  <Box display="flex" alignItems="center">
+                    <Typography variant="subtitle1" display="inline">
+                      Opportunity Tasks
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" style={{ marginLeft: 16 }}>
+                      {isDashboardUser(userRecord)
+                        ? `Showing all tasks (${tasks.length})`
+                        : `Showing your tasks (${tasks.length})`}
+                    </Typography>
+                  </Box>
+                }
+              />
+
+              {tasks.length === 0 ? (
+                <CardContent>
+                  <Typography
+                    variant="body1"
+                    style={{ textAlign: 'center', padding: 32, color: '#666' }}
+                  >
+                    {isDashboardUser(userRecord)
+                      ? 'No opportunity tasks found.'
+                      : 'No tasks assigned to you at the moment.'}
+                  </Typography>
+                </CardContent>
+              ) : (
+                <CardContent className={classes.content}>
+                  <OpportunityTasksTable
+                    tasks={tasks}
+                    isAdmin={isDashboardUser(userRecord)}
+                    onResolve={handleResolveTask}
+                    onDelete={handleDeleteTask}
+                  />
+                </CardContent>
+              )}
+            </Card>
+          </Fragment>
+        ) : (
+          <Paper className={classes.root}>
+            <ChartsCircularProgress />
+          </Paper>
+        )}
+      </div>
+    </Fragment>
+  );
+};
+
+export default OpportunityTasksView;
