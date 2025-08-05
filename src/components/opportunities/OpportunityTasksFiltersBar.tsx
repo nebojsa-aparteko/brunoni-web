@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid, TextField } from '@material-ui/core';
+import { Box, Grid, TextField, FormControlLabel, Checkbox } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import set from 'lodash/fp/set';
 import UserRecord from '../../model/UserRecord';
@@ -19,13 +19,16 @@ const OpportunityTasksFiltersBar: React.FC<Props> = ({
   users,
   opportunities,
 }) => {
-  const { assignedUser, opportunity } = filters;
+  const { assignedUser, opportunity, showResolved } = filters;
 
   const setAssignedUserFilter = (user: UserRecord | null | undefined) =>
     setFilters && setFilters(set('assignedUser', user || undefined)(filters));
 
   const setOpportunityFilter = (opportunity: NormalizedOpportunity | null) =>
     setFilters && setFilters(set('opportunity', opportunity)(filters));
+
+  const setShowResolvedFilter = (showResolved: boolean) =>
+    setFilters && setFilters(set('showResolved', showResolved)(filters));
 
   const opportunityFilterOptions = [
     { id: 'all', label: 'All Opportunities', data: null },
@@ -53,7 +56,7 @@ const OpportunityTasksFiltersBar: React.FC<Props> = ({
       mx={1}
     >
       <Grid container spacing={2}>
-        <Grid item sm={6} xs={12}>
+        <Grid item sm={4} xs={12}>
           <Autocomplete
             options={opportunityFilterOptions}
             getOptionLabel={option => option.label}
@@ -65,7 +68,7 @@ const OpportunityTasksFiltersBar: React.FC<Props> = ({
           />
         </Grid>
         {users && (
-          <Grid item sm={6} xs={12}>
+          <Grid item sm={4} xs={12}>
             <Autocomplete
               options={users || []}
               getOptionLabel={(option: UserRecord) =>
@@ -84,6 +87,18 @@ const OpportunityTasksFiltersBar: React.FC<Props> = ({
             />
           </Grid>
         )}
+        <Grid item sm={4} xs={12} style={{ display: 'flex', alignItems: 'center' }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={showResolved}
+                onChange={e => setShowResolvedFilter(e.target.checked)}
+                color="primary"
+              />
+            }
+            label="Show resolved tasks"
+          />
+        </Grid>
       </Grid>
     </Box>
   );

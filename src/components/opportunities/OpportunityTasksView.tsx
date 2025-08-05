@@ -66,6 +66,7 @@ export interface OpportunityTask {
 export interface OpportunityTasksFilters {
   assignedUser: UserRecord | null | undefined;
   opportunity: NormalizedOpportunity | null;
+  showResolved: boolean;
 }
 
 const OpportunityTasksView: React.FC = () => {
@@ -77,6 +78,7 @@ const OpportunityTasksView: React.FC = () => {
   const [filters, setFilters] = useState<OpportunityTasksFilters>({
     assignedUser: currentUser || undefined,
     opportunity: null,
+    showResolved: false,
   });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<OpportunityTask | null>(null);
@@ -85,7 +87,6 @@ const OpportunityTasksView: React.FC = () => {
   const opportunities = useOpportunities();
   const isInitialLoad = useRef(true);
 
-  // Set default user only on initial load, not when manually cleared
   useEffect(() => {
     if (currentUser && isInitialLoad.current) {
       setFilters(prev => ({ ...prev, assignedUser: currentUser }));
@@ -94,27 +95,35 @@ const OpportunityTasksView: React.FC = () => {
   }, [currentUser]);
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter(task => {
-      if (task.status === TaskStatus.Discarded) {
-        return false;
-      }
-
-      if (
-        filters.assignedUser &&
-        filters.assignedUser.id &&
-        task.assignedTo !== filters.assignedUser.id
-      ) {
-        return false;
-      }
-
-      if (filters.opportunity && task.opportunity?.id) {
-        if (task.opportunity.id !== filters.opportunity.id) {
+    return tasks
+      .filter(task => {
+        if (task.status === TaskStatus.Discarded) {
           return false;
         }
-      }
 
-      return true;
-    });
+        if (!filters.showResolved && task.status === TaskStatus.Resolved) {
+          return false;
+        }
+
+        if (
+          filters.assignedUser &&
+          filters.assignedUser.id &&
+          task.assignedTo !== filters.assignedUser.id
+        ) {
+          return false;
+        }
+
+        if (filters.opportunity && task.opportunity?.id) {
+          if (task.opportunity.id !== filters.opportunity.id) {
+            return false;
+          }
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      });
   }, [tasks, filters]);
 
   const handleResolveTask = useCallback(
