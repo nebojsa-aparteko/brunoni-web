@@ -13,22 +13,22 @@ import DateInput from '../inputs/DateInput';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import UserRecord from '../../model/UserRecord';
-import { NormalizedOpportunity, TaskStatus } from '../../model/Opportunity';
 import firebase from '../../firebase';
-import UserRecordContext from '../../contexts/UserRecordContext';
+import { OpportunityTask } from './OpportunityTasksView';
 
-interface CreateOpportunityTaskDialogProps {
+interface EditOpportunityTaskDialogProps {
   open: boolean;
   onClose: () => void;
-  opportunity: NormalizedOpportunity;
+  task: OpportunityTask;
+  onUpdate: () => void;
 }
 
-const CreateOpportunityTaskDialog: React.FC<CreateOpportunityTaskDialogProps> = ({
+const EditOpportunityTaskDialog: React.FC<EditOpportunityTaskDialogProps> = ({
   open,
   onClose,
-  opportunity,
+  task,
+  onUpdate,
 }) => {
-  const currentUser = useContext(UserRecordContext);
   const [content, setContent] = useState<string>('');
   const [assignedTo, setAssignedTo] = useState<UserRecord | null>(null);
   const [dueDate, setDueDate] = useState<Date | null>(null);
@@ -38,38 +38,39 @@ const CreateOpportunityTaskDialog: React.FC<CreateOpportunityTaskDialogProps> = 
   const users = useAdminUsers(CUSTOMER_FACING_ROLES);
 
   useEffect(() => {
-    if (!open) {
+    if (open && task) {
+      setContent(task.content || '');
+      setAssignedTo(task.assignedToUser || null);
+      setDueDate(task.dueDate || null);
+      setDueDatePickerOpen(false);
+    } else if (!open) {
       setContent('');
       setAssignedTo(null);
       setDueDate(null);
       setDueDatePickerOpen(false);
-    } else {
-      setAssignedTo(currentUser || null);
     }
-  }, [open, currentUser]);
+  }, [open, task]);
 
-  const handleCreate = async () => {
-    if (!content.trim() || !assignedTo || !dueDate) {
+  const handleUpdate = async () => {
+    if (!content.trim() || !assignedTo || !dueDate || !task.id) {
       return;
     }
 
     setLoading(true);
     try {
-      const taskData = {
+      const updateData = {
         content: content.trim(),
         assignedTo: assignedTo.id,
         dueDate: dueDate,
-        status: TaskStatus.Active,
-        opportunityId: opportunity.id,
-        createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      await firebase.firestore().collection('opportunity-tasks').add(taskData);
-      console.debug('Created opportunity task:', taskData);
+      await firebase.firestore().collection('opportunity-tasks').doc(task.id).update(updateData);
+      console.debug('Updated opportunity task:', updateData);
+      onUpdate();
       onClose();
     } catch (error) {
-      console.error('Failed to create opportunity task:', error);
+      console.error('Failed to update opportunity task:', error);
     } finally {
       setLoading(false);
     }
@@ -79,7 +80,14 @@ const CreateOpportunityTaskDialog: React.FC<CreateOpportunityTaskDialogProps> = 
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Create New Task for Opportunity #{opportunity.opportunityId}</DialogTitle>
+      <DialogTitle>
+        Edit Task #{task.id?.slice(-6).toUpperCase()}
+        {task.opportunity && (
+          <span style={{ fontSize: '0.9em', color: '#666', marginLeft: 8 }}>
+            for Opportunity #{task.opportunity.opportunityId}
+          </span>
+        )}
+      </DialogTitle>
       <DialogContent>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -125,16 +133,16 @@ const CreateOpportunityTaskDialog: React.FC<CreateOpportunityTaskDialogProps> = 
           Cancel
         </Button>
         <Button
-          onClick={handleCreate}
+          onClick={handleUpdate}
           color="primary"
           variant="contained"
           disabled={!isFormValid || loading}
         >
-          {loading ? 'Creating...' : 'Create Task'}
+          {loading ? 'Updating...' : 'Update Task'}
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default CreateOpportunityTaskDialog;
+export default EditOpportunityTaskDialog;
