@@ -124,8 +124,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
 
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
 
-  // Sorting state
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'id', direction: 'asc' });
 
   const handleSort = (key: string) => {
     setSortConfig(prevConfig => ({
