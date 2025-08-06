@@ -8,8 +8,8 @@ import OpportunitiesFilterProvider from '../providers/OpportunitiesFilterProvide
 import ManualMatchingFilterProvider from '../providers/ManualMatchingFilterProvider';
 import OpportunitiesView from '../components/opportunities/OpportunitiesView';
 import ManualMatchingView from '../components/opportunities/ManualMatchingView';
-// import OpportunityTasksView from '../components/opportunities/OpportunityTasksView';
-// import useOverdueTasksCount from '../hooks/useOverdueTasksCount';
+import OpportunityTasksView from '../components/opportunities/OpportunityTasksView';
+import useOverdueTasksCount from '../hooks/useOverdueTasksCount';
 import queryString from 'query-string';
 import { useNavigate } from 'react-router-dom';
 
@@ -63,7 +63,7 @@ function a11yProps(index: any) {
 const OpportunitiesPage: React.FC = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  //   const { count: overdueTasksCount } = useOverdueTasksCount();
+  const { count: overdueTasksCount } = useOverdueTasksCount();
 
   const params = queryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
@@ -119,7 +119,19 @@ const OpportunitiesPage: React.FC = () => {
             >
               <Tab icon={<AssessmentIcon />} label="Opportunities" {...a11yProps(0)} />
               <Tab icon={<HelpIcon />} label="Manual Matching" {...a11yProps(1)} />
-              <Tab icon={<CheckCircleIcon />} label="Tasks" {...a11yProps(2)} />
+              <Tab
+                icon={
+                  <Badge
+                    badgeContent={overdueTasksCount > 0 ? overdueTasksCount : null}
+                    color="error"
+                    max={99}
+                  >
+                    <CheckCircleIcon />
+                  </Badge>
+                }
+                label="Tasks"
+                {...a11yProps(2)}
+              />
             </Tabs>
           </Paper>
           <TabPanel value={selectedTab} index={0}>
@@ -131,7 +143,7 @@ const OpportunitiesPage: React.FC = () => {
             </ManualMatchingFilterProvider>
           </TabPanel>
           <TabPanel value={selectedTab} index={2}>
-            {/* <OpportunityTasksView isAdmin={true} /> */}
+            <OpportunityTasksView />
           </TabPanel>
         </Box>
       </OpportunitiesFilterProvider>

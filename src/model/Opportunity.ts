@@ -213,6 +213,7 @@ export interface NormalizedEntityOpportunityMatch {
 export enum TaskStatus {
   Active = 'active',
   Resolved = 'resolved',
+  Discarded = 'discarded',
 }
 export interface OpportunityTask {
   opportunityId: string; // current opportunity

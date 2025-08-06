@@ -15,8 +15,6 @@ import { format } from 'date-fns';
 
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 import CreateOpportunityTaskDialog from './CreateOpportunityTaskDialog';
-import { is } from 'cheerio/lib/api/traversing';
-import { on } from 'events';
 
 const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
   switch (key) {
@@ -463,9 +461,9 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         onClose={() => setCreateTaskDialogOpen(false)}
         opportunity={opportunity}
       />
-      {/* <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={e => handleCreateTaskClick(e)}>Create New Task</MenuItem>
-      </Menu> */}
+      </Menu>
     </TableRow>
   );
 };
@@ -498,12 +496,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
           >
             <TableHead className={classes.table}>
               <TableRow>
-                <SortableHeader
-                  sortKey="id"
-                  sortConfig={sortConfig}
-                  onSort={onSort}
-                  isActive={true}
-                >
+                <SortableHeader sortKey="id" sortConfig={sortConfig} onSort={onSort}>
                   File Number
                 </SortableHeader>
                 <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
