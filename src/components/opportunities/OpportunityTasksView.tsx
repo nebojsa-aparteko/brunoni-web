@@ -42,7 +42,8 @@ const useStyles = makeStyles(theme => ({
   content: {
     padding: 0,
     overflowX: 'auto',
-    width: 1600,
+    maxWidth: 1600,
+    minWidth: 600,
   },
   inner: {
     minWidth: 700,
