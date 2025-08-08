@@ -72,6 +72,12 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
         if (!entityIdMatch) return false;
       }
 
+      // Filter by booking party
+      if (filters.bookingParty) {
+        const bookingPartyMatch = match.bookingPartyId === filters.bookingParty.id;
+        if (!bookingPartyMatch) return false;
+      }
+
       // Filter by selected opportunity
       if (filters.opportunity && filters.opportunity !== 'unmatched') {
         return match.opportunityId === filters.opportunity;

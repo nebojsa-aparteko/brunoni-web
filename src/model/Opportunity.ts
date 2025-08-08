@@ -102,9 +102,16 @@ const formatLocation = (location: any): string => {
   return location.value || '';
 };
 
+const formatCommodity = (
+  commodity: { value: OpportunityCommodityGroup | string } | null,
+): string => {
+  return typeof commodity?.value === 'string' ? commodity.value : commodity?.value?.name || '';
+};
+
 export function opportunityToString(opportunity: NormalizedOpportunity): string {
   const bookingParty = opportunity.bookingPartyId?.name || '';
   const statisticalClient = opportunity.statisticalClientId?.name || '';
+  const commodity = formatCommodity(opportunity.commodity);
   const placeOfReceipt = formatLocation(opportunity.placeOfReceipt);
   const portOfLoading = formatLocation(opportunity.portOfLoading);
   const portOfDischarge = formatLocation(opportunity.portOfDischarge);
@@ -112,6 +119,7 @@ export function opportunityToString(opportunity: NormalizedOpportunity): string 
   const labels = [
     bookingParty,
     statisticalClient,
+    commodity,
     placeOfReceipt,
     portOfLoading,
     portOfDischarge,
