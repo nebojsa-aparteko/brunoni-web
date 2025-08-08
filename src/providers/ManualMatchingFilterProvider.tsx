@@ -1,10 +1,12 @@
 import React, { createContext, Dispatch, SetStateAction, useContext, useState } from 'react';
 import { ContextFilters } from './filterActions';
 import useUser from '../hooks/useUser';
+import Client from '../model/Client';
 
 export interface ManualMatchingContextFilters extends ContextFilters {
   opportunity?: string; // 'unmatched' or opportunity ID
   entityId?: string; // booking/quote ID for search
+  bookingParty?: Client;
 }
 
 export const MANUAL_MATCHING_FILTERS_INITIAL_STATE = {
