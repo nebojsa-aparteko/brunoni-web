@@ -18,6 +18,7 @@ interface Props {
   onClose?: () => void;
   margin?: 'none' | 'dense' | 'normal';
   fullWidth?: boolean;
+  format?: string;
 }
 
 const renderDay = (
@@ -55,6 +56,7 @@ export const DateInput: React.FC<Props> = ({
   label = 'Earliest Date',
   margin,
   fullWidth = true,
+  format = 'd.MMMM',
 }) => {
   const theme = useTheme();
   return (
@@ -71,7 +73,7 @@ export const DateInput: React.FC<Props> = ({
         value={value || null}
         onChange={date => onChange(date as Date)}
         onBlur={onBlur}
-        format="d.MMMM"
+        format={format}
         margin={margin}
         fullWidth={fullWidth}
         PopoverProps={{

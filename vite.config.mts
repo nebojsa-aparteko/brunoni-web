@@ -41,6 +41,7 @@ export default defineConfig(({ mode }) => {
       alias: {
         '@': path.resolve(rootDir, 'src'),
         'src': path.resolve(rootDir, 'src'),
+        '/src': path.resolve(rootDir, 'src')
       },
     },
     optimizeDeps: {

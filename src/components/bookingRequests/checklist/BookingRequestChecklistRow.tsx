@@ -5,7 +5,6 @@ import {
   CircularProgress,
   createStyles,
   IconButton,
-  LinearProgress,
   ListItem,
   ListItemIcon,
   ListItemSecondaryAction,
@@ -42,7 +41,6 @@ import { fileWithExt } from '../../bookings/checklist/ChecklistItemRow';
 import useGlobalAppState from '../../../hooks/useGlobalAppState';
 import { SAVED_ACTION_SNACKBAR } from '../../../store/types/globalAppState';
 import BookingRequestDocumentList from '../BookingRequestDocumentList';
-import CloseIcon from '@material-ui/icons/Close';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import { useActivityLogState } from '../../bookings/checklist/ActivityLogContext';
 import Alert from '@material-ui/lab/Alert';

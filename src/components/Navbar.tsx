@@ -24,12 +24,12 @@ import {
   Theme,
   Toolbar,
   Typography,
+  Hidden,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import { Link, ButtonLink, MenuItemLink } from './Link';
 import IdentityWidget from './IdentityWidget';
 import useUser from '../hooks/useUser';
-import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Divider from '@material-ui/core/Divider';
@@ -185,17 +185,28 @@ interface ListItemLinkProps {
   variant?: 'text' | 'outlined' | 'contained';
   color?: 'inherit' | 'default' | 'primary' | 'secondary' | undefined;
   typographyStyle?: any;
+  // Allow marking a link as external (will render an <a> instead of router <Link>)
+  isExternal?: boolean;
 }
 
 function ListItemLink(props: ListItemLinkProps) {
-  const { icon, primary, to, onClick } = props;
+  const { icon, primary, to, onClick, isExternal } = props;
+
+  const external = isExternal ?? /^https?:\/\//i.test(to);
 
   return (
     <li id={camelCase(primary) + 'Nav'}>
-      <ListItem button component={Link} to={to} onClick={onClick}>
-        {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
-        <ListItemText primary={primary} />
-      </ListItem>
+      {external ? (
+        <ListItem button component="a" href={to} onClick={onClick} target="_self" rel="noopener">
+          {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
+          <ListItemText primary={primary} />
+        </ListItem>
+      ) : (
+        <ListItem button component={Link} to={to} onClick={onClick}>
+          {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
+          <ListItemText primary={primary} />
+        </ListItem>
+      )}
     </li>
   );
 }
@@ -289,7 +300,12 @@ const Navbar: React.FC = () => {
                   className={classes.logo}
                 />
               </Link>
-              <Box displayPrint="none" width="100%" display="flex">
+              <Box
+                displayPrint="none"
+                width="100%"
+                display="flex"
+                style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}
+              >
                 {user !== undefined && user !== null && (
                   <Fragment>
                     {actingAs !== null && <ButtonMenuItem primary="Dashboard" to="/" />}
@@ -315,6 +331,9 @@ const Navbar: React.FC = () => {
                     <ButtonMenuItem primary="Bookings" to="/bookings" />
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem to="/client-statistics" primary="Statistics" />
+                    )}
+                    {isDashboardUser(userRecord) && !actingAs && (
+                      <ButtonMenuItem to="/opportunities" primary="Opportunities" />
                     )}
 
                     {actingAs !== null && (
@@ -368,6 +387,9 @@ const Navbar: React.FC = () => {
                           <MenuItemLink onClick={handleMenuClose} to="/land-transport-config">
                             Land Transport Config
                           </MenuItemLink>
+                          <MenuItemLink onClick={handleMenuClose} to="/opportunities-config">
+                            Opportunities Config
+                          </MenuItemLink>
                         </Menu>
                         {/*<ButtonMenuItem primary="Side Charges" to="/charges" />*/}
                         {/*{isSuperAdmin(userRecord) && <ButtonMenuItem primary="Teams" to="/teams" />}*/}
@@ -420,12 +442,6 @@ const Navbar: React.FC = () => {
                       >
                         <SearchIcon fontSize="small" />
                       </IconButton>
-                      {isSearchDialogOpen && (
-                        <NavBarQuickSearchDialog
-                          isOpen={isSearchDialogOpen}
-                          handleClose={handleDialogClose}
-                        />
-                      )}
                     </Fragment>
                   )
                 ) : import.meta.env.VITE_BRAND === 'brunoni' ? (
@@ -489,33 +505,143 @@ const Navbar: React.FC = () => {
               {user !== undefined && user !== null && (
                 <Fragment>
                   <ListItemLink primary="Dashboard" to="/" onClick={handleDrawerToggle} />
+
+                  {/* Quick Search */}
+                  <ListItem
+                    button
+                    onClick={() => {
+                      setIsSearchDialogOpen(true);
+                      handleDrawerToggle();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <SearchIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Quick Search" />
+                  </ListItem>
+
                   <ListItemLink primary="Schedule" to="/schedule" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Quotes" to="/quotes/groups" onClick={handleDrawerToggle} />
-                  {isAdmin && (
-                    <ListItemLink
-                      primary="Land Transport"
-                      to="/land-transport"
-                      onClick={handleDrawerToggle}
-                    />
+
+                  {/* Dashboard-only links (no actingAs) */}
+                  {isDashboardUser(userRecord) && !actingAs && (
+                    <Fragment>
+                      <ListItemLink primary="Vessel" to="/vessel" onClick={handleDrawerToggle} />
+                      <ListItemLink
+                        primary="Land"
+                        to="/land-transport"
+                        onClick={handleDrawerToggle}
+                      />
+                      <ListItemLink
+                        primary="Load list"
+                        to="/loadList"
+                        onClick={handleDrawerToggle}
+                      />
+                      <ListItemLink
+                        primary="Equipment control"
+                        to="/equipment-control"
+                        onClick={handleDrawerToggle}
+                      />
+                    </Fragment>
                   )}
-                  {/*<ListItemLink primary="Online Booking" to="/online-booking" onClick={handleDrawerToggle} />*/}
 
                   <ListItemLink primary="My day" to="/my-day" onClick={handleDrawerToggle} />
 
-                  <Fragment>
-                    <ListItemLink primary="Bookings" to="/bookings" onClick={handleDrawerToggle} />
-                  </Fragment>
-                  <ListItemLink
-                    primary="Equipment Situation"
-                    to="/equipment"
-                    onClick={handleDrawerToggle}
-                  />
-                  <ListItemLink primary="Side Charges" to="/charges" onClick={handleDrawerToggle} />
+                  <ListItemLink primary="Bookings" to="/bookings" onClick={handleDrawerToggle} />
+
+                  {/* Extra dashboard links */}
+                  {isDashboardUser(userRecord) && !actingAs && (
+                    <Fragment>
+                      <ListItemLink
+                        primary="Statistics"
+                        to="/client-statistics"
+                        onClick={handleDrawerToggle}
+                      />
+                      <ListItemLink
+                        primary="Opportunities"
+                        to="/opportunities"
+                        onClick={handleDrawerToggle}
+                      />
+                    </Fragment>
+                  )}
+
+                  {/* Acting-as client shortcuts */}
+                  {actingAs !== null && (
+                    <Fragment>
+                      <ListItemLink
+                        primary="Equipment Situation"
+                        to="/equipment"
+                        onClick={handleDrawerToggle}
+                      />
+                      <ListItemLink
+                        primary="Side Charges"
+                        to="/charges"
+                        onClick={handleDrawerToggle}
+                      />
+                    </Fragment>
+                  )}
+
+                  {/* Configuration section for admins (not actingAs) */}
+                  {actingAs === null && (
+                    <Fragment>
+                      <Divider />
+                      <ListItem disabled>
+                        <ListItemText primary="Configuration" />
+                      </ListItem>
+                      <ListItemLink
+                        primary="Side Charges"
+                        to="/charges"
+                        onClick={handleDrawerToggle}
+                      />
+                      <ListItemLink
+                        primary="Weekly Payment"
+                        to="/weekly-payment"
+                        onClick={handleDrawerToggle}
+                      />
+                      <ListItemLink
+                        primary="Commissions"
+                        to="/commissions"
+                        onClick={handleDrawerToggle}
+                      />
+                      <ListItemLink
+                        primary="Equipment Situation"
+                        to="/equipment"
+                        onClick={handleDrawerToggle}
+                      />
+                      {isSuperAdmin(userRecord) && (
+                        <ListItemLink primary="Teams" to="/teams" onClick={handleDrawerToggle} />
+                      )}
+                      <ListItemLink
+                        primary="Land Transport Config"
+                        to="/land-transport-config"
+                        onClick={handleDrawerToggle}
+                      />
+                      <ListItemLink
+                        primary="Opportunities Config"
+                        to="/opportunities-config"
+                        onClick={handleDrawerToggle}
+                      />
+                    </Fragment>
+                  )}
                 </Fragment>
               )}
 
+              {/* Call-to-actions (same as desktop: only when actingAs) or external links when logged out */}
               {user !== undefined && user !== null ? (
-                <ListItemLink primary="Get Quote" to="/quotes/get" onClick={handleDrawerToggle} />
+                actingAs ? (
+                  <Fragment>
+                    <ListItemLink
+                      primary="Get Quote"
+                      to="/quotes/get"
+                      onClick={handleDrawerToggle}
+                    />
+                    <ListItemLink
+                      primary="Book Now"
+                      to="/schedule?isPicker=true"
+                      onClick={handleDrawerToggle}
+                    />
+                  </Fragment>
+                ) : null
               ) : import.meta.env.VITE_BRAND === 'brunoni' ? (
                 <ListItemLink
                   primary="Visit brunoni.ch"
@@ -524,7 +650,7 @@ const Navbar: React.FC = () => {
                 />
               ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                 <ListItemLink
-                  primary="Visit  allmarine.ch"
+                  primary="Visit allmarine.ch"
                   to="https://allmarine.ch"
                   onClick={handleDrawerToggle}
                 />
@@ -548,6 +674,11 @@ const Navbar: React.FC = () => {
           </Drawer>
         </Hidden>
       </nav>
+
+      {/* Global quick search dialog for both desktop and mobile */}
+      {isSearchDialogOpen && (
+        <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
+      )}
     </Fragment>
   );
 };

@@ -21,7 +21,7 @@ import { Skeleton } from '@material-ui/lab';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import formatDate from 'date-fns/format';
-import firebase from 'firebase/compat/app';
+import firebase from '../../firebase';
 import 'firebase/compat/firestore';
 
 const Client: React.FC = () => {
