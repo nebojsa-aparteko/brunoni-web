@@ -84,7 +84,7 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
 
       // Show unmatched items (items without an opportunityId or with null/undefined opportunityId)
       if (filters.opportunity === OpportunityMatchStatus.Unmatched) {
-        return !match.opportunityId;
+        return match.status !== OpportunityMatchStatus.Discarded && !match.opportunityId;
       }
 
       if (filters.opportunity === OpportunityMatchStatus.Discarded) {
