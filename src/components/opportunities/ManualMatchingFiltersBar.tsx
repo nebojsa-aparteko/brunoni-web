@@ -3,7 +3,7 @@ import { Box, Grid, TextField } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import set from 'lodash/fp/set';
 import useOpportunities from '../../hooks/useOpportunities';
-import { opportunityToString } from '../../model/Opportunity';
+import { OpportunityMatchStatus, opportunityToString } from '../../model/Opportunity';
 import useClients from '../../hooks/useClients';
 import ClientInput from '../inputs/ClientInput';
 import Client from '../../model/Client';
@@ -19,7 +19,7 @@ const ManualMatchingFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const { opportunity, entityId, bookingParty } = filters;
 
   const setOpportunityFilter = (value: string | null) => {
-    setFilters && setFilters(set('opportunity', value || 'unmatched')(filters));
+    setFilters && setFilters(set('opportunity', value || '')(filters));
   };
 
   const setEntityIdFilter = (value: string) => {
@@ -30,7 +30,9 @@ const ManualMatchingFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
     setFilters && setFilters(set('bookingParty', client || undefined)(filters));
 
   const filterOptions = [
-    { id: 'unmatched', label: 'Unmatched' },
+    { id: '', label: 'All' },
+    { id: OpportunityMatchStatus.Unmatched, label: 'Unmatched' },
+    { id: OpportunityMatchStatus.Discarded, label: 'Discarded' },
     ...(opportunities || []).map(opp => ({
       id: opp.id,
       label: opportunityToString(opp),
@@ -52,14 +54,14 @@ const ManualMatchingFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
       mr={1}
     >
       <Grid container spacing={2}>
-        <Grid item sm={3} xs={12}>
+        <Grid item sm={5} xs={12}>
           <Autocomplete
             options={filterOptions}
-            getOptionLabel={option => option.label}
-            value={selectedValue}
-            onChange={(_, value) => setOpportunityFilter(value?.id || 'unmatched')}
+            getOptionLabel={option => option?.label || ''}
+            value={selectedValue || null}
+            onChange={(_, value) => setOpportunityFilter(value?.id || null)}
             renderInput={params => (
-              <TextField {...params} label="Opportunity" variant="outlined" fullWidth />
+              <TextField {...params} label="Match status" variant="outlined" fullWidth />
             )}
           />
         </Grid>
@@ -74,7 +76,7 @@ const ManualMatchingFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
           />
         </Grid>
         {clients && (
-          <Grid item sm={3} xs={12}>
+          <Grid item sm={4} xs={12}>
             <Box display="flex">
               <ClientInput
                 label="Booking Party"

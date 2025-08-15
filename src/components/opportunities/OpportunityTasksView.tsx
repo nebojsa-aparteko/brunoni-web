@@ -123,7 +123,7 @@ const OpportunityTasksView: React.FC = () => {
         return true;
       })
       .sort((a, b) => {
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
       });
   }, [tasks, filters]);
 
@@ -191,7 +191,7 @@ const OpportunityTasksView: React.FC = () => {
     setIsLoading(true);
     try {
       const db = firebase.firestore();
-      let query = db.collection('opportunity-tasks');
+      let query: firebase.firestore.Query = db.collection('opportunity-tasks');
 
       // Filter tasks based on user role
       if (!isDashboardUser(userRecord)) {
@@ -200,7 +200,7 @@ const OpportunityTasksView: React.FC = () => {
       }
       // Admin users see all tasks (no additional filtering)
 
-      const snapshot = await query.orderBy('createdAt', 'desc').get();
+      const snapshot = await query.orderBy('dueDate', 'asc').get();
 
       const tasksData: OpportunityTask[] = [];
       const userIds = new Set<string>();

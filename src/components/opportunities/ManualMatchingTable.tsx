@@ -17,15 +17,21 @@ import {
   Checkbox,
   Paper,
   Link,
+  Chip,
 } from '@material-ui/core';
 import { MoreVert as MoreVertIcon } from '@material-ui/icons';
 import { ManualMatchingTableToolbar } from './ManualMatchingTableToolbar';
-import { NormalizedEntityOpportunityMatch, OpportunityMatchStatus } from '../../model/Opportunity';
+import {
+  NormalizedEntityOpportunityMatch,
+  OpportunityMatchStatus,
+  opportunityToString,
+} from '../../model/Opportunity';
 import Port from '../../model/Port';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
 import useUser from '../../hooks/useUser';
 import { GlobalContext } from '../../store/GlobalStore';
 import { SHOW_SUCCESS_SNACKBAR, SHOW_ERROR_SNACKBAR } from '../../store/types/globalAppState';
+import useOpportunities from '../../hooks/useOpportunities';
 
 const getSortValue = (match: NormalizedEntityOpportunityMatch, key: string): any => {
   const matchData = match.entityMatchData;
@@ -331,6 +337,7 @@ const ManualMatchingTable: React.FC<Props> = ({
   const baseMatches = opportunityMatches || [];
   const displayMatches = sortConfig ? sortMatches(baseMatches, sortConfig) : baseMatches;
   const matchIds = displayMatches.map(match => `${match.entity}-${match.entityId}`);
+  const opportunities = useOpportunities();
 
   return (
     <Fragment>
@@ -397,6 +404,9 @@ const ManualMatchingTable: React.FC<Props> = ({
                   >
                     S/Client
                   </SortableHeader>
+                  <TableCell align="center" className={classes.headerCell}>
+                    Match status
+                  </TableCell>
                   <TableCell align="center" className={classes.headerCell}>
                     Actions
                   </TableCell>
@@ -585,6 +595,16 @@ const ManualMatchingTable: React.FC<Props> = ({
                     );
                   };
 
+                  const renderOpportunityInfo = (opportunityId?: string) => {
+                    const opportunity = opportunities?.find(op => op.id === opportunityId);
+                    if (!opportunity) return '';
+                    return (
+                      <div>
+                        <div>{opportunityToString(opportunity) || ''}</div>
+                      </div>
+                    );
+                  };
+
                   const renderEntityInfo = (item: NormalizedEntityOpportunityMatch) => {
                     if (!item) return '';
                     const handleLinkClick = (e: React.MouseEvent) => {
@@ -655,8 +675,20 @@ const ManualMatchingTable: React.FC<Props> = ({
                         {renderCompanyInfo(matchData?.statisticalClientId)}
                       </TableCell>
                       <TableCell align="center">
+                        {match.status === OpportunityMatchStatus.Matched && (
+                          <div>{renderOpportunityInfo(match.opportunityId)}</div>
+                        )}
+                        {match.status === OpportunityMatchStatus.Unmatched && (
+                          <Chip label="Unmatched" color="secondary" size="small" />
+                        )}
+                        {match.status === OpportunityMatchStatus.Discarded && (
+                          <Chip label="Discarded" color="default" size="small" />
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
                         {(match.status === OpportunityMatchStatus.Unmatched ||
-                          match.status === OpportunityMatchStatus.Matched) && (
+                          match.status === OpportunityMatchStatus.Matched ||
+                          match.status === OpportunityMatchStatus.Discarded) && (
                           <Tooltip title="Actions">
                             <IconButton size="small" onClick={e => handleMenuClick(e, match)}>
                               <MoreVertIcon />
@@ -683,6 +715,11 @@ const ManualMatchingTable: React.FC<Props> = ({
           <>
             <MenuItem onClick={handleAutoRematchOpportunity}>Auto Rematch</MenuItem>
             <MenuItem onClick={handleUnmatchOpportunity}>Unmatch</MenuItem>
+          </>
+        )}
+        {selectedMatch?.status === OpportunityMatchStatus.Discarded && (
+          <>
+            <MenuItem onClick={handleUnmatchOpportunity}>Revert to Unmatched</MenuItem>
           </>
         )}
       </Menu>
