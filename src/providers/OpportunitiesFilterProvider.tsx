@@ -7,7 +7,6 @@ import { OpportunityEquipmentGroup } from '../model/OpportunityEquipmentGroup';
 import { ContextFilters } from './filterActions';
 import useUser from '../hooks/useUser';
 import Client from '../model/Client';
-import UserRecord from '../model/UserRecord';
 import { OpportunityMatchDefinition, QuoteKind } from '../model/Opportunity';
 import ContainerType from '../model/ContainerType';
 import Port from '../model/Port';
@@ -15,7 +14,6 @@ import Port from '../model/Port';
 export interface OpportunitiesContextFilters extends ContextFilters {
   statisticalClient?: Client | null;
   bookingParty?: Client | null;
-  bookingPartyRep?: UserRecord | null;
   portsOfLoading?: {
     definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
     value: OpportunityPortsGroup | Port | string;
@@ -48,7 +46,6 @@ export interface OpportunitiesContextFilters extends ContextFilters {
 export const OPPORTUNITIES_FILTERS_INITIAL_STATE = {
   statisticalClient: undefined,
   bookingParty: undefined,
-  bookingPartyRep: undefined,
   archived: false,
   hold: false,
   portsOfLoading: null,

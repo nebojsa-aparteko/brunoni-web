@@ -93,7 +93,7 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
   const isAlreadyMatched = selectedOpportunity?.id === currentMatch?.opportunityId;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Match with Opportunity</DialogTitle>
       <DialogContent>
         <Autocomplete
@@ -134,16 +134,13 @@ const MatchOpportunityDialog: React.FC<MatchOpportunityDialogProps> = ({
               margin="dense"
               variant="outlined"
               fullWidth
-              placeholder="Search by ID, booking party, or agreement..."
+              placeholder="Search..."
             />
           )}
           filterOptions={(options, { inputValue }) => {
             const lowercaseInput = inputValue.toLowerCase();
-            return options.filter(
-              (option: EnhancedOpportunity) =>
-                option.opportunityId.toLowerCase().includes(lowercaseInput) ||
-                option.bookingPartyId?.name?.toLowerCase().includes(lowercaseInput) ||
-                option.agreementId?.toLowerCase().includes(lowercaseInput),
+            return options.filter((option: EnhancedOpportunity) =>
+              opportunityToString(option).toLowerCase().includes(lowercaseInput),
             );
           }}
         />

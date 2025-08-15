@@ -72,7 +72,6 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const {
     statisticalClient,
     bookingParty,
-    bookingPartyRep,
     portsOfLoading,
     portsOfDischarge,
     placesOfDelivery,
@@ -121,9 +120,6 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const setOpportunityIdFilter = (opportunityId: string) =>
     setFilters && setFilters(set('opportunityId', opportunityId || undefined)(filters));
 
-  const setBookingPartyRepFilter = (bookingPartyRep: UserRecord | null | undefined) =>
-    setFilters && setFilters(set('bookingPartyRep', bookingPartyRep || undefined)(filters));
-
   return (
     <Box
       display="flex"
@@ -139,14 +135,26 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
       <Grid container spacing={2}>
         <Grid item sm={3} xs={12}>
           <TextField
-            label="File Number"
+            label="Opportunity Number"
             variant="outlined"
             fullWidth
             value={opportunityId || ''}
             onChange={e => setOpportunityIdFilter(e.target.value)}
-            placeholder="Search by File Number..."
+            placeholder="Search by Opportunity Number..."
           />
         </Grid>
+        {clients && (
+          <Grid item sm={3} xs={12}>
+            <Box display="flex">
+              <ClientInput
+                label="Booking Party"
+                clients={clients || []}
+                onChange={setBookingPartyFilter}
+                value={bookingParty}
+              />
+            </Box>
+          </Grid>
+        )}
         {clients && (
           <Grid item sm={3} xs={12}>
             <Box display="flex" width={'100%'}>
@@ -159,16 +167,25 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             </Box>
           </Grid>
         )}
-        {clients && (
+        <Grid item sm={3} xs={12}>
+          <Autocomplete
+            options={[...QUOTE_KIND_OPTIONS]}
+            getOptionLabel={(option: string) => option}
+            value={quoteKind || null}
+            onChange={(_, value: string | null) => setQuoteKindFilter(value as QuoteKind)}
+            renderInput={(params: any) => (
+              <TextField {...params} label="Quote Kind" variant="outlined" />
+            )}
+          />
+        </Grid>
+        {placesOptions && (
           <Grid item sm={3} xs={12}>
-            <Box display="flex">
-              <ClientInput
-                label="Booking Party"
-                clients={clients || []}
-                onChange={setBookingPartyFilter}
-                value={bookingParty}
-              />
-            </Box>
+            <OpportunityPlacesGroupInput
+              label="Place of Receipt"
+              options={placesOptions}
+              onChange={setPlacesOfReceiptFilter}
+              value={placesOfReceipt || null}
+            />
           </Grid>
         )}
         {portsOptions && (
@@ -201,13 +218,33 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             />
           </Grid>
         )}{' '}
-        {placesOptions && (
+        {equipmentOptions && (
           <Grid item sm={3} xs={12}>
-            <OpportunityPlacesGroupInput
-              label="Place of Receipt"
-              options={placesOptions}
-              onChange={setPlacesOfReceiptFilter}
-              value={placesOfReceipt || null}
+            <OpportunityEquipmentGroupInput
+              label="Equipment"
+              options={equipmentOptions}
+              onChange={setEquipmentFilter}
+              value={selectedEquipment || null}
+            />
+          </Grid>
+        )}
+        {commodityOptions && (
+          <Grid item sm={3} xs={12}>
+            <OpportunityCommodityGroupInput
+              label="Commodity"
+              options={commodityOptions}
+              onChange={setCommodityFilter}
+              value={selectedCommodity || null}
+            />
+          </Grid>
+        )}
+        {users && (
+          <Grid item sm={3} xs={12}>
+            <UserInput
+              label="Choose Sales Representative"
+              users={users || []}
+              onChange={(_, user) => setUserFilter(user)}
+              value={assignee}
             />
           </Grid>
         )}
@@ -224,57 +261,6 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             />
           </Grid>
         )}
-        {commodityOptions && (
-          <Grid item sm={3} xs={12}>
-            <OpportunityCommodityGroupInput
-              label="Commodity"
-              options={commodityOptions}
-              onChange={setCommodityFilter}
-              value={selectedCommodity || null}
-            />
-          </Grid>
-        )}
-        {equipmentOptions && (
-          <Grid item sm={3} xs={12}>
-            <OpportunityEquipmentGroupInput
-              label="Equipment"
-              options={equipmentOptions}
-              onChange={setEquipmentFilter}
-              value={selectedEquipment || null}
-            />
-          </Grid>
-        )}
-        {users && (
-          <Grid item sm={3} xs={12}>
-            <UserInput
-              label="Choose Sales Representative"
-              users={users || []}
-              onChange={(_, user) => setUserFilter(user)}
-              value={assignee}
-            />
-          </Grid>
-        )}
-        {users && (
-          <Grid item sm={3} xs={12}>
-            <UserInput
-              label="Booking Party Representative"
-              users={users || []}
-              onChange={(_, user) => setBookingPartyRepFilter(user)}
-              value={bookingPartyRep}
-            />
-          </Grid>
-        )}
-        <Grid item sm={3} xs={12}>
-          <Autocomplete
-            options={[...QUOTE_KIND_OPTIONS]}
-            getOptionLabel={(option: string) => option}
-            value={quoteKind || null}
-            onChange={(_, value: string | null) => setQuoteKindFilter(value as QuoteKind)}
-            renderInput={(params: any) => (
-              <TextField {...params} label="Quote Kind" variant="outlined" />
-            )}
-          />
-        </Grid>
       </Grid>
     </Box>
   );

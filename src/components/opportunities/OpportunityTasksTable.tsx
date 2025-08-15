@@ -125,7 +125,7 @@ export const OpportunityTaskRow: React.FC<OpportunityTaskRowProps> = ({
             Task #{task.id?.slice(-6).toUpperCase()}
             {task.opportunity && (
               <span style={{ marginLeft: 8, color: '#666', fontSize: '0.9em' }}>
-                for Opportunity #{task.opportunity.opportunityId}
+                for Opportunity {opportunityToString(task.opportunity)}
               </span>
             )}
           </Typography>
@@ -191,7 +191,7 @@ export const OpportunityTaskRow: React.FC<OpportunityTaskRowProps> = ({
             gutterBottom
           />
 
-          {task.opportunity && (
+          {/* {task.opportunity && (
             <InfoBoxItem
               title="Opportunity"
               label1={
@@ -201,14 +201,14 @@ export const OpportunityTaskRow: React.FC<OpportunityTaskRowProps> = ({
               }
               gutterBottom
             />
-          )}
+          )} */}
 
-          <InfoBoxItem
+          {/* <InfoBoxItem
             title="Created"
             label1={format(new Date(task.createdAt), 'dd.MM.yyyy HH:mm')}
             label2={formatDistanceToNowConfigured(task.createdAt)}
             gutterBottom
-          />
+          /> */}
         </Box>
 
         {/* Action Buttons */}

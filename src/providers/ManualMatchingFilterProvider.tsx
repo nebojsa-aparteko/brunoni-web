@@ -1,16 +1,16 @@
-import React, { createContext, Dispatch, SetStateAction, useContext, useState } from 'react';
+import React, { createContext, Dispatch, SetStateAction, useState } from 'react';
 import { ContextFilters } from './filterActions';
-import useUser from '../hooks/useUser';
 import Client from '../model/Client';
+import { OpportunityMatchStatus } from '../model/Opportunity';
 
 export interface ManualMatchingContextFilters extends ContextFilters {
-  opportunity?: string; // 'unmatched' or opportunity ID
+  opportunity?: string; // 'unmatched', 'discarded' or opportunity ID
   entityId?: string; // booking/quote ID for search
   bookingParty?: Client;
 }
 
 export const MANUAL_MATCHING_FILTERS_INITIAL_STATE = {
-  opportunity: 'unmatched', // Default to unmatched
+  opportunity: OpportunityMatchStatus.Unmatched, // Default to unmatched
 } as ManualMatchingContextFilters;
 
 const ManualMatchingFilterContext = createContext<
@@ -18,10 +18,7 @@ const ManualMatchingFilterContext = createContext<
 >([MANUAL_MATCHING_FILTERS_INITIAL_STATE, undefined]);
 
 const ManualMatchingFilterProvider = (props: any) => {
-  const userRecord = useUser()[1];
-
   const [state, setState] = useState<ManualMatchingContextFilters>({
-    assignee: userRecord,
     ...MANUAL_MATCHING_FILTERS_INITIAL_STATE,
   });
 
