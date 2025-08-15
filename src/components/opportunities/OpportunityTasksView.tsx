@@ -191,7 +191,7 @@ const OpportunityTasksView: React.FC = () => {
     setIsLoading(true);
     try {
       const db = firebase.firestore();
-      let query = db.collection('opportunity-tasks');
+      let query: firebase.firestore.Query = db.collection('opportunity-tasks');
 
       // Filter tasks based on user role
       if (!isDashboardUser(userRecord)) {
