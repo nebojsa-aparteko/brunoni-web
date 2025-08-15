@@ -6,11 +6,19 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { useOpportunitiesListFilterContext } from '../../providers/OpportunitiesFilterProvider';
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 import OpportunityTable, { SortConfig } from './OpportunityTable';
-import { NormalizedOpportunity } from '../../model/Opportunity';
+import { NormalizedOpportunity, OpportunityMatchDefinition } from '../../model/Opportunity';
 import useOpportunitiesWithSalesRep from '../../hooks/useOpportunities';
 import AddOpportunityDialog from './AddOpportunityDialogue';
 import EditOpportunityDialog from './EditOpportunityDialog';
 import OpportunityUploadDialog from './OpportunityUploadDialog';
+import Port from '../../model/Port';
+import { OpportunityPortsGroup } from '../../model/OpportunityPortsGroup';
+import { isEqual } from 'lodash';
+import { is } from 'cheerio/lib/api/traversing';
+import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
+import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
+import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup';
+import ContainerType from '../../model/ContainerType';
 
 interface Props {
   isAdmin?: boolean;
@@ -34,6 +42,110 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
 
   const { assignee } = filters;
 
+  const isPortMatch = (
+    filter: {
+      definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+      value: OpportunityPortsGroup | Port | string;
+    },
+    opportunityPort: {
+      definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+      value: OpportunityPortsGroup | Port | string;
+    } | null,
+  ) => {
+    if (isEqual(filter.definition, opportunityPort?.definition)) {
+      return true;
+    }
+
+    if (filter.definition.type === 'groupId' && opportunityPort?.definition.type === 'portId') {
+      return (filter.value as OpportunityPortsGroup).portIds.includes(
+        (opportunityPort.value as Port).id,
+      );
+    }
+
+    if (filter.definition.type === 'portId' && opportunityPort?.definition.type === 'freeText') {
+      return (opportunityPort.value as OpportunityPortsGroup).portNames.includes(
+        filter.value as string,
+      );
+    }
+
+    return false;
+  };
+
+  const isPlaceMatch = (
+    filter: {
+      definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+      value: OpportunityPlacesGroup | string;
+    },
+    opportunityPlace: {
+      definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+      value: OpportunityPlacesGroup | string;
+    } | null,
+  ) => {
+    if (isEqual(filter.definition, opportunityPlace?.definition)) {
+      return true;
+    }
+
+    if (filter.definition.type === 'groupId' && opportunityPlace?.definition.type === 'freeText') {
+      return (filter.value as OpportunityPlacesGroup).places.includes(
+        opportunityPlace.value as string,
+      );
+    }
+
+    return false;
+  };
+
+  const isCommodityMatch = (
+    filter: {
+      definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+      value: OpportunityCommodityGroup | string;
+    },
+    opportunityCommodity: {
+      definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+      value: OpportunityCommodityGroup | string;
+    } | null,
+  ) => {
+    if (isEqual(filter.definition, opportunityCommodity?.definition)) {
+      return true;
+    }
+
+    if (
+      filter.definition.type === 'groupId' &&
+      opportunityCommodity?.definition.type === 'freeText'
+    ) {
+      return (filter.value as OpportunityCommodityGroup).commodities.includes(
+        opportunityCommodity.value as string,
+      );
+    }
+
+    return false;
+  };
+
+  const isEquipmentMatch = (
+    filter: {
+      definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+      value: OpportunityEquipmentGroup | ContainerType;
+    },
+    opportunityEquipment: {
+      definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+      value: OpportunityEquipmentGroup | ContainerType;
+    } | null,
+  ) => {
+    if (isEqual(filter.definition, opportunityEquipment?.definition)) {
+      return true;
+    }
+
+    if (
+      filter.definition.type === 'groupId' &&
+      opportunityEquipment?.definition.type === 'containerTypeId'
+    ) {
+      return (filter.value as OpportunityEquipmentGroup).equipmentTypeId.includes(
+        (opportunityEquipment.value as ContainerType).id,
+      );
+    }
+
+    return false;
+  };
+
   const filteredOpportunities = useMemo(() => {
     if (!opportunities) return [];
     return opportunities.filter(opportunity => {
@@ -52,26 +164,26 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
 
       if (
         filters.portsOfLoading &&
-        opportunity.portOfLoading?.definition.value !== filters.portsOfLoading.definition.value
+        !isPortMatch(filters.portsOfLoading, opportunity.portOfLoading)
       ) {
         return false;
       }
       if (
         filters.portsOfDischarge &&
-        opportunity.portOfDischarge?.definition.value !== filters.portsOfDischarge.definition.value
+        !isPortMatch(filters.portsOfDischarge, opportunity.portOfDischarge)
       ) {
         return false;
       }
 
       if (
         filters.placesOfDelivery &&
-        opportunity.placeOfDelivery?.definition.value !== filters.placesOfDelivery.definition.value
+        !isPlaceMatch(filters.placesOfDelivery, opportunity.placeOfDelivery)
       ) {
         return false;
       }
       if (
         filters.placesOfReceipt &&
-        opportunity.placeOfReceipt?.definition.value !== filters.placesOfReceipt.definition.value
+        !isPlaceMatch(filters.placesOfReceipt, opportunity.placeOfReceipt)
       ) {
         return false;
       }
@@ -84,17 +196,11 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
         }
       }
 
-      if (
-        filters.commodity &&
-        opportunity.commodity?.definition.value !== filters.commodity.definition.value
-      ) {
+      if (filters.commodity && !isCommodityMatch(filters.commodity, opportunity.commodity)) {
         return false;
       }
 
-      if (
-        filters.equipment &&
-        opportunity.equipment?.definition.value !== filters.equipment.definition.value
-      ) {
+      if (filters.equipment && !isEquipmentMatch(filters.equipment, opportunity.equipment)) {
         return false;
       }
 

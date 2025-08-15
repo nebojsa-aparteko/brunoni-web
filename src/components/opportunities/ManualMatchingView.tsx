@@ -59,16 +59,11 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
     if (!normalizedMatches) return [];
 
     return normalizedMatches.filter(match => {
-      // First, exclude discarded matches
-      if (match.status === OpportunityMatchStatus.Discarded) {
-        return false;
-      }
-
       // Filter by entity ID (booking/quote ID)
       if (filters.entityId && filters.entityId.trim()) {
         const entityIdMatch = match.entityId
           .toLowerCase()
-          .includes(filters.entityId.toLowerCase().trim());
+          .startsWith(filters.entityId.toLowerCase().trim());
         if (!entityIdMatch) return false;
       }
 
@@ -79,13 +74,21 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
       }
 
       // Filter by selected opportunity
-      if (filters.opportunity && filters.opportunity !== 'unmatched') {
+      if (
+        filters.opportunity &&
+        filters.opportunity !== OpportunityMatchStatus.Unmatched &&
+        filters.opportunity !== OpportunityMatchStatus.Discarded
+      ) {
         return match.opportunityId === filters.opportunity;
       }
 
       // Show unmatched items (items without an opportunityId or with null/undefined opportunityId)
-      if (filters.opportunity === 'unmatched') {
+      if (filters.opportunity === OpportunityMatchStatus.Unmatched) {
         return !match.opportunityId;
+      }
+
+      if (filters.opportunity === OpportunityMatchStatus.Discarded) {
+        return match.status === OpportunityMatchStatus.Discarded;
       }
 
       // Default: show all matches if no specific filter is applied
@@ -246,11 +249,13 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
             {filteredData && filteredData.length === 0 ? (
               <ManualMatchingEmptyResults
                 message={
-                  filters.opportunity === 'unmatched'
-                    ? 'No unmatched opportunities found.'
-                    : filters.opportunity
-                      ? 'No matches found for the selected opportunity.'
-                      : 'No manual matching opportunities found for your filter criteria. Try changing filters.'
+                  filters.opportunity === OpportunityMatchStatus.Unmatched
+                    ? 'No unmatched entities found.'
+                    : filters.opportunity === OpportunityMatchStatus.Discarded
+                      ? 'No discarded entities found.'
+                      : filters.opportunity
+                        ? 'No matches found for the selected opportunity.'
+                        : 'No manual matching entities found for your filter criteria. Try changing filters.'
                 }
               />
             ) : (

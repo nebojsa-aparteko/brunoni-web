@@ -123,7 +123,7 @@ const OpportunityTasksView: React.FC = () => {
         return true;
       })
       .sort((a, b) => {
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
       });
   }, [tasks, filters]);
 
@@ -200,7 +200,7 @@ const OpportunityTasksView: React.FC = () => {
       }
       // Admin users see all tasks (no additional filtering)
 
-      const snapshot = await query.orderBy('createdAt', 'desc').get();
+      const snapshot = await query.orderBy('dueDate', 'asc').get();
 
       const tasksData: OpportunityTask[] = [];
       const userIds = new Set<string>();
