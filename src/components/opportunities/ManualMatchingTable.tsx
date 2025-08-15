@@ -686,15 +686,11 @@ const ManualMatchingTable: React.FC<Props> = ({
                         )}
                       </TableCell>
                       <TableCell align="center">
-                        {(match.status === OpportunityMatchStatus.Unmatched ||
-                          match.status === OpportunityMatchStatus.Matched ||
-                          match.status === OpportunityMatchStatus.Discarded) && (
-                          <Tooltip title="Actions">
-                            <IconButton size="small" onClick={e => handleMenuClick(e, match)}>
-                              <MoreVertIcon />
-                            </IconButton>
-                          </Tooltip>
-                        )}
+                        <Tooltip title="Actions">
+                          <IconButton size="small" onClick={e => handleMenuClick(e, match)}>
+                            <MoreVertIcon />
+                          </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   );
