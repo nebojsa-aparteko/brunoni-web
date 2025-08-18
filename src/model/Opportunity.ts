@@ -108,23 +108,35 @@ const formatCommodity = (
   return typeof commodity?.value === 'string' ? commodity.value : commodity?.value?.name || '';
 };
 
+const formatEquipment = (
+  equipment: { value: OpportunityEquipmentGroup | ContainerType } | null,
+): string => {
+  return (
+    (equipment?.value as OpportunityEquipmentGroup)?.name ||
+    (equipment?.value as ContainerType)?.id ||
+    ''
+  );
+};
+
 export function opportunityToString(opportunity: NormalizedOpportunity): string {
   const bookingParty = opportunity.bookingPartyId?.name || '';
   const statisticalClient = opportunity.statisticalClientId?.name || '';
+  const equipment = formatEquipment(opportunity.equipment);
   const commodity = formatCommodity(opportunity.commodity);
   const placeOfReceipt = formatLocation(opportunity.placeOfReceipt);
   const portOfLoading = formatLocation(opportunity.portOfLoading);
   const portOfDischarge = formatLocation(opportunity.portOfDischarge);
   const placeOfDelivery = formatLocation(opportunity.placeOfDelivery);
-  const labels = [
-    bookingParty,
-    statisticalClient,
-    commodity,
-    placeOfReceipt,
-    portOfLoading,
-    portOfDischarge,
-    placeOfDelivery,
-  ];
+
+  const cargoPathLabels = [placeOfReceipt, portOfLoading, portOfDischarge, placeOfDelivery];
+
+  let cargoPath = cargoPathLabels.filter(label => label).join(' -> ');
+
+  if (cargoPath) {
+    cargoPath = `(${cargoPath})`;
+  }
+
+  const labels = [bookingParty, statisticalClient, equipment, commodity, cargoPath];
   const nonEmptyLabels = labels.filter(label => label);
   return `${opportunity.opportunityId} - ${nonEmptyLabels.join(' - ')}`;
 }
