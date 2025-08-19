@@ -703,13 +703,13 @@ const ManualMatchingTable: React.FC<Props> = ({
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         {selectedMatch?.status === OpportunityMatchStatus.Unmatched && (
           <>
-            <MenuItem onClick={handleMatchOpportunity}>Match Opportunity</MenuItem>
+            <MenuItem onClick={handleMatchOpportunity}>Match Manually</MenuItem>
             <MenuItem onClick={handleCreateNewOpportunity}>Create New Opportunity</MenuItem>
           </>
         )}
         {selectedMatch?.status === OpportunityMatchStatus.Matched && (
           <>
-            <MenuItem onClick={handleAutoRematchOpportunity}>Auto Rematch</MenuItem>
+            <MenuItem onClick={handleAutoRematchOpportunity}>Match Manually</MenuItem>
             <MenuItem onClick={handleUnmatchOpportunity}>Unmatch</MenuItem>
           </>
         )}
