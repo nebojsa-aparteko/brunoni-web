@@ -159,7 +159,7 @@ const OpportunityUploadDialog: React.FC<OpportunityUploadDialogProps> = ({
       } else {
         const errorData = await response.json().catch(() => ({ message: response.statusText }));
         console.debug('Upload error:', errorData);
-        const errorMessage = errorData.errors.join('/n ');
+        const errorMessage = errorData.errors.join('\n');
         console.debug('Upload error message:', errorMessage);
         throw new Error(errorMessage || `Upload failed: ${response.statusText}`);
       }
