@@ -130,6 +130,7 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
     try {
       const batch = firebase.firestore().batch();
       const updateData = {
+        opportunityId: null,
         status: OpportunityMatchStatus.Discarded,
         updatedAt: new Date(),
         updatedBy: firebase.auth().currentUser?.uid || 'unknown',
@@ -206,7 +207,7 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
         .collection('opportunity-matches')
         .doc(`${match.entity}-${match.entityId}`);
       await matchRef.update({
-        opportunityId: firebase.firestore.FieldValue.delete(),
+        opportunityId: null,
         status: OpportunityMatchStatus.Unmatched,
         updatedAt: new Date(),
         updatedBy: firebase.auth().currentUser?.uid || 'unknown',
