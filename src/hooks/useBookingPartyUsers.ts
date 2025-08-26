@@ -11,7 +11,7 @@ export default function useBookingPartyUsers(bookingPartyId?: string): UserRecor
     }
 
     return users
-      .filter(user => user.company?.id === bookingPartyId && !user.archived)
+      .filter(user => user.company?.id === bookingPartyId)
       .sort((a, b) => (a.firstName! >= b.firstName! ? 1 : -1));
   }, [users, bookingPartyId]);
 }
