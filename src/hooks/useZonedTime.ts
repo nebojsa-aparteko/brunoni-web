@@ -80,7 +80,7 @@ const useZonedTime = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setDate(new Date());
-    }, 1000);
+    }, 10000);
     return () => clearInterval(timer);
   }, []);
 
