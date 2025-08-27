@@ -1,22 +1,23 @@
-import React, { Fragment, useMemo, useState } from 'react';
 import { Grid, makeStyles, Paper } from '@material-ui/core';
-import Meta from '../Meta';
-import ManualMatchingFiltersBar from './ManualMatchingFiltersBar';
-import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
+import React, { Fragment, useMemo, useState } from 'react';
+
 import { useManualMatchingListFilterContext } from '../../providers/ManualMatchingFilterProvider';
-import ManualMatchingTable, { SortConfig } from './ManualMatchingTable';
+import Meta from '../Meta';
+import AddOpportunityDialog from './AddOpportunityDialogue';
 import ManualMatchingEmptyResults from './ManualMatchingEmptyResults';
+import ManualMatchingFiltersBar from './ManualMatchingFiltersBar';
+import ManualMatchingTable, { SortConfig } from './ManualMatchingTable';
+import MatchOpportunityDialog from './MatchOpportunityDialog';
+import firebase from '../../firebase';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import useNormalizedOpportunityMatch from '../../hooks/useNormalizedOpportunityMatch';
+import useOpportunities from '../../hooks/useOpportunities';
 import {
   EntityOpportunityMatch,
   NormalizedEntityOpportunityMatch,
   OpportunityMatchStatus,
 } from '../../model/Opportunity';
-import MatchOpportunityDialog from './MatchOpportunityDialog';
-import AddOpportunityDialog from './AddOpportunityDialogue';
-import useOpportunities from '../../hooks/useOpportunities';
-import firebase from '../../firebase';
+import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
 interface Props {
   isAdmin?: boolean;
@@ -142,7 +143,6 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
       });
 
       await batch.commit();
-      console.log(`${matchIds.length} matches discarded successfully`);
     } catch (error) {
       console.error('Failed to discard matches:', error);
     }
@@ -162,7 +162,6 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
         updatedAt: new Date(),
         updatedBy: firebase.auth().currentUser?.uid || 'unknown',
       });
-      console.log('Match updated with opportunity:', opportunityId);
       setMatchDialogOpen(false);
       setSelectedMatch(null);
     } catch (error) {
@@ -192,7 +191,6 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
         updatedBy: firebase.auth().currentUser?.uid || 'unknown',
       });
 
-      console.log('New opportunity created and matched:', opportunityRef.id);
       setAddOpportunityDialogOpen(false);
       setSelectedMatch(null);
     } catch (error) {
@@ -212,7 +210,6 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
         updatedAt: new Date(),
         updatedBy: firebase.auth().currentUser?.uid || 'unknown',
       });
-      console.log('Match unmatched successfully');
     } catch (error) {
       console.error('Failed to unmatch opportunity:', error);
     }

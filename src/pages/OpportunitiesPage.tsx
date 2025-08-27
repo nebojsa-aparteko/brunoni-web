@@ -68,15 +68,13 @@ const OpportunitiesPage: React.FC = () => {
   const params = queryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
 
-  const tabToIndex: any = {
-    'manual-matching': 1,
-    tasks: 2,
-  };
-
-  const indexToTab: any = {
-    1: 'manual-matching',
-    2: 'tasks',
-  };
+  const tabToIndex: any = React.useMemo(
+    () => ({
+      'manual-matching': 1,
+      tasks: 2,
+    }),
+    [],
+  );
 
   const [selectedTab, setSelectedTab] = useState(tab && tabToIndex[tab] ? tabToIndex[tab] : 0);
 
@@ -102,7 +100,7 @@ const OpportunitiesPage: React.FC = () => {
   useEffect(() => {
     const newValue = tab && tabToIndex[tab] ? tabToIndex[tab] : 0;
     setSelectedTab(newValue);
-  }, []);
+  }, [tab, tabToIndex]);
 
   return (
     <Fragment>
