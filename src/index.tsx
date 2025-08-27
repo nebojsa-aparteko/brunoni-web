@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { BrowserRouter as Router, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 import FontFaceObserver from 'fontfaceobserver';
 import { ThemeProvider } from '@material-ui/styles';
@@ -46,8 +46,6 @@ function ScrollToTop() {
 
 const appFont = new FontFaceObserver('Montserrat');
 
-const fontLoaded = appFont.load();
-
 export const showCrispChat = (show: boolean) => {
   try {
     $crisp.push(['do', show ? 'chat:show' : 'chat:hide']);
@@ -60,42 +58,44 @@ const UserApp: React.FC = () => {
   const userRecord = useContext(UserRecordContext);
   const [actingAs] = useContext(ActingAs);
 
-  if (userRecord) {
-    try {
-      $crisp.push([
-        'set',
-        'user:company',
-        [
-          userRecord.company?.name,
-          { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] },
-        ],
-      ]);
-      $crisp.push([
-        'set',
-        'user:name',
-        [
-          userRecord.company?.name,
-          { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] },
-        ],
-      ]);
-    } catch (e) {
-      console.warn('Failed to push crisp command.');
-    }
-    try {
-      $crisp.push([
-        'set',
-        'session:data',
-        [
+  useEffect(() => {
+    if (userRecord) {
+      try {
+        $crisp.push([
+          'set',
+          'user:company',
           [
-            ['name', `${userRecord.firstName} ${userRecord.lastName}`],
-            ['alphacomId', String(userRecord.alphacomId)],
+            userRecord.company?.name,
+            { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] },
           ],
-        ],
-      ]);
-    } catch (e) {
-      console.warn('Failed to push crisp command.');
+        ]);
+        $crisp.push([
+          'set',
+          'user:name',
+          [
+            userRecord.company?.name,
+            { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] },
+          ],
+        ]);
+      } catch (e) {
+        console.warn('Failed to push crisp command.');
+      }
+      try {
+        $crisp.push([
+          'set',
+          'session:data',
+          [
+            [
+              ['name', `${userRecord.firstName} ${userRecord.lastName}`],
+              ['alphacomId', String(userRecord.alphacomId)],
+            ],
+          ],
+        ]);
+      } catch (e) {
+        console.warn('Failed to push crisp command.');
+      }
     }
-  }
+  }, [userRecord]);
 
   switch (actingAs) {
     case undefined:
@@ -142,7 +142,6 @@ const UserApp: React.FC = () => {
 };
 
 const CrispChatRouteUpdater = () => {
-  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
@@ -166,20 +165,22 @@ const MainApp: React.FC = () => {
   const [fontLoaded, setFontLoaded] = useState(false);
 
   useEffect(() => {
+    // Handle font loading
+    appFont
+      .load()
+      .then(() => {
+        setFontLoaded(true);
+      })
+      .catch(error => {
+        console.warn('Application font failed to load', error);
+        setFontLoaded(true);
+      });
+  }, []);
+
+  useEffect(() => {
     let prevUser: firebase.User | null | undefined = undefined;
 
     const unsubscribe = firebase.auth().onAuthStateChanged(async currentUser => {
-      // Handle font loading
-      if (!fontLoaded) {
-        try {
-          await appFont.load();
-          setFontLoaded(true);
-        } catch (error) {
-          console.warn('Application font failed to load', error);
-          setFontLoaded(true);
-        }
-      }
-
       // Handle Crisp chat user changes
       if (prevUser && !currentUser) {
         try {
@@ -223,10 +224,11 @@ const MainApp: React.FC = () => {
     });
 
     return () => unsubscribe();
-  }, [fontLoaded]);
+  }, []);
 
   // Don't render until we have font loaded and user state
   if (!fontLoaded || user === undefined) {
+    console.debug('App initializing...');
     return null;
   }
 
@@ -236,7 +238,7 @@ const MainApp: React.FC = () => {
       <ThemeProvider theme={theme}>
         <SnackbarProvider maxSnack={3}>
           <GlobalStore>
-            <LoginDialogProvider>
+            <>
               <ScrollToTop />
               <CssBaseline />
               <CookiesNotification />
@@ -271,25 +273,27 @@ const MainApp: React.FC = () => {
                     </UserRecordProvider>
                   </UserContext.Provider>
                 ) : (
-                  <UserContext.Provider value={null}>
-                    <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
-                      <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                        <FirestoreCollectionProvider
-                          name="container-types"
-                          context={ContainerTypesContext}
-                        >
-                          <SpecialOffersProvider>
-                            <ActingAsProvider anonymous>
-                              <App />
-                            </ActingAsProvider>
-                          </SpecialOffersProvider>
+                  <LoginDialogProvider>
+                    <UserContext.Provider value={null}>
+                      <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
+                        <FirestoreCollectionProvider name="ports" context={PortsContext}>
+                          <FirestoreCollectionProvider
+                            name="container-types"
+                            context={ContainerTypesContext}
+                          >
+                            <SpecialOffersProvider>
+                              <ActingAsProvider anonymous>
+                                <App />
+                              </ActingAsProvider>
+                            </SpecialOffersProvider>
+                          </FirestoreCollectionProvider>
                         </FirestoreCollectionProvider>
                       </FirestoreCollectionProvider>
-                    </FirestoreCollectionProvider>
-                  </UserContext.Provider>
+                    </UserContext.Provider>
+                  </LoginDialogProvider>
                 )}
               </RouteSearchProvider>
-            </LoginDialogProvider>
+            </>
           </GlobalStore>
         </SnackbarProvider>
       </ThemeProvider>

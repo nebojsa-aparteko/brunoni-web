@@ -31,7 +31,7 @@ import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup
 import useUser from '../../hooks/useUser';
 import { GlobalContext } from '../../store/GlobalStore';
 import { SHOW_SUCCESS_SNACKBAR, SHOW_ERROR_SNACKBAR } from '../../store/types/globalAppState';
-import useOpportunities from '../../hooks/useOpportunities';
+import { useOpportunities } from './OpportunitiesDataProvider';
 
 const getSortValue = (match: NormalizedEntityOpportunityMatch, key: string): any => {
   const matchData = match.entityMatchData;

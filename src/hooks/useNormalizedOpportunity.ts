@@ -11,6 +11,7 @@ import { useOpportunityCounters } from './useOpportunityCounters';
 import { OpportunityMatchDefinition } from '../model/Opportunity';
 import Ports from '../contexts/Ports';
 import ContainerTypes from '../contexts/ContainerTypes';
+
 const useNormalizedOpportunity = (opportunityIds: string[]) => {
   const users = useContext(UserRecords);
   const clients = useClients();
@@ -22,9 +23,12 @@ const useNormalizedOpportunity = (opportunityIds: string[]) => {
   const counters = useOpportunityCounters(opportunityIds);
   const ports = useContext(Ports);
   const containers = useContext(ContainerTypes);
+
   return useMemo(() => {
     const getUser = (id: string) => users?.find(u => u.id === id) || null;
+
     const getClient = (id: string) => clients?.find(c => c.id === id) || null;
+
     const getPortsGroup = (omd: OpportunityMatchDefinition) => {
       if (!omd) return null;
       if (omd.type === 'portId') {

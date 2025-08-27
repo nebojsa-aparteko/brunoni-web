@@ -6,14 +6,9 @@ import useOpportunityCommodityGroups from './useOpportunityCommodityGroups';
 import useOpportunityEquipmentGroups from './useOpportunityEquipmentGroups';
 import useClients from './useClients';
 import UserRecords from '../contexts/UserRecordsContext';
-import {
-  OpportunityMatchDefinition,
-  EntityOpportunityMatch,
-  NormalizedEntityOpportunityMatch,
-} from '../model/Opportunity';
+import { OpportunityMatchDefinition } from '../model/Opportunity';
 import Ports from '../contexts/Ports';
 import ContainerTypes from '../contexts/ContainerTypes';
-import useFirestoreCollection from './useFirestoreCollection';
 
 const useNormalizedOpportunityMatch = () => {
   const users = useContext(UserRecords);
@@ -22,6 +17,7 @@ const useNormalizedOpportunityMatch = () => {
   const placesGroups = useOpportunityPlacesGroups();
   const commodityGroups = useOpportunityCommodityGroups();
   const equipmentGroups = useOpportunityEquipmentGroups();
+
   const ports = useContext(Ports);
   const containers = useContext(ContainerTypes);
 
