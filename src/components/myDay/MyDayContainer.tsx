@@ -28,7 +28,6 @@ import { getTaskFilter } from '../TaskStatusChip';
 import Task, { TaskCategory, UserRole } from '../../model/Task';
 import { Team, TeamType } from '../../model/Teams';
 import { ChecklistNames } from '../bookings/checklist/ChecklistItemModel';
-import { showCrispChat } from '../../index';
 import PaymentOverviewDialog from '../finance/PaymentOverviewDialog';
 import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
@@ -40,6 +39,7 @@ import IconButton from '@material-ui/core/IconButton';
 import { startOfDay } from 'date-fns/fp';
 import { setLastOpenedChecklistTab } from '../bookings/checklist/CheckList';
 import useUser from '../../hooks/useUser';
+import { showCrispChat } from '../../CrispChat';
 
 const MyDayContainer = () => {
   const tasks = useTasks();

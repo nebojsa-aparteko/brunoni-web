@@ -38,7 +38,6 @@ import { addActivityItem } from '../bookings/checklist/ActivityLogContainer';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { addDays } from 'date-fns';
 import PaymentOverviewDialog from './PaymentOverviewDialog';
-import { showCrispChat } from '../../index';
 import { Currency } from '../../model/Payment';
 import useUser from '../../hooks/useUser';
 import { GlobalContext } from '../../store/GlobalStore';
@@ -49,6 +48,7 @@ import { useCommissionFilterProviderContext } from '../../providers/CommissionFi
 import { DateRange } from '../daterangepicker/types';
 import Carrier from '../../model/Carrier';
 import { tryGetErrorMessage } from '../../utilities/errorHelper';
+import { showCrispChat } from '../../CrispChat';
 
 const useStyles = makeStyles(theme => ({
   formControl: {

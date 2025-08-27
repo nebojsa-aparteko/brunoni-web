@@ -4,8 +4,8 @@ import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import IconButton from '@material-ui/core/IconButton';
 import 'shepherd.js/dist/css/shepherd.css';
 import GuideDialog from './GuideDialog';
-import { showCrispChat } from '../index';
 import useUser from '../hooks/useUser';
+import { showCrispChat } from '../CrispChat';
 
 const GuideButton: React.FC<Props> = ({ guide }) => {
   const [, user] = useUser();
