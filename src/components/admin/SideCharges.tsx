@@ -117,12 +117,14 @@ const SideCharges: React.FC<{ carrier: Carrier }> = ({ carrier }) => {
   );
 };
 
-const WaitFor = (Component: React.FC<{ carrier: Carrier }>) => () => {
+const SideChargesPage: React.FC = () => {
   const { id: carrierId } = useParams();
   const carriers = useContext(Carriers);
-  const carrier = carriers?.find(carrier => carrier.id === carrierId);
+  const carrier = carriers?.find(c => c.id === carrierId);
 
-  return carrier ? <Component key={carrierId} carrier={carrier} /> : <ChartsCircularProgress />;
+  if (!carrier) return <ChartsCircularProgress />;
+
+  return <SideCharges key={carrierId} carrier={carrier} />;
 };
 
-export default WaitFor(SideCharges);
+export default SideChargesPage;

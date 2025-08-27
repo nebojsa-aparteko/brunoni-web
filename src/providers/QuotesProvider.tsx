@@ -143,7 +143,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
 
       return query;
     },
-    [userRecord, filters, actingAs, filtersPreviousVal, availableCarriers],
+    [userRecord, filters, actingAs, filtersPreviousVal, availableCarriers, isAdmin],
   );
 
   const quotesSnapshot = useFirestoreCollection('quotes', query);

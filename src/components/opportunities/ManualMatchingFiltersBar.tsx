@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Box, Grid, TextField } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import set from 'lodash/fp/set';
-import useOpportunities from '../../hooks/useOpportunities';
 import { OpportunityMatchStatus, opportunityToString } from '../../model/Opportunity';
 import useClients from '../../hooks/useClients';
 import ClientInput from '../inputs/ClientInput';
 import Client from '../../model/Client';
+import { useOpportunities } from './OpportunitiesDataProvider';
 
 interface Props {
   filters: any;
@@ -29,15 +29,18 @@ const ManualMatchingFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const setBookingPartyFilter = (client: Client | null | undefined) =>
     setFilters && setFilters(set('bookingParty', client || undefined)(filters));
 
-  const filterOptions = [
-    { id: '', label: 'All' },
-    { id: OpportunityMatchStatus.Unmatched, label: 'Unmatched' },
-    { id: OpportunityMatchStatus.Discarded, label: 'Discarded' },
-    ...(opportunities || []).map(opp => ({
-      id: opp.id,
-      label: opportunityToString(opp),
-    })),
-  ];
+  const filterOptions = useMemo(
+    () => [
+      { id: '', label: 'All' },
+      { id: OpportunityMatchStatus.Unmatched, label: 'Unmatched' },
+      { id: OpportunityMatchStatus.Discarded, label: 'Discarded' },
+      ...(opportunities || []).map(opp => ({
+        id: opp.id,
+        label: opportunityToString(opp),
+      })),
+    ],
+    [opportunities],
+  );
 
   const selectedValue = filterOptions.find(option => option.id === opportunity) || filterOptions[0];
 

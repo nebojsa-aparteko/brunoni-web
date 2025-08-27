@@ -71,6 +71,7 @@ import SchedulePicker from './bookingRequests/SchedulePicker';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 import BookNowButton from './BookNowButton';
 import ActingAs from '../contexts/ActingAs';
+import { is } from 'cheerio/lib/api/traversing';
 
 interface Props {
   id: string;
@@ -240,7 +241,7 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const quotesSnapshot = useFirestoreCollection(
     'quotes',
     useCallback(
-      q => {
+      (q: firebase.firestore.Query) => {
         q = q.where('groupId', '==', id);
         if (isSuperAdmin(userRecord) || !isAdmin) {
           return q;
@@ -258,7 +259,7 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
             : ['NONE FOUND'], //This should always fail and we won't fetch any results, if a better solution is found please change this
         );
       },
-      [id, carriers, userRecord],
+      [id, carriers, userRecord, isAdmin],
     ),
   );
 

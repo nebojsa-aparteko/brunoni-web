@@ -31,7 +31,7 @@ import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup
 import useUser from '../../hooks/useUser';
 import { GlobalContext } from '../../store/GlobalStore';
 import { SHOW_SUCCESS_SNACKBAR, SHOW_ERROR_SNACKBAR } from '../../store/types/globalAppState';
-import useOpportunities from '../../hooks/useOpportunities';
+import { useOpportunities } from './OpportunitiesDataProvider';
 
 const getSortValue = (match: NormalizedEntityOpportunityMatch, key: string): any => {
   const matchData = match.entityMatchData;
@@ -333,7 +333,7 @@ const ManualMatchingTable: React.FC<Props> = ({
       .map(match => ({ entity: match.entity, entityId: match.entityId }));
   }, [opportunityMatches, selectedMatches]);
 
-  console.debug('opportunityMatches', opportunityMatches);
+  console.debug('opportunityMatches', opportunityMatches?.length);
   const baseMatches = opportunityMatches || [];
   const displayMatches = sortConfig ? sortMatches(baseMatches, sortConfig) : baseMatches;
   const matchIds = displayMatches.map(match => `${match.entity}-${match.entityId}`);
@@ -429,7 +429,7 @@ const ManualMatchingTable: React.FC<Props> = ({
                             key={idx}
                             style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
                           >
-                            {item.value.name}
+                            {item.value?.name}
                           </div>
                         ))}
                         {remainingItems.length > 0 && (
@@ -437,7 +437,7 @@ const ManualMatchingTable: React.FC<Props> = ({
                             title={
                               <div>
                                 {remainingItems.map((item, idx) => (
-                                  <div key={idx}>{item.value.name}</div>
+                                  <div key={idx}>{item.value?.name}</div>
                                 ))}
                               </div>
                             }
@@ -466,7 +466,7 @@ const ManualMatchingTable: React.FC<Props> = ({
                             style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
                           >
                             {item.definition.type === 'groupId'
-                              ? (item.value as OpportunityCommodityGroup).name || item.value
+                              ? (item.value as OpportunityCommodityGroup)?.name || item.value
                               : item.value}
                           </div>
                         ))}
@@ -477,7 +477,8 @@ const ManualMatchingTable: React.FC<Props> = ({
                                 {remainingItems.map((item, idx) => (
                                   <div key={idx}>
                                     {item.definition.type === 'groupId'
-                                      ? (item.value as OpportunityCommodityGroup).name || item.value
+                                      ? (item.value as OpportunityCommodityGroup)?.name ||
+                                        item.value
                                       : item.value}
                                   </div>
                                 ))}
@@ -508,7 +509,7 @@ const ManualMatchingTable: React.FC<Props> = ({
                             style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
                           >
                             {item.definition.type === 'groupId'
-                              ? (item.value as OpportunityCommodityGroup).name || item.value
+                              ? (item.value as OpportunityCommodityGroup)?.name || item.value
                               : item.value}
                           </div>
                         ))}
@@ -519,7 +520,8 @@ const ManualMatchingTable: React.FC<Props> = ({
                                 {remainingItems.map((item, idx) => (
                                   <div key={idx}>
                                     {item.definition.type === 'groupId'
-                                      ? (item.value as OpportunityCommodityGroup).name || item.value
+                                      ? (item.value as OpportunityCommodityGroup)?.name ||
+                                        item.value
                                       : item.value}
                                   </div>
                                 ))}
@@ -550,9 +552,9 @@ const ManualMatchingTable: React.FC<Props> = ({
                             style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
                           >
                             {item.definition.type === 'groupId'
-                              ? (item.value as OpportunityCommodityGroup).name || item.value
+                              ? (item.value as OpportunityCommodityGroup)?.name || item.value
                               : item.definition.type === 'portId'
-                                ? `${(item.value as Port).city} ${(item.value as Port).id}`
+                                ? `${(item.value as Port)?.city} ${(item.value as Port)?.id}`
                                 : item.value}
                           </div>
                         ))}
@@ -563,7 +565,8 @@ const ManualMatchingTable: React.FC<Props> = ({
                                 {remainingItems.map((item, idx) => (
                                   <div key={idx}>
                                     {item.definition.type === 'groupId'
-                                      ? (item.value as OpportunityCommodityGroup).name || item.value
+                                      ? (item.value as OpportunityCommodityGroup)?.name ||
+                                        item.value
                                       : item.definition.type === 'portId'
                                         ? `${(item.value as Port).city} ${(item.value as Port).id}`
                                         : item.value}
@@ -587,8 +590,8 @@ const ManualMatchingTable: React.FC<Props> = ({
                     if (!company) return '';
                     return (
                       <div>
-                        <div>{company.name || ''}</div>
-                        {company.city && (
+                        <div>{company?.name || ''}</div>
+                        {company?.city && (
                           <div style={{ fontSize: '0.875em', color: '#666' }}>{company.city}</div>
                         )}
                       </div>

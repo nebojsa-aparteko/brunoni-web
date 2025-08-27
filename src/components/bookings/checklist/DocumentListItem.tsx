@@ -44,13 +44,13 @@ import theme from '../../../theme';
 import RejectionModal from '../documentApproval/RejectionModal';
 import { Booking } from '../../../model/Booking';
 import FlagIcon from '@material-ui/icons/Flag';
-import { showCrispChat } from '../../../index';
 import WeeklyPayment, { WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
 import { fileWithExt } from './ChecklistItemRow';
 import CheckAccountingDocumentDialog from '../documentApproval/CheckAccountingDocumentDialog';
 import { isPlatformActivity } from '../../../utilities/activityHelper';
 import { resolveUrl } from '../InternalStorage';
 import { tryGetErrorMessage } from '../../../utilities/errorHelper';
+import { showCrispChat } from '../../../CrispChat';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -20,8 +20,8 @@ import { NormalizedOpportunity, TaskStatus } from '../../model/Opportunity';
 import UserRecord from '../../model/UserRecord';
 import useOverdueTasksCount from '../../hooks/useOverdueTasksCount';
 import useAdminUsers from '../../hooks/useAdminUsers';
-import useOpportunities from '../../hooks/useOpportunities';
 import UserRecordContext from '../../contexts/UserRecordContext';
+import { useOpportunities } from './OpportunitiesDataProvider';
 
 const useStyles = makeStyles(theme => ({
   root: {

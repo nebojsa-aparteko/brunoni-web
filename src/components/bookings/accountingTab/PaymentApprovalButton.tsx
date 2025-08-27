@@ -25,7 +25,6 @@ import {
   Tooltip,
   Typography,
 } from '@material-ui/core';
-import { showCrispChat } from '../../../index';
 import ConfirmationDialog from '../../ConfirmationDialog';
 import { RejectionInput } from '../documentApproval/RejectionModal';
 import CloseIcon from '@material-ui/icons/Close';
@@ -43,6 +42,7 @@ import useUser from '../../../hooks/useUser';
 import firebase from '../../../firebase';
 import Task, { TaskType } from '../../../model/Task';
 import { tryGetErrorMessage } from '../../../utilities/errorHelper';
+import { showCrispChat } from '../../../CrispChat';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
