@@ -1,5 +1,6 @@
-import useFirestoreCollection from './useFirestoreCollection';
 import { useMemo } from 'react';
+
+import useFirestoreCollection from './useFirestoreCollection';
 import { normalizeActivity } from '../components/bookings/checklist/ActivityModel';
 import firebase from '../firebase';
 
@@ -18,6 +19,6 @@ export default (
         path: doc.ref.path,
         ...normalizeActivity(doc.data()),
       })),
-    [activityCollection?.docs, activityCollection?.docs.length],
+    [activityCollection?.docs],
   );
 };

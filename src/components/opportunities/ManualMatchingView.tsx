@@ -1,22 +1,18 @@
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { Grid, makeStyles, Paper } from '@material-ui/core';
-import Meta from '../Meta';
-import ManualMatchingFiltersBar from './ManualMatchingFiltersBar';
-import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
+
 import { useManualMatchingListFilterContext } from '../../providers/ManualMatchingFilterProvider';
-import ManualMatchingTable, { SortConfig } from './ManualMatchingTable';
+import Meta from '../Meta';
 import ManualMatchingEmptyResults from './ManualMatchingEmptyResults';
-import useFirestoreCollection from '../../hooks/useFirestoreCollection';
-import useNormalizedOpportunityMatch from '../../hooks/useNormalizedOpportunityMatch';
-import {
-  EntityOpportunityMatch,
-  NormalizedEntityOpportunityMatch,
-  OpportunityMatchStatus,
-} from '../../model/Opportunity';
+import ManualMatchingFiltersBar from './ManualMatchingFiltersBar';
+import ManualMatchingTable, { SortConfig } from './ManualMatchingTable';
+import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
+import { NormalizedEntityOpportunityMatch, OpportunityMatchStatus } from '../../model/Opportunity';
 import MatchOpportunityDialog from './MatchOpportunityDialog';
 import AddOpportunityDialog from './AddOpportunityDialogue';
-import useOpportunities from '../../hooks/useOpportunities';
 import firebase from '../../firebase';
+import { useOpportunities } from './OpportunitiesDataProvider';
+import { useOpportunityMatches } from './OpportunityMatchDataProvider';
 
 interface Props {
   isAdmin?: boolean;
@@ -35,26 +31,8 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
   const [filters, setFilters] = useManualMatchingListFilterContext();
 
   // Fetch opportunity matches from Firestore
-  const opportunityMatchSnapshot = useFirestoreCollection('opportunity-matches');
-  if (opportunityMatchSnapshot?.empty && opportunityMatchSnapshot?.size === 0) {
-    console.log('opportunity-matches collection is empty or inaccessible');
-  }
-  // Convert snapshot to EntityOpportunityMatch array
-  const entityOpportunityMatches = useMemo(() => {
-    if (!opportunityMatchSnapshot) return [];
-    if (!opportunityMatchSnapshot.docs) return [];
-    return opportunityMatchSnapshot.docs.map(doc => doc.data() as EntityOpportunityMatch);
-  }, [opportunityMatchSnapshot]);
-
-  // Get the normalization function
-  const normalizeOpportunityMatch = useNormalizedOpportunityMatch();
-
-  // Normalize the opportunity matches
-  const normalizedMatches = useMemo(() => {
-    if (!entityOpportunityMatches || !normalizeOpportunityMatch) return [];
-    return entityOpportunityMatches.map(match => normalizeOpportunityMatch(match));
-  }, [entityOpportunityMatches, normalizeOpportunityMatch]);
-
+  const normalizedMatches = useOpportunityMatches();
+  console.debug('Normalized Matches:', normalizedMatches?.length);
   const filteredData = useMemo(() => {
     if (!normalizedMatches) return [];
 
@@ -95,18 +73,19 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
       return true;
     });
   }, [normalizedMatches, filters]);
+  console.debug('normalizedMatches:', normalizedMatches?.length);
 
-  const isLoading = !opportunityMatchSnapshot || !normalizeOpportunityMatch;
+  const isLoading = !normalizedMatches;
 
   // Sorting state
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: 'asc' });
 
-  const handleSort = (key: string) => {
+  const handleSort = useCallback((key: string) => {
     setSortConfig(prevConfig => ({
       key,
       direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc',
     }));
-  };
+  }, []);
 
   // Dialog states
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
@@ -116,17 +95,17 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
   // Get opportunities for matching
   const opportunities = useOpportunities();
 
-  const handleMatchOpportunity = (match: NormalizedEntityOpportunityMatch) => {
+  const handleMatchOpportunity = useCallback((match: NormalizedEntityOpportunityMatch) => {
     setSelectedMatch(match);
     setMatchDialogOpen(true);
-  };
+  }, []);
 
-  const handleCreateNewOpportunity = (match: NormalizedEntityOpportunityMatch) => {
+  const handleCreateNewOpportunity = useCallback((match: NormalizedEntityOpportunityMatch) => {
     setSelectedMatch(match);
     setAddOpportunityDialogOpen(true);
-  };
+  }, []);
 
-  const handleBulkDiscardMatches = async (matchIds: string[]) => {
+  const handleBulkDiscardMatches = useCallback(async (matchIds: string[]) => {
     try {
       const batch = firebase.firestore().batch();
       const updateData = {
@@ -142,65 +121,68 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
       });
 
       await batch.commit();
-      console.log(`${matchIds.length} matches discarded successfully`);
     } catch (error) {
       console.error('Failed to discard matches:', error);
     }
-  };
+  }, []);
 
-  const handleOpportunityMatch = async (opportunityId: string) => {
-    if (!selectedMatch) return;
+  const handleOpportunityMatch = useCallback(
+    async (opportunityId: string) => {
+      if (!selectedMatch) return;
 
-    try {
-      const matchRef = firebase
-        .firestore()
-        .collection('opportunity-matches')
-        .doc(`${selectedMatch.entity}-${selectedMatch.entityId}`);
-      await matchRef.update({
-        opportunityId,
-        status: OpportunityMatchStatus.Matched,
-        updatedAt: new Date(),
-        updatedBy: firebase.auth().currentUser?.uid || 'unknown',
-      });
-      console.log('Match updated with opportunity:', opportunityId);
-      setMatchDialogOpen(false);
-      setSelectedMatch(null);
-    } catch (error) {
-      console.error('Failed to match opportunity:', error);
-    }
-  };
+      try {
+        const matchRef = firebase
+          .firestore()
+          .collection('opportunity-matches')
+          .doc(`${selectedMatch.entity}-${selectedMatch.entityId}`);
+        await matchRef.update({
+          opportunityId,
+          status: OpportunityMatchStatus.Matched,
+          updatedAt: new Date(),
+          updatedBy: firebase.auth().currentUser?.uid || 'unknown',
+        });
+        setMatchDialogOpen(false);
+        setSelectedMatch(null);
+      } catch (error) {
+        console.error('Failed to match opportunity:', error);
+      }
+    },
+    [selectedMatch],
+  );
 
-  const handleAddOpportunity = async (opportunityData: any) => {
-    if (!selectedMatch) return;
+  const handleAddOpportunity = useCallback(
+    async (opportunityData: any) => {
+      if (!selectedMatch) return;
 
-    try {
-      // Create the opportunity
-      const opportunityRef = await firebase
-        .firestore()
-        .collection('opportunities')
-        .add(opportunityData);
+      try {
+        // Create the opportunity
+        const opportunityRef = await firebase
+          .firestore()
+          .collection('opportunities')
+          .add(opportunityData);
 
-      // Update the match with the new opportunity ID
-      const matchRef = firebase
-        .firestore()
-        .collection('opportunity-matches')
-        .doc(`${selectedMatch.entity}-${selectedMatch.entityId}`);
-      await matchRef.update({
-        opportunityId: opportunityRef.id,
-        status: OpportunityMatchStatus.Matched,
-        updatedAt: new Date(),
-        updatedBy: firebase.auth().currentUser?.uid || 'unknown',
-      });
+        // Update the match with the new opportunity ID
+        const matchRef = firebase
+          .firestore()
+          .collection('opportunity-matches')
+          .doc(`${selectedMatch.entity}-${selectedMatch.entityId}`);
+        await matchRef.update({
+          opportunityId: opportunityRef.id,
+          status: OpportunityMatchStatus.Matched,
+          updatedAt: new Date(),
+          updatedBy: firebase.auth().currentUser?.uid || 'unknown',
+        });
 
-      console.log('New opportunity created and matched:', opportunityRef.id);
-      setAddOpportunityDialogOpen(false);
-      setSelectedMatch(null);
-    } catch (error) {
-      console.error('Failed to create opportunity:', error);
-    }
-  };
+        setAddOpportunityDialogOpen(false);
+        setSelectedMatch(null);
+      } catch (error) {
+        console.error('Failed to create opportunity:', error);
+      }
+    },
+    [selectedMatch],
+  );
 
-  const handleUnmatchOpportunity = async (match: NormalizedEntityOpportunityMatch) => {
+  const handleUnmatchOpportunity = useCallback(async (match: NormalizedEntityOpportunityMatch) => {
     try {
       const matchRef = firebase
         .firestore()
@@ -212,18 +194,17 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
         updatedAt: new Date(),
         updatedBy: firebase.auth().currentUser?.uid || 'unknown',
       });
-      console.log('Match unmatched successfully');
     } catch (error) {
       console.error('Failed to unmatch opportunity:', error);
     }
-  };
+  }, []);
 
-  const handleAutoRematchOpportunity = (match: NormalizedEntityOpportunityMatch) => {
+  const handleAutoRematchOpportunity = useCallback((match: NormalizedEntityOpportunityMatch) => {
     setSelectedMatch(match);
     setMatchDialogOpen(true);
-  };
+  }, []);
 
-  const handleRowClick = (match: NormalizedEntityOpportunityMatch) => {
+  const handleRowClick = useCallback((match: NormalizedEntityOpportunityMatch) => {
     const entityId = match.entityId;
 
     if (match.entity === 'booking') {
@@ -233,7 +214,17 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
       // Open quote in new tab
       window.open(`/quotes/${entityId}`, '_blank');
     }
-  };
+  }, []);
+
+  const handleMatchDialogClose = useCallback(() => {
+    setMatchDialogOpen(false);
+    setSelectedMatch(null);
+  }, []);
+
+  const handleAddOpportunityDialogClose = useCallback(() => {
+    setAddOpportunityDialogOpen(false);
+    setSelectedMatch(null);
+  }, []);
 
   return (
     <Fragment>
@@ -283,10 +274,7 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
       {/* Match Opportunity Dialog */}
       <MatchOpportunityDialog
         open={matchDialogOpen}
-        onClose={() => {
-          setMatchDialogOpen(false);
-          setSelectedMatch(null);
-        }}
+        onClose={handleMatchDialogClose}
         onMatch={handleOpportunityMatch}
         opportunities={opportunities || []}
         currentMatch={selectedMatch || undefined}
@@ -295,10 +283,7 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
       {/* Add Opportunity Dialog */}
       <AddOpportunityDialog
         open={addOpportunityDialogOpen}
-        onClose={() => {
-          setAddOpportunityDialogOpen(false);
-          setSelectedMatch(null);
-        }}
+        onClose={handleAddOpportunityDialogClose}
         onAdd={handleAddOpportunity}
         prefillFromMatch={selectedMatch || undefined}
       />

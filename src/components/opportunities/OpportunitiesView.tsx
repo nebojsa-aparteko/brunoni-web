@@ -1,5 +1,6 @@
+import { Button, Grid, makeStyles, Paper } from '@material-ui/core';
 import React, { Fragment, useMemo, useState } from 'react';
-import { Grid, makeStyles, Paper, Button } from '@material-ui/core';
+
 import Meta from '../Meta';
 import OpportunitiesFiltersBar from './OpportunitiesFiltersBar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
@@ -7,18 +8,17 @@ import { useOpportunitiesListFilterContext } from '../../providers/Opportunities
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 import OpportunityTable, { SortConfig } from './OpportunityTable';
 import { NormalizedOpportunity, OpportunityMatchDefinition } from '../../model/Opportunity';
-import useOpportunitiesWithSalesRep from '../../hooks/useOpportunities';
 import AddOpportunityDialog from './AddOpportunityDialogue';
 import EditOpportunityDialog from './EditOpportunityDialog';
 import OpportunityUploadDialog from './OpportunityUploadDialog';
 import Port from '../../model/Port';
 import { OpportunityPortsGroup } from '../../model/OpportunityPortsGroup';
 import { isEqual } from 'lodash';
-import { is } from 'cheerio/lib/api/traversing';
 import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
 import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup';
 import ContainerType from '../../model/ContainerType';
+import { useOpportunities } from './OpportunitiesDataProvider';
 
 interface Props {
   isAdmin?: boolean;
@@ -36,8 +36,8 @@ const useStyles = makeStyles(theme => ({
 
 const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
   const classes = useStyles();
-  const isLoading = false; // Replace with actual loading state if needed
-  const opportunities = useOpportunitiesWithSalesRep();
+  const opportunities = useOpportunities();
+  const isLoading = !opportunities;
   const [filters, setFilters] = useOpportunitiesListFilterContext();
 
   const { assignee } = filters;
@@ -221,7 +221,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
   }, [opportunities, filters]);
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [newOpportunityName, setNewOpportunityName] = useState('');
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState<NormalizedOpportunity | null>(

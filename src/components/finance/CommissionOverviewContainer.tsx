@@ -20,13 +20,13 @@ import CarrierInput from '../inputs/CarrierInput';
 import theme from '../../theme';
 import Carriers from '../../contexts/Carriers';
 import PaymentOverviewDialog from './PaymentOverviewDialog';
-import { showCrispChat } from '../../index';
 import { Currency } from '../../model/Payment';
 import { CommissionStatus } from '../../model/Commission';
 import useCommissions from '../../hooks/useCommissions';
 import { useCommissionFilterProviderContext } from '../../providers/CommissionFilterProvider';
 import { DateRange } from '../daterangepicker/types';
 import DateRangeInput from '../inputs/DateRangeInput';
+import { showCrispChat } from '../../CrispChat';
 
 const useStyles = makeStyles(theme => ({
   formControl: {

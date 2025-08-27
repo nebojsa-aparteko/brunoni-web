@@ -205,7 +205,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleRowClick = () => {
-    if (!createTaskDialogOpen && !Boolean(anchorEl)) {
+    if (!createTaskDialogOpen && !anchorEl) {
       onRowClick?.(opportunity);
     }
   };
