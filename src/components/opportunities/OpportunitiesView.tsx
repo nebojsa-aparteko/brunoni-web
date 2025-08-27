@@ -1,5 +1,6 @@
-import React, { Fragment, useMemo, useState } from 'react';
 import { Button, Grid, makeStyles, Paper } from '@material-ui/core';
+import React, { Fragment, useMemo, useState } from 'react';
+
 import Meta from '../Meta';
 import OpportunitiesFiltersBar from './OpportunitiesFiltersBar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
@@ -35,8 +36,8 @@ const useStyles = makeStyles(theme => ({
 
 const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
   const classes = useStyles();
-  const isLoading = false; // Replace with actual loading state if needed
   const opportunities = useOpportunities();
+  const isLoading = !opportunities;
   const [filters, setFilters] = useOpportunitiesListFilterContext();
 
   const { assignee } = filters;

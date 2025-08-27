@@ -333,7 +333,7 @@ const ManualMatchingTable: React.FC<Props> = ({
       .map(match => ({ entity: match.entity, entityId: match.entityId }));
   }, [opportunityMatches, selectedMatches]);
 
-  console.debug('opportunityMatches', opportunityMatches);
+  console.debug('opportunityMatches', opportunityMatches?.length);
   const baseMatches = opportunityMatches || [];
   const displayMatches = sortConfig ? sortMatches(baseMatches, sortConfig) : baseMatches;
   const matchIds = displayMatches.map(match => `${match.entity}-${match.entityId}`);

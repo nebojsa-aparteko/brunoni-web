@@ -13,6 +13,8 @@ import useOverdueTasksCount from '../hooks/useOverdueTasksCount';
 import queryString from 'query-string';
 import { useNavigate } from 'react-router-dom';
 import { OpportunitiesDataProvider } from '../components/opportunities/OpportunitiesDataProvider';
+import { OpportunityMatchesDataProvider } from '../components/opportunities/OpportunityMatchDataProvider';
+import { NormalizeOpportunityDefinitionsProvider } from '../components/opportunities/NormlizeOpportunityDefinitionsProvider';
 
 const useStyles = makeStyles((theme: Theme) => ({
   tabContainer: {
@@ -106,48 +108,55 @@ const OpportunitiesPage: React.FC = () => {
   return (
     <Fragment>
       <Meta title="Opportunities" />
-      <OpportunitiesDataProvider>
-        <OpportunitiesFilterProvider>
-          <Box className={classes.tabContainer} style={{ maxWidth: '100vw', overflowY: 'hidden' }}>
-            <Paper square>
-              <Tabs
-                value={selectedTab}
-                onChange={handleTabChange}
-                orientation="vertical"
-                aria-label="Opportunities tabs"
-                className={classes.tabs}
-              >
-                <Tab icon={<AssessmentIcon />} label="Opportunities" {...a11yProps(0)} />
-                <Tab icon={<HelpIcon />} label="Manual Matching" {...a11yProps(1)} />
-                <Tab
-                  icon={
-                    <Badge
-                      badgeContent={overdueTasksCount > 0 ? overdueTasksCount : null}
-                      color="error"
-                      max={99}
-                    >
-                      <CheckCircleIcon />
-                    </Badge>
-                  }
-                  label="Tasks"
-                  {...a11yProps(2)}
-                />
-              </Tabs>
-            </Paper>
-            <TabPanel value={selectedTab} index={0}>
-              <OpportunitiesView isAdmin={true} />
-            </TabPanel>
-            <TabPanel value={selectedTab} index={1}>
-              <ManualMatchingFilterProvider>
-                <ManualMatchingView isAdmin={true} />
-              </ManualMatchingFilterProvider>
-            </TabPanel>
-            <TabPanel value={selectedTab} index={2}>
-              <OpportunityTasksView />
-            </TabPanel>
-          </Box>
-        </OpportunitiesFilterProvider>
-      </OpportunitiesDataProvider>
+      <NormalizeOpportunityDefinitionsProvider>
+        <OpportunitiesDataProvider>
+          <OpportunitiesFilterProvider>
+            <Box
+              className={classes.tabContainer}
+              style={{ maxWidth: '100vw', overflowY: 'hidden' }}
+            >
+              <Paper square>
+                <Tabs
+                  value={selectedTab}
+                  onChange={handleTabChange}
+                  orientation="vertical"
+                  aria-label="Opportunities tabs"
+                  className={classes.tabs}
+                >
+                  <Tab icon={<AssessmentIcon />} label="Opportunities" {...a11yProps(0)} />
+                  <Tab icon={<HelpIcon />} label="Manual Matching" {...a11yProps(1)} />
+                  <Tab
+                    icon={
+                      <Badge
+                        badgeContent={overdueTasksCount > 0 ? overdueTasksCount : null}
+                        color="error"
+                        max={99}
+                      >
+                        <CheckCircleIcon />
+                      </Badge>
+                    }
+                    label="Tasks"
+                    {...a11yProps(2)}
+                  />
+                </Tabs>
+              </Paper>
+              <TabPanel value={selectedTab} index={0}>
+                <OpportunitiesView isAdmin={true} />
+              </TabPanel>
+              <TabPanel value={selectedTab} index={1}>
+                <OpportunityMatchesDataProvider>
+                  <ManualMatchingFilterProvider>
+                    <ManualMatchingView isAdmin={true} />
+                  </ManualMatchingFilterProvider>
+                </OpportunityMatchesDataProvider>
+              </TabPanel>
+              <TabPanel value={selectedTab} index={2}>
+                <OpportunityTasksView />
+              </TabPanel>
+            </Box>
+          </OpportunitiesFilterProvider>
+        </OpportunitiesDataProvider>
+      </NormalizeOpportunityDefinitionsProvider>
     </Fragment>
   );
 };

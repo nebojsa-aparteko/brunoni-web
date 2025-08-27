@@ -1,8 +1,9 @@
 import React, { createContext, PropsWithChildren, useContext } from 'react';
-import { NormalizedOpportunity } from '../../model/Opportunity';
-import useOpportunitiesWithSalesRep from '../../hooks/useOpportunities';
 
-const OpportunitiesDataProviderCtx = createContext([] as NormalizedOpportunity[]);
+import useOpportunitiesWithSalesRep from '../../hooks/useOpportunities';
+import { NormalizedOpportunity } from '../../model/Opportunity';
+
+const OpportunitiesDataProviderCtx = createContext([] as NormalizedOpportunity[] | undefined);
 
 export const OpportunitiesDataProvider = ({ children }: PropsWithChildren<{}>) => {
   const opportunities = useOpportunitiesWithSalesRep();
