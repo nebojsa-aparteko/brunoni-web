@@ -3,7 +3,7 @@ import { NormalizedOpportunity } from '../model/Opportunity';
 import useFirestoreCollection from './useFirestoreCollection';
 import useNormalizedOpportunity from './useNormalizedOpportunity';
 
-const useOpportunitiesWithSalesRep = (): NormalizedOpportunity[] | null => {
+const useOpportunitiesWithSalesRep = (): NormalizedOpportunity[] => {
   const opportunitySnapshot = useFirestoreCollection('opportunities');
   const opportunityIds = useMemo(() => {
     return opportunitySnapshot?.docs?.map(doc => doc.id) || [];
@@ -18,7 +18,7 @@ const useOpportunitiesWithSalesRep = (): NormalizedOpportunity[] | null => {
   }, [opportunitySnapshot?.docs, normalizeOpportunity]);
 
   return useMemo(() => {
-    if (!opportunities) return null;
+    if (!opportunities) return [];
     return opportunities;
   }, [opportunities]);
 };

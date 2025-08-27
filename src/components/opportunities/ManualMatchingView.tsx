@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { Grid, makeStyles, Paper } from '@material-ui/core';
 import Meta from '../Meta';
 import ManualMatchingFiltersBar from './ManualMatchingFiltersBar';
@@ -15,8 +15,9 @@ import {
 } from '../../model/Opportunity';
 import MatchOpportunityDialog from './MatchOpportunityDialog';
 import AddOpportunityDialog from './AddOpportunityDialogue';
-import useOpportunities from '../../hooks/useOpportunities';
 import firebase from '../../firebase';
+import { updateOpportunityMatch } from './ManualMatchingView.data';
+import { useOpportunities } from './OpportunitiesDataProvider';
 
 interface Props {
   isAdmin?: boolean;
@@ -148,57 +149,53 @@ const ManualMatchingView: React.FC<Props> = ({ isAdmin }) => {
     }
   };
 
-  const handleOpportunityMatch = async (opportunityId: string) => {
-    if (!selectedMatch) return;
+  const handleOpportunityMatch = useCallback(
+    async (opportunityId: string) => {
+      if (!selectedMatch) return;
 
-    try {
-      const matchRef = firebase
-        .firestore()
-        .collection('opportunity-matches')
-        .doc(`${selectedMatch.entity}-${selectedMatch.entityId}`);
-      await matchRef.update({
-        opportunityId,
-        status: OpportunityMatchStatus.Matched,
-        updatedAt: new Date(),
-        updatedBy: firebase.auth().currentUser?.uid || 'unknown',
-      });
-      console.log('Match updated with opportunity:', opportunityId);
-      setMatchDialogOpen(false);
-      setSelectedMatch(null);
-    } catch (error) {
-      console.error('Failed to match opportunity:', error);
-    }
-  };
+      try {
+        await updateOpportunityMatch(selectedMatch, opportunityId);
+        setMatchDialogOpen(false);
+        setSelectedMatch(null);
+      } catch (error) {
+        console.error('Failed to match opportunity:', error);
+      }
+    },
+    [selectedMatch],
+  );
 
-  const handleAddOpportunity = async (opportunityData: any) => {
-    if (!selectedMatch) return;
+  const handleAddOpportunity = useCallback(
+    async (opportunityData: any) => {
+      if (!selectedMatch) return;
 
-    try {
-      // Create the opportunity
-      const opportunityRef = await firebase
-        .firestore()
-        .collection('opportunities')
-        .add(opportunityData);
+      try {
+        // Create the opportunity
+        const opportunityRef = await firebase
+          .firestore()
+          .collection('opportunities')
+          .add(opportunityData);
 
-      // Update the match with the new opportunity ID
-      const matchRef = firebase
-        .firestore()
-        .collection('opportunity-matches')
-        .doc(`${selectedMatch.entity}-${selectedMatch.entityId}`);
-      await matchRef.update({
-        opportunityId: opportunityRef.id,
-        status: OpportunityMatchStatus.Matched,
-        updatedAt: new Date(),
-        updatedBy: firebase.auth().currentUser?.uid || 'unknown',
-      });
+        // Update the match with the new opportunity ID
+        const matchRef = firebase
+          .firestore()
+          .collection('opportunity-matches')
+          .doc(`${selectedMatch.entity}-${selectedMatch.entityId}`);
+        await matchRef.update({
+          opportunityId: opportunityRef.id,
+          status: OpportunityMatchStatus.Matched,
+          updatedAt: new Date(),
+          updatedBy: firebase.auth().currentUser?.uid || 'unknown',
+        });
 
-      console.log('New opportunity created and matched:', opportunityRef.id);
-      setAddOpportunityDialogOpen(false);
-      setSelectedMatch(null);
-    } catch (error) {
-      console.error('Failed to create opportunity:', error);
-    }
-  };
+        console.log('New opportunity created and matched:', opportunityRef.id);
+        setAddOpportunityDialogOpen(false);
+        setSelectedMatch(null);
+      } catch (error) {
+        console.error('Failed to create opportunity:', error);
+      }
+    },
+    [selectedMatch],
+  );
 
   const handleUnmatchOpportunity = async (match: NormalizedEntityOpportunityMatch) => {
     try {
