@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react-swc';
 import svgr from 'vite-plugin-svgr';
 import path from 'path';
 import fs from 'fs';
@@ -26,27 +26,17 @@ export default defineConfig(({ mode }) => {
     root: brandDir,
     envDir: rootDir,
     plugins: [
-      react({
-        jsxRuntime: 'classic',
-        babel: {
-          presets: [
-            ['@babel/preset-react', { runtime: 'classic' }],
-          ],
-        },
-        include: '**/*.{jsx,js,ts,tsx}',
-      }),
+      react(),
       svgr()
     ],
     resolve: {
       alias: {
         '@': path.resolve(rootDir, 'src'),
-        'src': path.resolve(rootDir, 'src'),
-        '/src': path.resolve(rootDir, 'src')
+        '/src': path.resolve(rootDir, 'src'),
       },
     },
     optimizeDeps: {
       include: ['react', 'react-dom'],
-      force: true,
       esbuildOptions: {
         loader: {
           '.js': 'jsx',

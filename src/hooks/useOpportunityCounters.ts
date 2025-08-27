@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import firebase from '../firebase';
 import { OpportunityCounter } from '../model/Opportunity';
 
@@ -13,29 +13,17 @@ interface OpportunityCounters {
 
 export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCounters => {
   const [counters, setCounters] = useState<OpportunityCounters>({});
-  const currentYear = new Date().getFullYear();
-
-  const stableOpportunityIds = useMemo(() => {
-    return [...opportunityIds].sort();
-  }, [opportunityIds]);
-
-  const [fetchedIds, setFetchedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!stableOpportunityIds.length) {
+    if (!opportunityIds.length) {
       setCounters({});
-      setFetchedIds(new Set());
       return;
     }
 
-    const idsToFetch = stableOpportunityIds.filter(id => !fetchedIds.has(id));
-
-    if (!idsToFetch.length) {
-      return;
-    }
+    const currentYear = new Date().getFullYear();
 
     const fetchCounters = async () => {
-      const counterPromises = idsToFetch.map(async opportunityId => {
+      const counterPromises = opportunityIds.map(async opportunityId => {
         try {
           const countersSnapshot = await firebase
             .firestore()
@@ -82,11 +70,11 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
 
       const results = await Promise.all(counterPromises);
 
-      setFetchedIds(prevFetched => {
-        const newFetched = new Set(prevFetched);
-        idsToFetch.forEach(id => newFetched.add(id));
-        return newFetched;
-      });
+      // setFetchedIds(prevFetched => {
+      //   const newFetched = new Set(prevFetched);
+      //   idsToFetch.forEach(id => newFetched.add(id));
+      //   return newFetched;
+      // });
 
       setCounters(prevCounters => {
         const newCounters = { ...prevCounters };
@@ -112,8 +100,8 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
       });
     };
 
-    fetchCounters();
-  }, [stableOpportunityIds, currentYear, fetchedIds]);
+    fetchCounters().catch(error => console.error('Error calculating counters:', error));
+  }, [opportunityIds]);
 
   return useMemo(() => counters, [counters]);
 };

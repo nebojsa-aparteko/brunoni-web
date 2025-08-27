@@ -85,7 +85,7 @@ const useLocalStorage = (
       localStorage.setItem(key, serializedState);
       localStorage.setItem(key + '_saved', new Date().getTime().toString());
     } catch (e) {}
-  });
+  }, [useRawValues, value, key, timeoutMinutes]);
 
   return [value, setValue];
 };

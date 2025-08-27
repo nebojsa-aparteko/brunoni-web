@@ -88,7 +88,7 @@ const QuoteGroups: React.FC = () => {
           )(quoteFilters),
         );
     }
-  }, [actingAs]);
+  }, [actingAs, quoteFilters, setQuoteFilters]);
 
   return (
     <Fragment>

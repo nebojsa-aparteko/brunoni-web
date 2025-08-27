@@ -28,11 +28,11 @@ import CloseIcon from '@material-ui/icons/Close';
 import { useActivityLogState } from './checklist/ActivityLogContext';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import { ActivityLogItem, ActivityType } from './checklist/ActivityModel';
-import { showCrispChat } from '../../index';
 import BookingRequestComparisonDialog from '../bookingRequests/checklist/BookingRequestComparisonDialog';
 import { BookingRequest } from '../../model/BookingRequest';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import { tryGetErrorMessage } from '../../utilities/errorHelper';
+import { showCrispChat } from '../../CrispChat';
 
 const useStyles = makeStyles(() => ({
   rootEmpty: {

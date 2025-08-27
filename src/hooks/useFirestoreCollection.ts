@@ -52,7 +52,7 @@ export default function useFirestoreCollection(
               docs: [],
               empty: true,
               size: 0,
-            } as firebase.firestore.QuerySnapshot);
+            } as unknown as firebase.firestore.QuerySnapshot);
           },
           next: (snapshot: firebase.firestore.QuerySnapshot) => {
             console.debug(

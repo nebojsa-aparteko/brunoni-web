@@ -99,10 +99,10 @@ const QuoteGroupRow: React.FC<RowProps> = ({
   }, [showCompanyInfo, client, requestedBy, requestedById, clientId, clientUserNameString]);
 
   const handleRowClick = useCallback(
-    (event: React.MouseEvent<unknown>) => {
+    (_: React.MouseEvent<unknown>) => {
       navigate(quotes?.length > 1 ? `/quotes/groups/${id}` : `/quotes/${quotes[0].id}`);
     },
-    [history, quotes, id],
+    [quotes, id, navigate],
   );
 
   return (
