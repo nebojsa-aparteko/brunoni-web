@@ -36,7 +36,7 @@ const GlobalStore = ({ children }: GlobalStoreProps) => {
         preventDuplicate: true,
       });
     }
-  }, [snackbarMessage]);
+  }, [snackbarMessage, enqueueSnackbar]);
 
   useEffect(() => {
     if (promiseActivity) {
