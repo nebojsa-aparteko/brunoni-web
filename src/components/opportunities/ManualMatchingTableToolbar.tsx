@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface ManualMatchingTableToolbarProps {
   numSelected: number;
+  numTotal: number;
   onDiscard: () => void;
   onAutoRematch: (selectedRows: Array<{ entity: string; entityId: string }>) => void;
   selectedRows: Array<{ entity: string; entityId: string }>;
@@ -33,6 +34,7 @@ interface ManualMatchingTableToolbarProps {
 
 export const ManualMatchingTableToolbar: React.FC<ManualMatchingTableToolbarProps> = ({
   numSelected,
+  numTotal,
   onDiscard,
   onAutoRematch,
   selectedRows,
@@ -54,29 +56,31 @@ export const ManualMatchingTableToolbar: React.FC<ManualMatchingTableToolbarProp
         </Typography>
       ) : (
         <Typography className={classes.toolbarTitle} variant="h4" component="div">
-          Manual Matching
+          {`Manual Matching (${numTotal} results)`}
         </Typography>
       )}
       {numSelected > 0 && (
         <>
           {numSelected > 100 ? (
             <Typography color="error" variant="body2" style={{ flexShrink: 0, marginRight: 8 }}>
-              Too many entities selected for automatic rematching, maximum allowed is 100
+              Auto rematch is limited to first 100 selected items, not all selected items will be
+              processed.
             </Typography>
           ) : (
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => {
-                console.debug('Auto Rematch selected rows:', selectedRows);
-                onAutoRematch(selectedRows);
-              }}
-              style={{ flexShrink: 0, marginRight: 8 }}
-            >
-              Auto Rematch
-            </Button>
+            <div></div>
           )}
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={() => {
+              console.debug('Auto Rematch selected rows:', selectedRows);
+              onAutoRematch(selectedRows);
+            }}
+            style={{ flexShrink: 0, marginRight: 8 }}
+          >
+            Auto Rematch
+          </Button>
           <Button
             variant="contained"
             color="secondary"

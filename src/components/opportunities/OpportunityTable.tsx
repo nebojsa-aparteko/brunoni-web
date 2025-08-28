@@ -10,11 +10,43 @@ import { Chip, makeStyles, Theme, Tooltip, IconButton, Menu, MenuItem } from '@m
 import { Notes as NotesIcon, MoreVert as MoreVertIcon } from '@material-ui/icons';
 import Avatar from 'react-avatar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
+import { List as RVList, AutoSizer } from 'react-virtualized';
+import type { ListRowRenderer, AutoSizerProps } from 'react-virtualized';
+
+// react-virtualized's exported components are JS classes that confuse TSX typing
+// create any-typed aliases for safe JSX usage
+const RVAutoSizer: any = AutoSizer as any;
+const RVListAny: any = RVList as any;
 import { NormalizedOpportunity } from '../../model/Opportunity';
 import { format } from 'date-fns';
 
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 import CreateOpportunityTaskDialog from './CreateOpportunityTaskDialog';
+
+// Explicit column widths used for header cells and virtualized grid rows
+const columnWidths = [
+  '100px', // id
+  '150px', // bookingParty
+  '100px', // bookingPartyRep
+  '150px', // statisticalClient
+  '120px', // placeOfReceipt
+  '120px', // portOfLoading
+  '120px', // portOfDischarge
+  '120px', // placeOfDelivery
+  '120px', // equipment
+  '120px', // commodity
+  '120px', // quoteKind
+  '120px', // agreement
+  '120px', // validity
+  '100px', // capacityTEU
+  '120px', // quotedProgress
+  '120px', // bookedProgress
+  '40px', // note
+  '300px', // tags
+  '100px', // salesRep
+  '80px', // actions
+];
+const gridTemplate = columnWidths.join(' ');
 
 const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
   switch (key) {
@@ -178,7 +210,7 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   isActive = false,
   onSort,
 }) => {
-  const classes = opportunityTableStyles();
+  const classes = opportunityTableStyles({});
 
   const active = sortConfig?.key === sortKey;
   if (isActive && !active) {
@@ -191,7 +223,11 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   };
 
   return (
-    <TableCell align="center" className={classes.headerCell}>
+    <TableCell
+      align="center"
+      className={classes.headerCell}
+      style={(children as any)?.props?.style || undefined}
+    >
       <TableSortLabel active={active} direction={direction} onClick={handleClick}>
         {children}
       </TableSortLabel>
@@ -199,16 +235,10 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   );
 };
 
-const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, onRowClick }) => {
-  const classes = opportunityTableStyles();
+const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }) => {
+  const classes = opportunityTableStyles({});
   const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const handleRowClick = () => {
-    if (!createTaskDialogOpen && !anchorEl) {
-      onRowClick?.(opportunity);
-    }
-  };
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
@@ -296,13 +326,14 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
               : opportunity.portOfDischarge?.value) || '',
           );
 
+  // Render row children only; the outer virtualized wrapper provides the grid template
+  // Return a Fragment so the children become direct grid items of the outer grid container.
+  // The outer container (in the virtualized rowRenderer) will handle hover and click.
   return (
-    <TableRow hover className={classes.row} tabIndex={-1} onClick={handleRowClick}>
-      <TableCell component="th" scope="row" style={{ paddingLeft: 4 }}>
-        {opportunity.opportunityId}
-      </TableCell>
-      <TableCell align="center">{opportunity.bookingPartyId?.name || ''}</TableCell>
-      <TableCell align="center">
+    <>
+      <div style={{ paddingLeft: 4, textAlign: 'left' }}>{opportunity.opportunityId}</div>
+      <div style={{ textAlign: 'center' }}>{opportunity.bookingPartyId?.name || ''}</div>
+      <div style={{ textAlign: 'center' }}>
         {opportunity.bookingPartyRepId ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
             <Avatar
@@ -315,28 +346,28 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         ) : (
           ''
         )}
-      </TableCell>
-      <TableCell align="center">{opportunity.statisticalClientId?.name || ''}</TableCell>
-      <TableCell align="center">{placeOfReceipt || ''}</TableCell>
-      <TableCell align="center">{portOfLoading || ''}</TableCell>
-      <TableCell align="center">{portOfDischarge || ''}</TableCell>
-      <TableCell align="center">{placeOfDelivery || ''}</TableCell>
-      <TableCell align="center">{equipment || ''}</TableCell>
-      <TableCell align="center">{commodity || ''}</TableCell>
-      <TableCell align="center">{opportunity.quoteKind || ''}</TableCell>
-      <TableCell align="center">{opportunity.agreementId || ''}</TableCell>
+      </div>
+      <div style={{ textAlign: 'center' }}>{opportunity.statisticalClientId?.name || ''}</div>
+      <div style={{ textAlign: 'center' }}>{placeOfReceipt || ''}</div>
+      <div style={{ textAlign: 'center' }}>{portOfLoading || ''}</div>
+      <div style={{ textAlign: 'center' }}>{portOfDischarge || ''}</div>
+      <div style={{ textAlign: 'center' }}>{placeOfDelivery || ''}</div>
+      <div style={{ textAlign: 'center' }}>{equipment || ''}</div>
+      <div style={{ textAlign: 'center' }}>{commodity || ''}</div>
+      <div style={{ textAlign: 'center' }}>{opportunity.quoteKind || ''}</div>
+      <div style={{ textAlign: 'center' }}>{opportunity.agreementId || ''}</div>
 
-      <TableCell align="center">
+      <div style={{ textAlign: 'center' }}>
         {opportunity.validity ? format(new Date(opportunity.validity), 'dd.MM.yyyy') : ''}
-      </TableCell>
-      <TableCell align="center">
-        {opportunity.capacityTEU ? `${opportunity.capacityTEU} TEU` : ''}
-      </TableCell>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        {opportunity.capacityTEU ? `${opportunity.capacityTEU}` : ''}
+      </div>
 
-      <TableCell align="center">
+      <div style={{ textAlign: 'center' }}>
         {opportunity.capacityTEU && opportunity.capacityTEU > 0 ? (
           <div style={{ minWidth: 80 }}>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, width: '90%' }}>
               <span style={{ fontSize: 12, marginRight: 6 }}>
                 {opportunity.booked != null && opportunity.quoted != null
                   ? `${opportunity.booked} / ${opportunity.quoted}`
@@ -350,7 +381,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
                   </span>
                 )}
             </div>
-            <div style={{ width: '100%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
+            <div style={{ width: '90%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
               <div
                 style={{
                   width:
@@ -368,11 +399,11 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         ) : (
           ''
         )}
-      </TableCell>
-      <TableCell align="center">
+      </div>
+      <div style={{ textAlign: 'center' }}>
         {opportunity.capacityTEU && opportunity.capacityTEU > 0 ? (
           <div style={{ minWidth: 80 }}>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, width: '90%' }}>
               <span style={{ fontSize: 12, marginRight: 6 }}>
                 {opportunity.bookedTEU != null && opportunity.capacityTEU != null
                   ? `${opportunity.bookedTEU} / ${opportunity.capacityTEU}`
@@ -386,7 +417,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
                   </span>
                 )}
             </div>
-            <div style={{ width: '100%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
+            <div style={{ width: '90%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
               <div
                 style={{
                   width:
@@ -404,8 +435,8 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         ) : (
           ''
         )}
-      </TableCell>
-      <TableCell align="center">
+      </div>
+      <div style={{ textAlign: 'center' }}>
         {opportunity.note ? (
           <Tooltip
             title={opportunity.note}
@@ -420,8 +451,8 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         ) : (
           ''
         )}
-      </TableCell>
-      <TableCell align="center">
+      </div>
+      <div style={{ textAlign: 'center' }}>
         {opportunity.tagIds && opportunity.tagIds.length > 0
           ? opportunity.tagIds.map(tag => (
               <Chip
@@ -434,8 +465,8 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
               />
             ))
           : ''}
-      </TableCell>
-      <TableCell align="center">
+      </div>
+      <div style={{ textAlign: 'center' }}>
         {opportunity.salesRepId ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
             <Avatar
@@ -448,14 +479,14 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         ) : (
           ''
         )}
-      </TableCell>
-      <TableCell align="center">
+      </div>
+      <div style={{ textAlign: 'center' }}>
         <Tooltip title="Actions">
           <IconButton size="small" onClick={handleMenuClick}>
             <MoreVertIcon />
           </IconButton>
         </Tooltip>
-      </TableCell>
+      </div>
       <CreateOpportunityTaskDialog
         open={createTaskDialogOpen}
         onClose={() => setCreateTaskDialogOpen(false)}
@@ -464,7 +495,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={e => handleCreateTaskClick(e)}>Create New Task</MenuItem>
       </Menu>
-    </TableRow>
+    </>
   );
 };
 
@@ -474,7 +505,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
   sortConfig,
   onSort,
 }) => {
-  const classes = opportunityTableStyles();
+  const classes = opportunityTableStyles({});
   const baseOpportunities = opportunities || [];
   const displayOpportunities = sortConfig
     ? sortOpportunities(baseOpportunities, sortConfig)
@@ -496,88 +527,327 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
           >
             <TableHead className={classes.table}>
               <TableRow>
-                <SortableHeader sortKey="id" sortConfig={sortConfig} onSort={onSort}>
-                  Opportunity Number
-                </SortableHeader>
-                <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
-                  B/Party
-                </SortableHeader>
-                <SortableHeader sortKey="bookingPartyRep" sortConfig={sortConfig} onSort={onSort}>
-                  B/Party Rep
-                </SortableHeader>
-                <SortableHeader sortKey="statisticalClient" sortConfig={sortConfig} onSort={onSort}>
-                  S/Client
-                </SortableHeader>
-                <SortableHeader sortKey="placeOfReceipt" sortConfig={sortConfig} onSort={onSort}>
-                  PLR
-                </SortableHeader>
-                <SortableHeader sortKey="portOfLoading" sortConfig={sortConfig} onSort={onSort}>
-                  POL
-                </SortableHeader>
-                <SortableHeader sortKey="portOfDischarge" sortConfig={sortConfig} onSort={onSort}>
-                  POD
-                </SortableHeader>
-                <SortableHeader sortKey="placeOfDelivery" sortConfig={sortConfig} onSort={onSort}>
-                  PLD
-                </SortableHeader>
-                <SortableHeader sortKey="equipmentGroup" sortConfig={sortConfig} onSort={onSort}>
-                  Equipment
-                </SortableHeader>
-                <SortableHeader sortKey="commodityGroup" sortConfig={sortConfig} onSort={onSort}>
-                  Commodity
-                </SortableHeader>
-                <SortableHeader sortKey="quoteKind" sortConfig={sortConfig} onSort={onSort}>
-                  Quote
-                </SortableHeader>
-                <SortableHeader sortKey="agreement" sortConfig={sortConfig} onSort={onSort}>
-                  Agreement
-                </SortableHeader>
-                <SortableHeader sortKey="validity" sortConfig={sortConfig} onSort={onSort}>
-                  Validity
-                </SortableHeader>
-                <SortableHeader sortKey="capacityTEU" sortConfig={sortConfig} onSort={onSort}>
-                  Potential
-                </SortableHeader>
-                <SortableHeader sortKey="quotedProgress" sortConfig={sortConfig} onSort={onSort}>
-                  <div>
-                    <div>Quoted</div>
-                    <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>Booked / Quoted</div>
-                  </div>
-                </SortableHeader>
-                <SortableHeader sortKey="bookedProgress" sortConfig={sortConfig} onSort={onSort}>
-                  <div>
-                    <div>Booked</div>
-                    <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>
-                      Booked TEU / Potential
+                <TableCell colSpan={20} style={{ padding: 0, borderBottom: 'none' }}>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: gridTemplate,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div
+                      className={classes.headerCell}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        paddingLeft: 8,
+                      }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'id'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('id')}
+                      >
+                        Opportunity Number
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'bookingParty'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('bookingParty')}
+                      >
+                        B/Party
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'bookingPartyRep'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('bookingPartyRep')}
+                      >
+                        B/Party Rep
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'statisticalClient'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('statisticalClient')}
+                      >
+                        S/Client
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'placeOfReceipt'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('placeOfReceipt')}
+                      >
+                        PLR
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'portOfLoading'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('portOfLoading')}
+                      >
+                        POL
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'portOfDischarge'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('portOfDischarge')}
+                      >
+                        POD
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'placeOfDelivery'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('placeOfDelivery')}
+                      >
+                        PLD
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'equipmentGroup'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('equipmentGroup')}
+                      >
+                        Equipment
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'commodityGroup'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('commodityGroup')}
+                      >
+                        Commodity
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'quoteKind'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('quoteKind')}
+                      >
+                        Quote
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'agreement'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('agreement')}
+                      >
+                        Agreement
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'validity'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('validity')}
+                      >
+                        Validity
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'capacityTEU'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('capacityTEU')}
+                      >
+                        Potential TEU
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'quotedProgress'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('quotedProgress')}
+                      >
+                        <div>
+                          <div>Quoted</div>
+                          <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>
+                            Booked / Quoted
+                          </div>
+                        </div>
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'bookedProgress'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('bookedProgress')}
+                      >
+                        <div>
+                          <div>Booked</div>
+                          <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>
+                            Booked TEU / Potential
+                          </div>
+                        </div>
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'note'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('note')}
+                      >
+                        Note
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'tags'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('tags')}
+                      >
+                        Tags
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <TableSortLabel
+                        active={sortConfig?.key === 'salesRep'}
+                        direction={sortConfig?.direction || 'asc'}
+                        onClick={() => onSort?.('salesRep')}
+                      >
+                        S/Rep
+                      </TableSortLabel>
+                    </div>
+                    <div
+                      className={classes.headerCell}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      Actions
                     </div>
                   </div>
-                </SortableHeader>
-                <SortableHeader sortKey="note" sortConfig={sortConfig} onSort={onSort}>
-                  Note
-                </SortableHeader>
-                <SortableHeader sortKey="tags" sortConfig={sortConfig} onSort={onSort}>
-                  Tags
-                </SortableHeader>
-                <SortableHeader sortKey="salesRep" sortConfig={sortConfig} onSort={onSort}>
-                  S/Rep
-                </SortableHeader>
-                <TableCell align="center" className={classes.headerCell}>
-                  Actions
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody className={classes.table}>
-              {displayOpportunities ? (
-                displayOpportunities.map(opportunity => (
-                  <OpportunityTableRow
-                    key={opportunity.id}
-                    opportunity={opportunity}
-                    onRowClick={onRowClick}
-                  />
-                ))
-              ) : (
-                <ChartsCircularProgress />
-              )}
+              <TableRow>
+                <TableCell colSpan={20} style={{ padding: 0, border: 'none' }}>
+                  {displayOpportunities ? (
+                    // Virtualized list using react-virtualized AutoSizer + List
+                    <div style={{ height: 800, width: '100%' }}>
+                      <RVAutoSizer disableHeight>
+                        {({ width }: { width: number }) => (
+                          <RVListAny
+                            width={width}
+                            height={800}
+                            rowCount={Math.min(displayOpportunities.length, 1000)}
+                            rowHeight={56}
+                            rowRenderer={
+                              (({ index, key, style }: any) => {
+                                const opportunity = displayOpportunities[index];
+                                // Ensure the wrapper spans full width (use measured width)
+                                const rowStyle = {
+                                  ...style,
+                                  width: '100%',
+                                  height: '100%',
+                                  left: 0,
+                                  display: 'block',
+                                  boxSizing: 'border-box',
+                                } as React.CSSProperties;
+
+                                // Render virtualized row as a single grid container so columns line up
+                                // The grid container handles hover and click; OpportunityTableRow renders direct grid items
+                                return (
+                                  <div key={key} style={rowStyle}>
+                                    <div
+                                      className={classes.row}
+                                      style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: gridTemplate,
+                                        alignItems: 'center',
+                                        cursor: 'pointer',
+                                        height: 56,
+                                      }}
+                                      role="row"
+                                      onClick={() => onRowClick?.(opportunity)}
+                                    >
+                                      <OpportunityTableRow
+                                        key={opportunity.id}
+                                        opportunity={opportunity}
+                                      />
+                                    </div>
+                                  </div>
+                                );
+                              }) as ListRowRenderer
+                            }
+                          />
+                        )}
+                      </RVAutoSizer>
+                    </div>
+                  ) : (
+                    <ChartsCircularProgress />
+                  )}
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>
@@ -641,7 +911,17 @@ const opportunityTableStyles = makeStyles((theme: Theme) => ({
     paddingRight: theme.spacing(3),
     border: `1px solid ${theme.palette.divider}`,
   },
+  // Define the grid template used by virtualized rows and header
+  __colTemplate: (props: any) => ({
+    gridTemplateColumns:
+      '150px 120px 120px 120px 80px 80px 80px 80px 100px 100px 80px 100px 100px 100px 120px 120px 80px 160px 120px 80px',
+  }),
   table: {},
+  headerCellGrid: {
+    display: 'block',
+    padding: theme.spacing(1),
+    boxSizing: 'border-box',
+  },
   largeTooltip: {
     fontSize: theme.typography.body1.fontSize,
     maxWidth: 300,

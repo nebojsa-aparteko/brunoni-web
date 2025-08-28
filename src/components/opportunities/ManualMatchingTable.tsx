@@ -32,6 +32,13 @@ import useUser from '../../hooks/useUser';
 import { GlobalContext } from '../../store/GlobalStore';
 import { SHOW_SUCCESS_SNACKBAR, SHOW_ERROR_SNACKBAR } from '../../store/types/globalAppState';
 import { useOpportunities } from './OpportunitiesDataProvider';
+import { List as RVList, AutoSizer } from 'react-virtualized';
+import type { ListRowRenderer } from 'react-virtualized';
+
+// react-virtualized's exported components are JS classes that confuse TSX typing
+// create any-typed aliases for safe JSX usage
+const RVAutoSizer: any = AutoSizer as any;
+const RVListAny: any = RVList as any;
 
 const getSortValue = (match: NormalizedEntityOpportunityMatch, key: string): any => {
   const matchData = match.entityMatchData;
@@ -73,6 +80,16 @@ const sortMatches = (
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     marginBottom: theme.spacing(3),
+  },
+
+  row: {
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: 'rgba(161,213,255,0.20) !important',
+      '& > td': {
+        backgroundColor: 'inherit',
+      },
+    },
   },
 
   defaultCell: {
@@ -134,6 +151,24 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
 }));
+
+// Explicit column widths used for header cells and virtualized grid rows
+const columnWidths = [
+  '40px', // checkbox
+  '120px', // id
+  '200px', // bookingParty
+  '170px', // agreement
+  '170px', // commodity
+  '170px', // equipment
+  '170px', // placeOfReceipt
+  '170px', // portOfLoading
+  '170px', // portOfDischarge
+  '170px', // placeOfDelivery
+  '200px', // statisticalClient
+  '300px', // matchStatus
+  '80px', // actions
+];
+const gridTemplate = columnWidths.join(' ');
 
 export interface SortConfig {
   key: string;
@@ -284,7 +319,8 @@ const ManualMatchingTable: React.FC<Props> = ({
   const [, globalDispatch] = useContext(GlobalContext);
   const handleBulkAutoRematch = useCallback(
     async (selectedRows: Array<{ entity: string; entityId: string }>) => {
-      console.debug('Bulk auto rematch for selected rows:', selectedRows);
+      const forRematch = selectedRows.slice(0, 100);
+      console.debug('Bulk auto rematch for selected rows:', forRematch);
 
       try {
         const token = await user.getIdToken();
@@ -296,7 +332,7 @@ const ManualMatchingTable: React.FC<Props> = ({
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify(selectedRows),
+            body: JSON.stringify(forRematch),
           },
         );
 
@@ -310,7 +346,7 @@ const ManualMatchingTable: React.FC<Props> = ({
         // Show success message and clear selections
         globalDispatch({
           type: SHOW_SUCCESS_SNACKBAR,
-          message: `Auto rematch completed successfully for ${selectedRows.length} items`,
+          message: `Auto rematch completed successfully for ${forRematch.length} items`,
           duration: 3000,
         });
         setSelectedMatches([]);
@@ -350,6 +386,7 @@ const ManualMatchingTable: React.FC<Props> = ({
         <Paper>
           <ManualMatchingTableToolbar
             numSelected={selectedMatches.length}
+            numTotal={displayMatches.length}
             onDiscard={handleBulkDiscard}
             onAutoRematch={handleBulkAutoRematch}
             selectedRows={getSelectedMatchObjects()}
@@ -363,341 +400,523 @@ const ManualMatchingTable: React.FC<Props> = ({
             >
               <TableHead className={classes.table}>
                 <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedMatches.length === matchIds.length && matchIds.length > 0}
-                      onClick={handleSelectDeselectAll}
-                      color="primary"
-                    />
-                  </TableCell>
-                  <SortableHeader sortKey="id" sortConfig={sortConfig} onSort={onSort}>
-                    ID
-                  </SortableHeader>
-                  <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
-                    B/Party
-                  </SortableHeader>
-                  <SortableHeader sortKey="agreement" sortConfig={sortConfig} onSort={onSort}>
-                    Agreement
-                  </SortableHeader>
-                  <TableCell align="center" className={classes.headerCell}>
-                    Commodity
-                  </TableCell>
-                  <TableCell align="center" className={classes.headerCell}>
-                    Equipment
-                  </TableCell>
-                  <TableCell align="center" className={classes.headerCell}>
-                    PLR
-                  </TableCell>
-                  <TableCell align="center" className={classes.headerCell}>
-                    POL
-                  </TableCell>
-                  <TableCell align="center" className={classes.headerCell}>
-                    POD
-                  </TableCell>
-                  <TableCell align="center" className={classes.headerCell}>
-                    PLD
-                  </TableCell>
-                  <SortableHeader
-                    sortKey="statisticalClient"
-                    sortConfig={sortConfig}
-                    onSort={onSort}
-                  >
-                    S/Client
-                  </SortableHeader>
-                  <TableCell align="center" className={classes.headerCell}>
-                    Match status
-                  </TableCell>
-                  <TableCell align="center" className={classes.headerCell}>
-                    Actions
+                  <TableCell colSpan={13} style={{ padding: 0, borderBottom: 'none' }}>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: gridTemplate,
+                        alignItems: 'center',
+                      }}
+                    >
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Checkbox
+                          checked={
+                            selectedMatches.length === matchIds.length && matchIds.length > 0
+                          }
+                          onClick={handleSelectDeselectAll}
+                          color="primary"
+                        />
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'flex-start',
+                          paddingLeft: 8,
+                        }}
+                      >
+                        <TableSortLabel
+                          active={sortConfig?.key === 'id'}
+                          direction={sortConfig?.direction || 'asc'}
+                          onClick={() => onSort?.('id')}
+                        >
+                          Entity ID
+                        </TableSortLabel>
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <TableSortLabel
+                          active={sortConfig?.key === 'bookingParty'}
+                          direction={sortConfig?.direction || 'asc'}
+                          onClick={() => onSort?.('bookingParty')}
+                        >
+                          B/Party
+                        </TableSortLabel>
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <TableSortLabel
+                          active={sortConfig?.key === 'agreement'}
+                          direction={sortConfig?.direction || 'asc'}
+                          onClick={() => onSort?.('agreement')}
+                        >
+                          Agreement
+                        </TableSortLabel>
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        Commodity
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        Equipment
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        PLR
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        POL
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        POD
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        PLD
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <TableSortLabel
+                          active={sortConfig?.key === 'statisticalClient'}
+                          direction={sortConfig?.direction || 'asc'}
+                          onClick={() => onSort?.('statisticalClient')}
+                        >
+                          S/Client
+                        </TableSortLabel>
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        Match status
+                      </div>
+                      <div
+                        className={classes.headerCell}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        Actions
+                      </div>
+                    </div>
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody className={classes.table}>
-                {displayMatches.map((match, index) => {
-                  const matchData = match.entityMatchData;
+                <TableRow>
+                  <TableCell colSpan={13} style={{ padding: 0, border: 'none' }}>
+                    {displayMatches ? (
+                      <div style={{ height: 800, width: '100%' }}>
+                        <RVAutoSizer disableHeight>
+                          {({ width }: { width: number }) => (
+                            <RVListAny
+                              width={width}
+                              height={800}
+                              rowCount={Math.min(displayMatches.length, 1000)}
+                              rowHeight={56}
+                              rowRenderer={
+                                (({ index, key, style }: any) => {
+                                  const match = displayMatches[index];
+                                  const matchData = match.entityMatchData;
 
-                  const renderEquipmentArrayItems = (items: any[]) => {
-                    if (!items || items.length === 0) return '';
+                                  // helpers reused from previous implementation
+                                  const renderEquipmentArrayItems = (items: any[]) => {
+                                    if (!items || items.length === 0) return '';
 
-                    const visibleItems = items.slice(0, 2);
-                    const remainingItems = items.slice(2);
+                                    const visibleItems = items.slice(0, 2);
+                                    const remainingItems = items.slice(2);
 
-                    return (
-                      <div>
-                        {visibleItems.map((item, idx) => (
-                          <div
-                            key={idx}
-                            style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
-                          >
-                            {item.value?.name}
-                          </div>
-                        ))}
-                        {remainingItems.length > 0 && (
-                          <Tooltip
-                            title={
-                              <div>
-                                {remainingItems.map((item, idx) => (
-                                  <div key={idx}>{item.value?.name}</div>
-                                ))}
-                              </div>
-                            }
-                            arrow
-                            placement="top"
-                          >
-                            <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
-                              +{remainingItems.length} more
-                            </span>
-                          </Tooltip>
-                        )}
-                      </div>
-                    );
-                  };
-                  const renderCommodityArrayItems = (items: any[]) => {
-                    if (!items || items.length === 0) return '';
+                                    return (
+                                      <div>
+                                        {visibleItems.map((item, idx) => (
+                                          <div
+                                            key={idx}
+                                            style={{
+                                              marginBottom: idx < visibleItems.length - 1 ? 4 : 0,
+                                            }}
+                                          >
+                                            {item.value?.name}
+                                          </div>
+                                        ))}
+                                        {remainingItems.length > 0 && (
+                                          <Tooltip
+                                            title={
+                                              <div>
+                                                {remainingItems.map((item, idx) => (
+                                                  <div key={idx}>{item.value?.name}</div>
+                                                ))}
+                                              </div>
+                                            }
+                                            arrow
+                                            placement="top"
+                                          >
+                                            <span
+                                              style={{
+                                                color: '#666',
+                                                fontSize: '0.875em',
+                                                cursor: 'help',
+                                              }}
+                                            >
+                                              +{remainingItems.length} more
+                                            </span>
+                                          </Tooltip>
+                                        )}
+                                      </div>
+                                    );
+                                  };
+                                  const renderCommodityArrayItems = (items: any[]) => {
+                                    if (!items || items.length === 0) return '';
 
-                    const visibleItems = items.slice(0, 2);
-                    const remainingItems = items.slice(2);
+                                    const visibleItems = items.slice(0, 2);
+                                    const remainingItems = items.slice(2);
 
-                    return (
-                      <div>
-                        {visibleItems.map((item, idx) => (
-                          <div
-                            key={idx}
-                            style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
-                          >
-                            {item.definition.type === 'groupId'
-                              ? (item.value as OpportunityCommodityGroup)?.name || item.value
-                              : item.value}
-                          </div>
-                        ))}
-                        {remainingItems.length > 0 && (
-                          <Tooltip
-                            title={
-                              <div>
-                                {remainingItems.map((item, idx) => (
-                                  <div key={idx}>
-                                    {item.definition.type === 'groupId'
-                                      ? (item.value as OpportunityCommodityGroup)?.name ||
-                                        item.value
-                                      : item.value}
-                                  </div>
-                                ))}
-                              </div>
-                            }
-                            arrow
-                            placement="top"
-                          >
-                            <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
-                              +{remainingItems.length} more
-                            </span>
-                          </Tooltip>
-                        )}
-                      </div>
-                    );
-                  };
-                  const renderPlacesArrayItems = (items: any[]) => {
-                    if (!items || items.length === 0) return '';
+                                    return (
+                                      <div>
+                                        {visibleItems.map((item, idx) => (
+                                          <div
+                                            key={idx}
+                                            style={{
+                                              marginBottom: idx < visibleItems.length - 1 ? 4 : 0,
+                                            }}
+                                          >
+                                            {item.definition.type === 'groupId'
+                                              ? (item.value as OpportunityCommodityGroup)?.name ||
+                                                item.value
+                                              : item.value}
+                                          </div>
+                                        ))}
+                                        {remainingItems.length > 0 && (
+                                          <Tooltip
+                                            title={
+                                              <div>
+                                                {remainingItems.map((item, idx) => (
+                                                  <div key={idx}>
+                                                    {item.definition.type === 'groupId'
+                                                      ? (item.value as OpportunityCommodityGroup)
+                                                          ?.name || item.value
+                                                      : item.value}
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            }
+                                            arrow
+                                            placement="top"
+                                          >
+                                            <span
+                                              style={{
+                                                color: '#666',
+                                                fontSize: '0.875em',
+                                                cursor: 'help',
+                                              }}
+                                            >
+                                              +{remainingItems.length} more
+                                            </span>
+                                          </Tooltip>
+                                        )}
+                                      </div>
+                                    );
+                                  };
+                                  const renderPlacesArrayItems = (items: any[]) => {
+                                    if (!items || items.length === 0) return '';
 
-                    const visibleItems = items.slice(0, 2);
-                    const remainingItems = items.slice(2);
+                                    const visibleItems = items.slice(0, 2);
+                                    const remainingItems = items.slice(2);
 
-                    return (
-                      <div>
-                        {visibleItems.map((item, idx) => (
-                          <div
-                            key={idx}
-                            style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
-                          >
-                            {item.definition.type === 'groupId'
-                              ? (item.value as OpportunityCommodityGroup)?.name || item.value
-                              : item.value}
-                          </div>
-                        ))}
-                        {remainingItems.length > 0 && (
-                          <Tooltip
-                            title={
-                              <div>
-                                {remainingItems.map((item, idx) => (
-                                  <div key={idx}>
-                                    {item.definition.type === 'groupId'
-                                      ? (item.value as OpportunityCommodityGroup)?.name ||
-                                        item.value
-                                      : item.value}
-                                  </div>
-                                ))}
-                              </div>
-                            }
-                            arrow
-                            placement="top"
-                          >
-                            <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
-                              +{remainingItems.length} more
-                            </span>
-                          </Tooltip>
-                        )}
-                      </div>
-                    );
-                  };
-                  const renderPortsArrayItems = (items: any[]) => {
-                    if (!items || items.length === 0) return '';
+                                    return (
+                                      <div>
+                                        {visibleItems.map((item, idx) => (
+                                          <div
+                                            key={idx}
+                                            style={{
+                                              marginBottom: idx < visibleItems.length - 1 ? 4 : 0,
+                                            }}
+                                          >
+                                            {item.definition.type === 'groupId'
+                                              ? (item.value as OpportunityCommodityGroup)?.name ||
+                                                item.value
+                                              : item.value}
+                                          </div>
+                                        ))}
+                                        {remainingItems.length > 0 && (
+                                          <Tooltip
+                                            title={
+                                              <div>
+                                                {remainingItems.map((item, idx) => (
+                                                  <div key={idx}>
+                                                    {item.definition.type === 'groupId'
+                                                      ? (item.value as OpportunityCommodityGroup)
+                                                          ?.name || item.value
+                                                      : item.value}
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            }
+                                            arrow
+                                            placement="top"
+                                          >
+                                            <span
+                                              style={{
+                                                color: '#666',
+                                                fontSize: '0.875em',
+                                                cursor: 'help',
+                                              }}
+                                            >
+                                              +{remainingItems.length} more
+                                            </span>
+                                          </Tooltip>
+                                        )}
+                                      </div>
+                                    );
+                                  };
+                                  const renderPortsArrayItems = (items: any[]) => {
+                                    if (!items || items.length === 0) return '';
 
-                    const visibleItems = items.slice(0, 2);
-                    const remainingItems = items.slice(2);
+                                    const visibleItems = items.slice(0, 2);
+                                    const remainingItems = items.slice(2);
 
-                    return (
-                      <div>
-                        {visibleItems.map((item, idx) => (
-                          <div
-                            key={idx}
-                            style={{ marginBottom: idx < visibleItems.length - 1 ? 4 : 0 }}
-                          >
-                            {item.definition.type === 'groupId'
-                              ? (item.value as OpportunityCommodityGroup)?.name || item.value
-                              : item.definition.type === 'portId'
-                                ? `${(item.value as Port)?.city} ${(item.value as Port)?.id}`
-                                : item.value}
-                          </div>
-                        ))}
-                        {remainingItems.length > 0 && (
-                          <Tooltip
-                            title={
-                              <div>
-                                {remainingItems.map((item, idx) => (
-                                  <div key={idx}>
-                                    {item.definition.type === 'groupId'
-                                      ? (item.value as OpportunityCommodityGroup)?.name ||
-                                        item.value
-                                      : item.definition.type === 'portId'
-                                        ? `${(item.value as Port).city} ${(item.value as Port).id}`
-                                        : item.value}
-                                  </div>
-                                ))}
-                              </div>
-                            }
-                            arrow
-                            placement="top"
-                          >
-                            <span style={{ color: '#666', fontSize: '0.875em', cursor: 'help' }}>
-                              +{remainingItems.length} more
-                            </span>
-                          </Tooltip>
-                        )}
-                      </div>
-                    );
-                  };
+                                    return (
+                                      <div>
+                                        {visibleItems.map((item, idx) => (
+                                          <div
+                                            key={idx}
+                                            style={{
+                                              marginBottom: idx < visibleItems.length - 1 ? 4 : 0,
+                                            }}
+                                          >
+                                            {item.definition.type === 'groupId'
+                                              ? (item.value as OpportunityCommodityGroup)?.name ||
+                                                item.value
+                                              : item.definition.type === 'portId'
+                                                ? `${(item.value as Port)?.city} ${(item.value as Port)?.id}`
+                                                : item.value}
+                                          </div>
+                                        ))}
+                                        {remainingItems.length > 0 && (
+                                          <Tooltip
+                                            title={
+                                              <div>
+                                                {remainingItems.map((item, idx) => (
+                                                  <div key={idx}>
+                                                    {item.definition.type === 'groupId'
+                                                      ? (item.value as OpportunityCommodityGroup)
+                                                          ?.name || item.value
+                                                      : item.definition.type === 'portId'
+                                                        ? `${(item.value as Port).city} ${(item.value as Port).id}`
+                                                        : item.value}
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            }
+                                            arrow
+                                            placement="top"
+                                          >
+                                            <span
+                                              style={{
+                                                color: '#666',
+                                                fontSize: '0.875em',
+                                                cursor: 'help',
+                                              }}
+                                            >
+                                              +{remainingItems.length} more
+                                            </span>
+                                          </Tooltip>
+                                        )}
+                                      </div>
+                                    );
+                                  };
 
-                  const renderCompanyInfo = (company: any) => {
-                    if (!company) return '';
-                    return (
-                      <div>
-                        <div>{company?.name || ''}</div>
-                        {company?.city && (
-                          <div style={{ fontSize: '0.875em', color: '#666' }}>{company.city}</div>
-                        )}
-                      </div>
-                    );
-                  };
+                                  const renderCompanyInfo = (company: any) => {
+                                    if (!company) return '';
+                                    return (
+                                      <div>
+                                        <div>{company?.name || ''}</div>
+                                        {company?.city && (
+                                          <div style={{ fontSize: '0.875em', color: '#666' }}>
+                                            {company.city}
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  };
 
-                  const renderOpportunityInfo = (opportunityId?: string) => {
-                    const opportunity = opportunities?.find(op => op.id === opportunityId);
-                    if (!opportunity) return '';
-                    return (
-                      <div>
-                        <div>{opportunityToString(opportunity) || ''}</div>
-                      </div>
-                    );
-                  };
+                                  const renderOpportunityInfo = (opportunityId?: string) => {
+                                    const opportunity = opportunities?.find(
+                                      op => op.id === opportunityId,
+                                    );
+                                    if (!opportunity) return '';
+                                    return (
+                                      <div
+                                        style={{
+                                          textOverflow: 'ellipsis',
+                                          overflow: 'hidden',
+                                          whiteSpace: 'nowrap',
+                                        }}
+                                      >
+                                        {opportunityToString(opportunity) || ''}
+                                      </div>
+                                    );
+                                  };
 
-                  const renderEntityInfo = (item: NormalizedEntityOpportunityMatch) => {
-                    if (!item) return '';
-                    const handleLinkClick = (e: React.MouseEvent) => {
-                      e.stopPropagation();
-                      if (onRowClick) {
-                        onRowClick(item);
-                      }
-                    };
-                    return (
-                      <Link
-                        component="button"
-                        variant="body2"
-                        className={classes.entityLink}
-                        onClick={handleLinkClick}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <div>
-                          <div>{item.entityId || ''}</div>
-                          {item.entity && (
-                            <div style={{ fontSize: '0.875em', color: '#666' }}>{item.entity}</div>
+                                  const renderEntityInfo = (
+                                    item: NormalizedEntityOpportunityMatch,
+                                  ) => {
+                                    if (!item) return '';
+                                    const handleLinkClick = (e: React.MouseEvent) => {
+                                      e.stopPropagation();
+                                      if (onRowClick) {
+                                        onRowClick(item);
+                                      }
+                                    };
+                                    return (
+                                      <Link
+                                        component="button"
+                                        variant="body2"
+                                        className={classes.entityLink}
+                                        onClick={handleLinkClick}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                      >
+                                        <div>
+                                          <div>{item.entityId || ''}</div>
+                                          {item.entity && (
+                                            <div style={{ fontSize: '0.875em', color: '#666' }}>
+                                              {item.entity}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </Link>
+                                    );
+                                  };
+
+                                  const matchId = `${match.entity}-${match.entityId}`;
+                                  const isSelected = selectedMatches.includes(matchId);
+
+                                  const rowStyle = {
+                                    ...style,
+                                    width: '100%',
+                                    height: '100%',
+                                    left: 0,
+                                    display: 'block',
+                                    boxSizing: 'border-box',
+                                  } as React.CSSProperties;
+
+                                  return (
+                                    <div key={key} style={rowStyle}>
+                                      <div
+                                        className={classes.row}
+                                        style={{
+                                          display: 'grid',
+                                          gridTemplateColumns: gridTemplate,
+                                          alignItems: 'center',
+                                          cursor: 'pointer',
+                                          height: 56,
+                                        }}
+                                        role="row"
+                                      >
+                                        <div style={{ textAlign: 'center' }}>
+                                          <Checkbox
+                                            checked={isSelected}
+                                            onClick={(event: React.MouseEvent) =>
+                                              onSelectRow(event as any, matchId)
+                                            }
+                                            color="primary"
+                                          />
+                                        </div>
+                                        <div style={{ paddingLeft: 4, textAlign: 'left' }}>
+                                          {renderEntityInfo(match)}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                          {renderCompanyInfo(matchData?.bookingPartyId)}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                          {matchData?.agreementId || ''}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                          {renderCommodityArrayItems(matchData?.commodity || [])}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                          {renderEquipmentArrayItems(matchData?.equipment || [])}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                          {renderPlacesArrayItems(matchData?.placeOfReceipt || [])}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                          {renderPortsArrayItems(matchData?.portOfLoading || [])}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                          {renderPortsArrayItems(matchData?.portOfDischarge || [])}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                          {renderPlacesArrayItems(matchData?.placeOfDelivery || [])}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                          {renderCompanyInfo(matchData?.statisticalClientId)}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                          {match.status === OpportunityMatchStatus.Matched && (
+                                            <div>
+                                              <Chip label="Matched" color="primary" size="small" />{' '}
+                                              {renderOpportunityInfo(match.opportunityId)}
+                                            </div>
+                                          )}
+                                          {match.status === OpportunityMatchStatus.Unmatched && (
+                                            <Chip
+                                              label="Unmatched"
+                                              color="secondary"
+                                              size="small"
+                                            />
+                                          )}
+                                          {match.status === OpportunityMatchStatus.Discarded && (
+                                            <Chip label="Discarded" color="default" size="small" />
+                                          )}
+                                        </div>
+                                        <div style={{ textAlign: 'center' }}>
+                                          <Tooltip title="Actions">
+                                            <IconButton
+                                              size="small"
+                                              onClick={e => handleMenuClick(e, match)}
+                                            >
+                                              <MoreVertIcon />
+                                            </IconButton>
+                                          </Tooltip>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                }) as ListRowRenderer
+                              }
+                            />
                           )}
-                        </div>
-                      </Link>
-                    );
-                  };
-
-                  const matchId = `${match.entity}-${match.entityId}`;
-                  const isSelected = selectedMatches.includes(matchId);
-
-                  return (
-                    <TableRow
-                      key={`${match.entity}-${match.entityId}-${index}`}
-                      tabIndex={-1}
-                      selected={isSelected}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={isSelected}
-                          onClick={event => onSelectRow(event, matchId)}
-                          color="primary"
-                        />
-                      </TableCell>
-                      <TableCell align="center">{renderEntityInfo(match)}</TableCell>
-                      <TableCell align="center">
-                        {renderCompanyInfo(matchData?.bookingPartyId)}
-                      </TableCell>
-                      <TableCell align="center">{matchData?.agreementId || ''}</TableCell>
-                      <TableCell align="center">
-                        {renderCommodityArrayItems(matchData?.commodity || [])}
-                      </TableCell>
-                      <TableCell align="center">
-                        {renderEquipmentArrayItems(matchData?.equipment || [])}
-                      </TableCell>
-                      <TableCell align="center">
-                        {renderPlacesArrayItems(matchData?.placeOfReceipt || [])}
-                      </TableCell>
-                      <TableCell align="center">
-                        {renderPortsArrayItems(matchData?.portOfLoading || [])}
-                      </TableCell>
-                      <TableCell align="center">
-                        {renderPortsArrayItems(matchData?.portOfDischarge || [])}
-                      </TableCell>
-                      <TableCell align="center">
-                        {renderPlacesArrayItems(matchData?.placeOfDelivery || [])}
-                      </TableCell>
-                      <TableCell align="center">
-                        {renderCompanyInfo(matchData?.statisticalClientId)}
-                      </TableCell>
-                      <TableCell align="center">
-                        {match.status === OpportunityMatchStatus.Matched && (
-                          <div>{renderOpportunityInfo(match.opportunityId)}</div>
-                        )}
-                        {match.status === OpportunityMatchStatus.Unmatched && (
-                          <Chip label="Unmatched" color="secondary" size="small" />
-                        )}
-                        {match.status === OpportunityMatchStatus.Discarded && (
-                          <Chip label="Discarded" color="default" size="small" />
-                        )}
-                      </TableCell>
-                      <TableCell align="center">
-                        <Tooltip title="Actions">
-                          <IconButton size="small" onClick={e => handleMenuClick(e, match)}>
-                            <MoreVertIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                        </RVAutoSizer>
+                      </div>
+                    ) : (
+                      <div className={classes.emptyMessage}>No matches</div>
+                    )}
+                  </TableCell>
+                </TableRow>
               </TableBody>
             </Table>
           </TableContainer>

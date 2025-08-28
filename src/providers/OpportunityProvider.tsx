@@ -4,6 +4,7 @@ import invoke from 'lodash/fp/invoke';
 import map from 'lodash/fp/map';
 import filter from 'lodash/fp/filter';
 import { OpportunityMatchDefinition } from '../model/Opportunity';
+
 export const normalizeOpportunity = (
   getUser: (id: string) => any,
   getClient: (id: string) => any,
