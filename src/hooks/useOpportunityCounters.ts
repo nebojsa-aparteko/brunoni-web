@@ -70,12 +70,6 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
 
       const results = await Promise.all(counterPromises);
 
-      // setFetchedIds(prevFetched => {
-      //   const newFetched = new Set(prevFetched);
-      //   idsToFetch.forEach(id => newFetched.add(id));
-      //   return newFetched;
-      // });
-
       setCounters(prevCounters => {
         const newCounters = { ...prevCounters };
 
