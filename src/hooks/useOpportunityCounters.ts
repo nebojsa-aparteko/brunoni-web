@@ -2,90 +2,78 @@ import { useEffect, useMemo, useState } from 'react';
 import firebase from '../firebase';
 import { OpportunityCounter } from '../model/Opportunity';
 
-interface OpportunityCounters {
-  [opportunityId: string]: {
-    booked: number;
-    quoted: number;
-    bookedTEU: number;
-    quotedTEU: number;
-  };
-}
+type OpportunityCounters = Map<
+  string,
+  { booked: number; quoted: number; bookedTEU: number; quotedTEU: number }
+>;
+
+const getCountersForOpportunity = async (opportunityId: string, year: number) => {
+  try {
+    const countersSnapshot = await firebase
+      .firestore()
+      .collection('opportunities')
+      .doc(opportunityId)
+      .collection('counters')
+      .where('year', '==', year)
+      .get();
+
+    let booked = 0;
+    let quoted = 0;
+    let bookedTEU = 0;
+    let quotedTEU = 0;
+
+    countersSnapshot.docs.forEach(doc => {
+      const counter = doc.data() as OpportunityCounter;
+      if (counter.entity === 'booking') {
+        booked += counter.count || 0;
+        bookedTEU += counter.teuCount || 0;
+      } else if (counter.entity === 'quote') {
+        quoted += counter.count || 0;
+        quotedTEU += counter.teuCount || 0;
+      }
+    });
+
+    return {
+      opportunityId,
+      booked,
+      quoted,
+      bookedTEU,
+      quotedTEU,
+    };
+  } catch (error) {
+    console.error(`Error fetching counters for opportunity ${opportunityId}:`, error);
+    return {
+      opportunityId,
+      booked: 0,
+      quoted: 0,
+      bookedTEU: 0,
+      quotedTEU: 0,
+    };
+  }
+};
 
 export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCounters => {
-  const [counters, setCounters] = useState<OpportunityCounters>({});
+  const [counters, setCounters] = useState<OpportunityCounters>(new Map());
 
   useEffect(() => {
     if (!opportunityIds.length) {
-      setCounters({});
+      setCounters(new Map());
       return;
     }
 
     const currentYear = new Date().getFullYear();
 
     const fetchCounters = async () => {
-      const counterPromises = opportunityIds.map(async opportunityId => {
-        try {
-          const countersSnapshot = await firebase
-            .firestore()
-            .collection('opportunities')
-            .doc(opportunityId)
-            .collection('counters')
-            .where('year', '==', currentYear)
-            .get();
-
-          let booked = 0;
-          let quoted = 0;
-          let bookedTEU = 0;
-          let quotedTEU = 0;
-
-          countersSnapshot.docs.forEach(doc => {
-            const counter = doc.data() as OpportunityCounter;
-            if (counter.entity === 'booking') {
-              booked += counter.count || 0;
-              bookedTEU += counter.teuCount || 0;
-            } else if (counter.entity === 'quote') {
-              quoted += counter.count || 0;
-              quotedTEU += counter.teuCount || 0;
-            }
-          });
-
-          return {
-            opportunityId,
-            booked,
-            quoted,
-            bookedTEU,
-            quotedTEU,
-          };
-        } catch (error) {
-          console.error(`Error fetching counters for opportunity ${opportunityId}:`, error);
-          return {
-            opportunityId,
-            booked: 0,
-            quoted: 0,
-            bookedTEU: 0,
-            quotedTEU: 0,
-          };
-        }
-      });
-
-      const results = await Promise.all(counterPromises);
-
-      // setFetchedIds(prevFetched => {
-      //   const newFetched = new Set(prevFetched);
-      //   idsToFetch.forEach(id => newFetched.add(id));
-      //   return newFetched;
-      // });
+      const results = await Promise.all(
+        opportunityIds.map(async opportunityId => {
+          return getCountersForOpportunity(opportunityId, currentYear);
+        }),
+      );
 
       setCounters(prevCounters => {
-        const newCounters = { ...prevCounters };
-
-        results.forEach(({ opportunityId, booked, quoted, bookedTEU, quotedTEU }) => {
-          newCounters[opportunityId] = { booked, quoted, bookedTEU, quotedTEU };
-        });
-
         const hasChanged = results.some(
           ({ opportunityId, booked, quoted, bookedTEU, quotedTEU }) => {
-            const prev = prevCounters[opportunityId];
+            const prev = prevCounters.get(opportunityId);
             return (
               !prev ||
               prev.booked !== booked ||
@@ -96,7 +84,16 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
           },
         );
 
-        return hasChanged ? newCounters : prevCounters;
+        // if not changed, do not update state
+        if (!hasChanged) {
+          return prevCounters;
+        }
+
+        const newCounters = new Map(prevCounters);
+        results.forEach(({ opportunityId, booked, quoted, bookedTEU, quotedTEU }) => {
+          newCounters.set(opportunityId, { booked, quoted, bookedTEU, quotedTEU });
+        });
+        return newCounters;
       });
     };
 

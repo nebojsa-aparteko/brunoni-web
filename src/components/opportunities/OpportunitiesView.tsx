@@ -215,7 +215,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
           return false;
         }
       }
-      console.debug('filters', filters);
       return true;
     });
   }, [opportunities, filters]);
