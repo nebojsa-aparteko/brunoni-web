@@ -810,7 +810,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
                           <RVListAny
                             width={width}
                             height={800}
-                            rowCount={Math.min(displayOpportunities.length, 1000)}
+                            rowCount={displayOpportunities.length}
                             rowHeight={56}
                             rowRenderer={
                               (({ index, key, style }: any) => {

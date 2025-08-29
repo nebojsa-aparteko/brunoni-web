@@ -14,10 +14,10 @@ const useOpportunitiesWithSalesRep = (): NormalizedOpportunity[] | undefined => 
 
   const normalizator = useOpportunityDefinitionNormalizer();
   const counters = useOpportunityCounters(opportunityIds);
-  const getCounters = (id: string) =>
-    counters.get(id) || { booked: 0, quoted: 0, bookedTEU: 0, quotedTEU: 0 };
 
   return useMemo(() => {
+    const defaultCounters = { booked: 0, quoted: 0, bookedTEU: 0, quotedTEU: 0 };
+
     return opportunitySnapshot?.docs?.map(doc =>
       normalizeOpportunity(
         normalizator.getUser,
@@ -27,7 +27,7 @@ const useOpportunitiesWithSalesRep = (): NormalizedOpportunity[] | undefined => 
         normalizator.getCommodityGroup,
         normalizator.getEquipmentGroup,
         normalizator.getTag,
-        getCounters,
+        (id: string) => counters.get(id) || defaultCounters,
       )({ id: doc.id, ...doc.data() }),
     );
   }, [opportunitySnapshot?.docs, normalizator, counters]);
