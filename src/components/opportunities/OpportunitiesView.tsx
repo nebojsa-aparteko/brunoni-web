@@ -328,7 +328,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
             ) : (
               <OpportunityTable
                 opportunities={filteredOpportunities}
-                onRowClick={handleEditOpportunity}
+                editOpportunity={handleEditOpportunity}
                 sortConfig={sortConfig}
                 onSort={handleSort}
               />

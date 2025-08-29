@@ -25,9 +25,9 @@ import CreateOpportunityTaskDialog from './CreateOpportunityTaskDialog';
 
 // Explicit column widths used for header cells and virtualized grid rows
 const columnWidths = [
-  '100px', // id
+  '60px', // id
   '150px', // bookingParty
-  '100px', // bookingPartyRep
+  '90px', // bookingPartyRep
   '150px', // statisticalClient
   '120px', // placeOfReceipt
   '120px', // portOfLoading
@@ -43,7 +43,7 @@ const columnWidths = [
   '120px', // bookedProgress
   '40px', // note
   '300px', // tags
-  '100px', // salesRep
+  '90px', // salesRep
   '80px', // actions
 ];
 const gridTemplate = columnWidths.join(' ');
@@ -185,14 +185,14 @@ export interface SortConfig {
 
 interface OpportunityTableProps {
   opportunities: NormalizedOpportunity[] | undefined;
-  onRowClick?: (opportunity: NormalizedOpportunity) => void;
+  editOpportunity?: (opportunity: NormalizedOpportunity) => void;
   sortConfig?: SortConfig;
   onSort?: (key: string) => void;
 }
 
 interface OpportunityTableRowProps {
   opportunity: NormalizedOpportunity;
-  onRowClick?: (opportunity: NormalizedOpportunity) => void;
+  editOpportunity?: (opportunity: NormalizedOpportunity) => void;
 }
 
 interface SortableHeaderProps {
@@ -235,7 +235,10 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   );
 };
 
-const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }) => {
+const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({
+  opportunity,
+  editOpportunity,
+}) => {
   const classes = opportunityTableStyles({});
   const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -254,6 +257,13 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }
     setCreateTaskDialogOpen(true);
     handleMenuClose();
   };
+
+  const handleOpportunityEdit = (event?: React.MouseEvent) => {
+    event?.stopPropagation();
+    editOpportunity?.(opportunity);
+    handleMenuClose();
+  };
+
   const placeOfReceipt =
     opportunity.placeOfReceipt?.definition.type === 'groupId'
       ? String(
@@ -494,6 +504,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }
       />
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={e => handleCreateTaskClick(e)}>Create New Task</MenuItem>
+        <MenuItem onClick={e => handleOpportunityEdit(e)}>Edit Opportunity</MenuItem>
       </Menu>
     </>
   );
@@ -501,7 +512,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }
 
 const OpportunityTable: React.FC<OpportunityTableProps> = ({
   opportunities,
-  onRowClick,
+  editOpportunity,
   sortConfig,
   onSort,
 }) => {
@@ -549,7 +560,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
                         direction={sortConfig?.direction || 'asc'}
                         onClick={() => onSort?.('id')}
                       >
-                        Opportunity Number
+                        #
                       </TableSortLabel>
                     </div>
                     <div
@@ -824,15 +835,15 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
                                         display: 'grid',
                                         gridTemplateColumns: gridTemplate,
                                         alignItems: 'center',
-                                        cursor: 'pointer',
+                                        // cursor: 'pointer',
                                         height: 56,
                                       }}
                                       role="row"
-                                      onClick={() => onRowClick?.(opportunity)}
                                     >
                                       <OpportunityTableRow
                                         key={opportunity.id}
                                         opportunity={opportunity}
+                                        editOpportunity={editOpportunity}
                                       />
                                     </div>
                                   </div>
@@ -863,7 +874,7 @@ const opportunityTableStyles = makeStyles((theme: Theme) => ({
     marginBottom: theme.spacing(3),
   },
   row: {
-    cursor: 'pointer',
+    // cursor: 'pointer',
     '&:hover': {
       backgroundColor: 'rgba(161,213,255,0.20) !important',
       '& > td': {
@@ -907,8 +918,10 @@ const opportunityTableStyles = makeStyles((theme: Theme) => ({
   },
   root: {
     position: 'relative',
-    left: theme.spacing(3),
-    paddingRight: theme.spacing(3),
+    left: 0,
+    paddingRight: 0,
+    paddingLeft: 0,
+    margin: 0,
     border: `1px solid ${theme.palette.divider}`,
   },
   // Define the grid template used by virtualized rows and header
