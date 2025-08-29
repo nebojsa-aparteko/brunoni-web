@@ -128,8 +128,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   root: {
     position: 'relative',
-    left: theme.spacing(3),
-    paddingRight: theme.spacing(3),
+    left: 0,
+    paddingRight: 0,
+    paddingLeft: 0,
+    margin: 0,
     border: `1px solid ${theme.palette.divider}`,
   },
   table: {},
@@ -228,13 +230,6 @@ const ManualMatchingTable: React.FC<Props> = ({
   sortConfig,
   onSort,
 }) => {
-  console.debug('ManualMatchingTable props', {
-    opportunityMatches,
-    onMatchOpportunity,
-    onCreateNewOpportunity,
-    onBulkDiscardMatches,
-    onUnmatchOpportunity,
-  });
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedMatch, setSelectedMatch] = useState<NormalizedEntityOpportunityMatch | null>(null);
@@ -877,10 +872,7 @@ const ManualMatchingTable: React.FC<Props> = ({
                                         </div>
                                         <div style={{ textAlign: 'center' }}>
                                           {match.status === OpportunityMatchStatus.Matched && (
-                                            <div>
-                                              <Chip label="Matched" color="primary" size="small" />{' '}
-                                              {renderOpportunityInfo(match.opportunityId)}
-                                            </div>
+                                            <div>{renderOpportunityInfo(match.opportunityId)}</div>
                                           )}
                                           {match.status === OpportunityMatchStatus.Unmatched && (
                                             <Chip
