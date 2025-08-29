@@ -30,7 +30,6 @@ import { isDashboardUser } from './model/UserRecord';
 import ClientsContext from './contexts/ClientsContext';
 import ClientUsersProvider from './providers/ClientUsersProvider';
 import GlobalStore from './store/GlobalStore';
-import { createRoot } from 'react-dom/client';
 import { showCrispChat } from './CrispChat';
 
 // Environment variables are handled by Vite automatically
@@ -157,12 +156,6 @@ const MainApp: React.FC = () => {
   const [user, setUser] = useState<firebase.User | null | undefined>(undefined);
   const [fontLoaded, setFontLoaded] = useState(false);
 
-  // Debug: Track MainApp renders
-  useEffect(() => {
-    console.log('🔄 MainApp mounted at:', new Date().toISOString());
-    return () => console.log('🔄 MainApp unmounted at:', new Date().toISOString());
-  }, []);
-
   useEffect(() => {
     // Handle font loading
     appFont
@@ -244,50 +237,12 @@ const MainApp: React.FC = () => {
               <RouteSearchProvider>
                 {user ? (
                   <UserContext.Provider value={user}>
-                    <UserRecordProvider>
-                      <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
-                        <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                          <FirestoreCollectionProvider
-                            name="container-types"
-                            context={ContainerTypesContext}
-                          >
-                            <SpecialOffersProvider>
-                              <FirestoreCollectionProvider
-                                name="commodity-types"
-                                context={CommodityTypesContext}
-                              >
-                                <FirestoreCollectionProvider
-                                  name="pickup-locations"
-                                  context={PickupLocationsContext}
-                                >
-                                  <ActingAsProvider>
-                                    <UserApp />
-                                  </ActingAsProvider>
-                                </FirestoreCollectionProvider>
-                              </FirestoreCollectionProvider>
-                            </SpecialOffersProvider>
-                          </FirestoreCollectionProvider>
-                        </FirestoreCollectionProvider>
-                      </FirestoreCollectionProvider>
-                    </UserRecordProvider>
+                    <AuthenticatedMain />
                   </UserContext.Provider>
                 ) : (
                   <LoginDialogProvider>
                     <UserContext.Provider value={null}>
-                      <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
-                        <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                          <FirestoreCollectionProvider
-                            name="container-types"
-                            context={ContainerTypesContext}
-                          >
-                            <SpecialOffersProvider>
-                              <ActingAsProvider anonymous>
-                                <App />
-                              </ActingAsProvider>
-                            </SpecialOffersProvider>
-                          </FirestoreCollectionProvider>
-                        </FirestoreCollectionProvider>
-                      </FirestoreCollectionProvider>
+                      <AnonymousMain />
                     </UserContext.Provider>
                   </LoginDialogProvider>
                 )}
@@ -299,5 +254,39 @@ const MainApp: React.FC = () => {
     </Router>
   );
 };
+
+const AuthenticatedMain = () => (
+  <UserRecordProvider>
+    <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
+      <FirestoreCollectionProvider name="ports" context={PortsContext}>
+        <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
+          <SpecialOffersProvider>
+            <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
+              <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
+                <ActingAsProvider>
+                  <UserApp />
+                </ActingAsProvider>
+              </FirestoreCollectionProvider>
+            </FirestoreCollectionProvider>
+          </SpecialOffersProvider>
+        </FirestoreCollectionProvider>
+      </FirestoreCollectionProvider>
+    </FirestoreCollectionProvider>
+  </UserRecordProvider>
+);
+
+const AnonymousMain = () => (
+  <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
+    <FirestoreCollectionProvider name="ports" context={PortsContext}>
+      <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
+        <SpecialOffersProvider>
+          <ActingAsProvider anonymous>
+            <App />
+          </ActingAsProvider>
+        </SpecialOffersProvider>
+      </FirestoreCollectionProvider>
+    </FirestoreCollectionProvider>
+  </FirestoreCollectionProvider>
+);
 
 export default MainApp;

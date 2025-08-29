@@ -15,6 +15,7 @@ import {
   Container,
   Drawer,
   Grid,
+  Hidden,
   List,
   ListItem,
   ListItemIcon,
@@ -24,10 +25,9 @@ import {
   Theme,
   Toolbar,
   Typography,
-  Hidden,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
-import { Link, ButtonLink, MenuItemLink } from './Link';
+import { ButtonLink, Link, MenuItemLink } from './Link';
 import IdentityWidget from './IdentityWidget';
 import useUser from '../hooks/useUser';
 import IconButton from '@material-ui/core/IconButton';
@@ -47,7 +47,6 @@ import GuideButton from './GuideButton';
 import Shepherd from 'shepherd.js';
 import { bookingsTableShepherdTour } from './guides/BookingsTableGuide';
 import { quotesShepherdTour } from './guides/QuotesGuide';
-import { dashboardShepherdTour } from './guides/DashboardGuide';
 import { scheduleShepherdTour } from './guides/ScheduleGuide';
 import { myDayShepherdTour } from './guides/MyDayGuide';
 import { bookingShepherdTour } from './guides/BookingGuide';
@@ -226,11 +225,36 @@ function ButtonMenuItem(props: ListItemLinkProps) {
   );
 }
 
+const CityClock = ({ clock }: { clock: { timeZone: string; city: string } }) => {
+  const zonedTime = useZonedTime();
+
+  const { formattedDate } = zonedTime(clock.timeZone);
+
+  return (
+    <Grid item>
+      <Box display="flex" alignItems="center">
+        <Typography variant="body2" color="inherit">
+          <span>{clock.city}</span> • <span style={{ whiteSpace: 'nowrap' }}>{formattedDate}</span>
+        </Typography>
+      </Box>
+    </Grid>
+  );
+};
+
+const CitiesClocksHeader = () => {
+  return (
+    <>
+      {CLOCKS.map((clock, i) => (
+        <CityClock clock={clock} key={i} />
+      ))}
+    </>
+  );
+};
+
 const Navbar: React.FC = () => {
   const classes = useStyles();
   const [user, userRecord] = useUser();
   const [actingAs] = useContext(ActingAs);
-  const isAdmin = !actingAs;
   const { open } = useContext(LoginDialog);
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
   const handleDialogClose = useCallback(() => {
@@ -239,8 +263,6 @@ const Navbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [guide, setGuide] = useState<Shepherd.Tour | undefined>(undefined);
-
-  const zonedTime = useZonedTime();
 
   useEffect(() => {
     setGuide(getGuide(window.location.pathname));
@@ -275,20 +297,8 @@ const Navbar: React.FC = () => {
       <Hidden smDown>
         <AppBar position="relative" className={classes.appBar}>
           <Container maxWidth={false} className={classes.worldClock}>
-            <Grid container justify={'center'} spacing={3} style={{ flexWrap: 'nowrap' }}>
-              {CLOCKS.map((clock, i) => {
-                const { formattedDate } = zonedTime(clock.timeZone);
-                return (
-                  <Grid item key={i}>
-                    <Box display="flex" alignItems="center">
-                      <Typography variant="body2" color="inherit">
-                        <span>{clock.city}</span> •{' '}
-                        <span style={{ whiteSpace: 'nowrap' }}>{formattedDate}</span>
-                      </Typography>
-                    </Box>
-                  </Grid>
-                );
-              })}
+            <Grid container justifyContent={'center'} spacing={3} style={{ flexWrap: 'nowrap' }}>
+              <CitiesClocksHeader />
             </Grid>
           </Container>
           <Container maxWidth="xl">
@@ -418,7 +428,7 @@ const Navbar: React.FC = () => {
                       />
                       <IconButton
                         id="quickSearchNav"
-                        buttonRef={quickSearchButtonRef}
+                        ref={quickSearchButtonRef}
                         onClick={() => setIsSearchDialogOpen(true)}
                         style={{ padding: 8 }}
                         title={'Hey hey you can use your keyboard as well. Try it out >> ctrl+g <<'}
@@ -435,7 +445,7 @@ const Navbar: React.FC = () => {
                   ) : (
                     <Fragment>
                       <IconButton
-                        buttonRef={quickSearchButtonRef}
+                        ref={quickSearchButtonRef}
                         onClick={() => setIsSearchDialogOpen(true)}
                         style={{ padding: 8 }}
                         title={'Hey hey you can use your keyboard as well. Try it out >> ctrl+g <<'}
