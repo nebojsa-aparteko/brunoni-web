@@ -224,7 +224,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Edit Opportunity</DialogTitle>
+      <DialogTitle>Edit Opportunity #{opportunity?.opportunityId}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2}>
           <Grid item xs={6}>
