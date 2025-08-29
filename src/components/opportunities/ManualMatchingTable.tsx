@@ -530,7 +530,7 @@ const ManualMatchingTable: React.FC<Props> = ({
                             <RVListAny
                               width={width}
                               height={800}
-                              rowCount={Math.min(displayMatches.length, 1000)}
+                              rowCount={displayMatches.length}
                               rowHeight={56}
                               rowRenderer={
                                 (({ index, key, style }: any) => {
