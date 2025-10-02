@@ -63,8 +63,10 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
     }
 
     if (filter.definition.type === 'portId' && opportunityPort?.definition.type === 'freeText') {
-      return (opportunityPort.value as OpportunityPortsGroup).portNames.includes(
-        filter.value as string,
+      const port = filter.value as Port;
+      return (
+        port.id === (opportunityPort.value as string) ||
+        port.city === (opportunityPort.value as string)
       );
     }
 
