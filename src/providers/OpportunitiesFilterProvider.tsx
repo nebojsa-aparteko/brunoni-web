@@ -12,6 +12,7 @@ import ContainerType from '../model/ContainerType';
 import Port from '../model/Port';
 
 export interface OpportunitiesContextFilters extends ContextFilters {
+  year?: number;
   statisticalClient?: Client | null;
   bookingParty?: Client | null;
   portsOfLoading?: {
@@ -44,6 +45,7 @@ export interface OpportunitiesContextFilters extends ContextFilters {
 }
 
 export const OPPORTUNITIES_FILTERS_INITIAL_STATE = {
+  year: new Date().getFullYear(),
   statisticalClient: undefined,
   bookingParty: undefined,
   archived: false,

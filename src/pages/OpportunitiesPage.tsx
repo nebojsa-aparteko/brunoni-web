@@ -109,8 +109,8 @@ const OpportunitiesPage: React.FC = () => {
     <Fragment>
       <Meta title="Opportunities" />
       <NormalizeOpportunityDefinitionsProvider>
-        <OpportunitiesDataProvider>
-          <OpportunitiesFilterProvider>
+        <OpportunitiesFilterProvider>
+          <OpportunitiesDataProvider>
             <Box
               className={classes.tabContainer}
               style={{ maxWidth: '100vw', overflowY: 'hidden' }}
@@ -154,8 +154,8 @@ const OpportunitiesPage: React.FC = () => {
                 <OpportunityTasksView />
               </TabPanel>
             </Box>
-          </OpportunitiesFilterProvider>
-        </OpportunitiesDataProvider>
+          </OpportunitiesDataProvider>
+        </OpportunitiesFilterProvider>
       </NormalizeOpportunityDefinitionsProvider>
     </Fragment>
   );

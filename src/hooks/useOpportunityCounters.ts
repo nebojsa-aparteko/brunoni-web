@@ -2,10 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import firebase from '../firebase';
 import { OpportunityCounter } from '../model/Opportunity';
 
-type OpportunityCounters = Map<
-  string,
-  { booked: number; quoted: number; bookedTEU: number; quotedTEU: number }
->;
+type YearTotals = { booked: number; quoted: number; bookedTEU: number; quotedTEU: number };
+type OpportunityCounters = Map<string, YearTotals>;
 
 const getCountersForOpportunity = async (opportunityId: string, year: number) => {
   try {
@@ -33,27 +31,20 @@ const getCountersForOpportunity = async (opportunityId: string, year: number) =>
       }
     });
 
-    return {
-      opportunityId,
-      booked,
-      quoted,
-      bookedTEU,
-      quotedTEU,
-    };
+    return { opportunityId, booked, quoted, bookedTEU, quotedTEU };
   } catch (error) {
-    console.error(`Error fetching counters for opportunity ${opportunityId}:`, error);
-    return {
-      opportunityId,
-      booked: 0,
-      quoted: 0,
-      bookedTEU: 0,
-      quotedTEU: 0,
-    };
+    console.error(`Error fetching counters for opportunity ${opportunityId} (${year}):`, error);
+    return { opportunityId, booked: 0, quoted: 0, bookedTEU: 0, quotedTEU: 0 };
   }
 };
 
-export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCounters => {
+export const useOpportunityCounters = (
+  opportunityIds: string[],
+  year?: number,
+): OpportunityCounters => {
   const [counters, setCounters] = useState<OpportunityCounters>(new Map());
+
+  const selectedYear = year ?? new Date().getFullYear();
 
   useEffect(() => {
     if (!opportunityIds.length) {
@@ -61,13 +52,11 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
       return;
     }
 
-    const currentYear = new Date().getFullYear();
-
     const fetchCounters = async () => {
       const results = await Promise.all(
-        opportunityIds.map(async opportunityId => {
-          return getCountersForOpportunity(opportunityId, currentYear);
-        }),
+        opportunityIds.map(async opportunityId =>
+          getCountersForOpportunity(opportunityId, selectedYear),
+        ),
       );
 
       setCounters(prevCounters => {
@@ -84,7 +73,7 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
           },
         );
 
-        // if not changed, do not update state
+        // if not changed, do not update state (keeps old behavior)
         if (!hasChanged) {
           return prevCounters;
         }
@@ -98,7 +87,7 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
     };
 
     fetchCounters().catch(error => console.error('Error calculating counters:', error));
-  }, [opportunityIds]);
+  }, [opportunityIds, selectedYear]);
 
   return useMemo(() => counters, [counters]);
 };

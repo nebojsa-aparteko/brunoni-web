@@ -6,14 +6,16 @@ import { NormalizedOpportunity } from '../model/Opportunity';
 import { useOpportunityDefinitionNormalizer } from '../components/opportunities/NormlizeOpportunityDefinitionsProvider';
 import { useOpportunityCounters } from './useOpportunityCounters';
 
-const useOpportunitiesWithSalesRep = (): NormalizedOpportunity[] | undefined => {
+const useOpportunitiesWithSalesRep = (year?: number): NormalizedOpportunity[] | undefined => {
   const opportunitySnapshot = useFirestoreCollection('opportunities');
+
   const opportunityIds = useMemo(() => {
     return opportunitySnapshot?.docs?.map(doc => doc.id) || [];
   }, [opportunitySnapshot?.docs]);
 
   const normalizator = useOpportunityDefinitionNormalizer();
-  const counters = useOpportunityCounters(opportunityIds);
+
+  const counters = useOpportunityCounters(opportunityIds, year);
 
   return useMemo(() => {
     const defaultCounters = { booked: 0, quoted: 0, bookedTEU: 0, quotedTEU: 0 };

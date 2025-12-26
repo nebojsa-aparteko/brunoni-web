@@ -19,6 +19,7 @@ import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup
 import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup';
 import ContainerType from '../../model/ContainerType';
 import { useOpportunities } from './OpportunitiesDataProvider';
+import DashboardYearSelect from '../DashboardYearSelect';
 
 interface Props {
   isAdmin?: boolean;
@@ -41,6 +42,14 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
   const [filters, setFilters] = useOpportunitiesListFilterContext();
 
   const { assignee } = filters;
+
+  const currentYear = new Date().getFullYear();
+  const selectedYear = filters.year ?? currentYear;
+
+  const handleYearChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const newYear = event.target.value as number;
+    setFilters?.(prev => ({ ...prev, year: newYear }));
+  };
 
   const isPortMatch = (
     filter: {
@@ -270,8 +279,9 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
   return (
     <Fragment>
       <Meta title={`Opportunities`} />
-      <Grid container direction="row">
-        <Grid item sm={3} xs={12}>
+      <Grid container direction="row" alignItems="center" spacing={2}>
+        {/* LEFT: buttons + year picker */}
+        <Grid item xs={12} md="auto" style={{ display: 'flex', alignItems: 'center' }}>
           <Button
             variant="contained"
             color="primary"
@@ -280,6 +290,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
           >
             Add Opportunity
           </Button>
+
           <Button
             variant="contained"
             color="primary"
@@ -288,6 +299,10 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
           >
             Upload xlsx
           </Button>
+
+          <div style={{ marginLeft: 36, minWidth: 220 }}>
+            <DashboardYearSelect year={selectedYear} handleYearChange={handleYearChange} />
+          </div>
 
           <AddOpportunityDialog open={openDialog} onClose={handleCloseDialog} />
           <EditOpportunityDialog
@@ -300,21 +315,22 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin }) => {
           <OpportunityUploadDialog
             isOpen={uploadDialogOpen}
             handleClose={handleCloseUploadDialog}
-            onUploadComplete={() => {
-              console.debug('Upload completed - data should refresh automatically');
-            }}
+            onUploadComplete={() =>
+              console.debug('Upload completed - data should refresh automatically')
+            }
           />
         </Grid>
-        <Grid item md={12}>
+
+        {/* Filters bar below */}
+        <Grid item xs={12}>
           <OpportunitiesFiltersBar
             filters={filters}
             setFilters={setFilters}
             showAssigneeFilter={isAdmin}
           />
         </Grid>
-
-        <Grid item md={12}></Grid>
       </Grid>
+
       <div>
         {!isLoading ? (
           <Fragment>
