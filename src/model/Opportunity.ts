@@ -84,10 +84,10 @@ export interface NormalizedOpportunity {
   validity: Date | null;
   note: string | null;
   capacityTEU: number | null; // Total capacity in number of TEU per year, or null if not set
-  booked: number; // Sum of booking counts for current year
-  quoted: number; // Sum of quote counts for current year
-  bookedTEU: number; // Sum of TEU counts for bookings in current year
-  quotedTEU: number; // Sum of TEU counts for quotes in current year
+  booked?: number; // Sum of booking counts for current year
+  quoted?: number; // Sum of quote counts for current year
+  bookedTEU?: number; // Sum of TEU counts for bookings in current year
+  quotedTEU?: number; // Sum of TEU counts for quotes in current year
 }
 
 // Helper function to format location data

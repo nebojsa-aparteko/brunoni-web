@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-
 import useFirestoreCollection from './useFirestoreCollection';
 import { normalizeOpportunity } from '../providers/OpportunityProvider';
 import { NormalizedOpportunity } from '../model/Opportunity';
@@ -10,15 +9,20 @@ const useOpportunitiesWithSalesRep = (year?: number): NormalizedOpportunity[] | 
   const opportunitySnapshot = useFirestoreCollection('opportunities');
 
   const opportunityIds = useMemo(() => {
-    return opportunitySnapshot?.docs?.map(doc => doc.id) || [];
+    if (!opportunitySnapshot?.docs) return [];
+    return opportunitySnapshot.docs.map(doc => doc.id);
   }, [opportunitySnapshot?.docs]);
 
   const normalizator = useOpportunityDefinitionNormalizer();
-
   const counters = useOpportunityCounters(opportunityIds, year);
 
   return useMemo(() => {
-    const defaultCounters = { booked: 0, quoted: 0, bookedTEU: 0, quotedTEU: 0 };
+    const defaultCounters = {
+      booked: undefined,
+      quoted: undefined,
+      bookedTEU: undefined,
+      quotedTEU: undefined,
+    };
 
     return opportunitySnapshot?.docs?.map(doc =>
       normalizeOpportunity(
@@ -29,7 +33,7 @@ const useOpportunitiesWithSalesRep = (year?: number): NormalizedOpportunity[] | 
         normalizator.getCommodityGroup,
         normalizator.getEquipmentGroup,
         normalizator.getTag,
-        (id: string) => counters.get(id) || defaultCounters,
+        (id: string) => counters.get(id) ?? defaultCounters,
       )({ id: doc.id, ...doc.data() }),
     );
   }, [opportunitySnapshot?.docs, normalizator, counters]);

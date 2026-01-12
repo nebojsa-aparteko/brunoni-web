@@ -14,9 +14,9 @@ export const normalizeOpportunity = (
   getEquipmentGroup: (omd: OpportunityMatchDefinition) => any,
   getTag: (id: string) => any,
   getCounters: (id: string) => {
-    booked: number;
+    booked?: number;
     bookedTEU?: number;
-    quoted: number;
+    quoted?: number;
     quotedTEU?: number;
   },
 ) =>

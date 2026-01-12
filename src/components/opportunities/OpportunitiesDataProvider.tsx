@@ -1,12 +1,12 @@
-import React, { createContext, PropsWithChildren, useContext } from 'react';
+import { createContext, PropsWithChildren, useContext } from 'react';
 import useOpportunitiesWithSalesRep from '../../hooks/useOpportunities';
 import { NormalizedOpportunity } from '../../model/Opportunity';
 import { useOpportunitiesListFilterContext } from '../../providers/OpportunitiesFilterProvider';
 
-const OpportunitiesDataProviderCtx = createContext([] as NormalizedOpportunity[] | undefined);
+const OpportunitiesDataProviderCtx = createContext<NormalizedOpportunity[] | undefined>(undefined);
 
 export const OpportunitiesDataProvider = ({ children }: PropsWithChildren<{}>) => {
-  const [filters] = useOpportunitiesListFilterContext(); // ✅ read year from context
+  const [filters] = useOpportunitiesListFilterContext();
   const opportunities = useOpportunitiesWithSalesRep(filters?.year);
 
   return (
@@ -16,4 +16,5 @@ export const OpportunitiesDataProvider = ({ children }: PropsWithChildren<{}>) =
   );
 };
 
-export const useOpportunities = () => useContext(OpportunitiesDataProviderCtx);
+export const useOpportunities = (): NormalizedOpportunity[] | undefined =>
+  useContext(OpportunitiesDataProviderCtx);

@@ -6,7 +6,16 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableBody from '@material-ui/core/TableBody';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import { Chip, makeStyles, Theme, Tooltip, IconButton, Menu, MenuItem } from '@material-ui/core';
+import {
+  Chip,
+  makeStyles,
+  Theme,
+  Tooltip,
+  IconButton,
+  Menu,
+  MenuItem,
+  CircularProgress,
+} from '@material-ui/core';
 import { Notes as NotesIcon, MoreVert as MoreVertIcon } from '@material-ui/icons';
 import Avatar from 'react-avatar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
@@ -379,9 +388,11 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({
           <div style={{ minWidth: 80 }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, width: '90%' }}>
               <span style={{ fontSize: 12, marginRight: 6 }}>
-                {opportunity.booked != null && opportunity.quoted != null
-                  ? `${opportunity.booked} / ${opportunity.quoted}`
-                  : '—'}
+                {opportunity.booked == null || opportunity.quoted == null ? (
+                  <span className={classes.skeletonLine} />
+                ) : (
+                  `${opportunity.booked} / ${opportunity.quoted}`
+                )}
               </span>
               {opportunity.booked != null &&
                 opportunity.quoted != null &&
@@ -415,9 +426,11 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({
           <div style={{ minWidth: 80 }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, width: '90%' }}>
               <span style={{ fontSize: 12, marginRight: 6 }}>
-                {opportunity.bookedTEU != null && opportunity.capacityTEU != null
-                  ? `${opportunity.bookedTEU} / ${opportunity.capacityTEU}`
-                  : '—'}
+                {opportunity.booked == null || opportunity.quoted == null ? (
+                  <span className={classes.skeletonLine} />
+                ) : (
+                  `${opportunity.booked} / ${opportunity.quoted}`
+                )}
               </span>
               {opportunity.bookedTEU != null &&
                 opportunity.capacityTEU != null &&
@@ -938,5 +951,18 @@ const opportunityTableStyles = makeStyles((theme: Theme) => ({
   largeTooltip: {
     fontSize: theme.typography.body1.fontSize,
     maxWidth: 300,
+  },
+  skeletonLine: {
+    display: 'inline-block',
+    height: 12,
+    width: 48,
+    borderRadius: 4,
+    background: 'linear-gradient(90deg, #eee, #f5f5f5, #eee)',
+    backgroundSize: '200% 100%',
+    animation: '$skeleton 1.2s ease-in-out infinite',
+  },
+  '@keyframes skeleton': {
+    '0%': { backgroundPosition: '200% 0' },
+    '100%': { backgroundPosition: '-200% 0' },
   },
 }));
