@@ -426,10 +426,10 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({
           <div style={{ minWidth: 80 }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, width: '90%' }}>
               <span style={{ fontSize: 12, marginRight: 6 }}>
-                {opportunity.booked == null || opportunity.quoted == null ? (
+                {opportunity.bookedTEU == null || opportunity.capacityTEU == null ? (
                   <span className={classes.skeletonLine} />
                 ) : (
-                  `${opportunity.booked} / ${opportunity.quoted}`
+                  `${opportunity.bookedTEU} / ${opportunity.capacityTEU}`
                 )}
               </span>
               {opportunity.bookedTEU != null &&
